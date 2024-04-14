@@ -53,7 +53,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         Allow to update for the first time without further checking
         """
         # try:
-        if self.yoto_manger is None:
+        if self.yoto_manager is None:
             self.yoto_manager = await hass.async_add_executor_job(
                 YotoManager, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
             )
