@@ -43,7 +43,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=min(self.scan_interval)
+            update_interval=timedelta(seconds=self.scan_interval
             )
         )
 
