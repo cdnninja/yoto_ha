@@ -1,16 +1,14 @@
 """Coordinator for yoto integration."""
+
 from __future__ import annotations
 
-from datetime import timedelta
 
 import logging
-from site import venv
 
 from yoto_api import (
     YotoManager,
 )
 
-from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -18,10 +16,8 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_USERNAME,
 )
-from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.util import dt as dt_util
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
     DEFAULT_SCAN_INTERVAL,
@@ -59,7 +55,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         # try:
         await self.async_check_and_refresh_token()
         # except AuthenticationError as AuthError:
-            #raise ConfigEntryAuthFailed(AuthError) from AuthError
+        # raise ConfigEntryAuthFailed(AuthError) from AuthError
 
         await self.hass.async_add_executor_job(
             self.yoto_manager.update_all_vehicles_with_cached_state
@@ -80,4 +76,3 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.hass.async_add_executor_job(
             self.yoto_manager.check_and_refresh_token
         )
-

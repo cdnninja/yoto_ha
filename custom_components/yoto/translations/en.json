@@ -1,0 +1,48 @@
+{
+  "title": "Yoto",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Yoto - Authentication",
+        "description": "Set up your Yoto to integrate with Home Assistant.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Yoto - Reauthentication",
+        "description": "Your account is unable to authenticate.  Click Submit to re-setup."
+      }
+    },
+    "abort": {
+      "already_configured": "Device is already configured"
+    },
+    "error": {
+      "invalid_auth": "Login failed into Yoto Servers. Please use official app to logout and log back in and try again!",
+      "unknown": "Unexpected error"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Yoto - Configuration",
+        "data": {
+          "scan_interval": "Scan Interval (min)"
+        }
+      }
+    }
+  },
+  "services": {
+    "update": {
+      "name": "Update",
+      "description": "Update player data from service cache",
+      "fields": {
+        "device_id": {
+          "name": "Player",
+          "description": "Target Player"
+        }
+      }
+    }
+  }
+}

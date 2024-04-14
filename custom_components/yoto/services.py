@@ -1,5 +1,5 @@
 import logging
-from typing import Any, cast
+from typing import cast
 
 
 from homeassistant.const import ATTR_DEVICE_ID
@@ -12,9 +12,7 @@ from .const import DOMAIN
 
 SERVICE_UPDATE = "update"
 
-SUPPORTED_SERVICES = (
-    SERVICE_UPDATE,
-)
+SUPPORTED_SERVICES = (SERVICE_UPDATE,)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,15 +21,12 @@ _LOGGER = logging.getLogger(__name__)
 def async_setup_services(hass: HomeAssistant) -> bool:
     """Set up services for Yoto"""
 
-
     async def async_handle_update(call):
         _LOGGER.debug(f"Call:{call.data}")
         coordinator = _get_coordinator_from_device(hass, call)
         await coordinator.async_update_all()
 
-    services = {
-        SERVICE_UPDATE: async_handle_update
-    }
+    services = {SERVICE_UPDATE: async_handle_update}
 
     for service in SUPPORTED_SERVICES:
         hass.services.async_register(DOMAIN, service, services[service])
