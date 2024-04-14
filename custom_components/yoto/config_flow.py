@@ -38,7 +38,7 @@ async def validate_input(hass: HomeAssistant, user_input: dict[str, Any]) -> Tok
     """Validate the user input allows us to connect."""
     
     ym = await hass.async_add_executor_job(
-        YotoManager.login, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+        YotoManager, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
     )
 
     if ym.token is None:
