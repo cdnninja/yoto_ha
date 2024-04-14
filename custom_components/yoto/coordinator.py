@@ -33,10 +33,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
-        self.yoto_manager = YotoManager(
-            username=config_entry.data.get(CONF_USERNAME),
-            password=config_entry.data.get(CONF_PASSWORD),
-        )
+        self.yoto_manager = None
         self.scan_interval: int = (
             config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL) * 60
         )
@@ -53,7 +50,12 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         Allow to update for the first time without further checking
         """
         # try:
-        await self.async_check_and_refresh_token()
+        if self.yoto_manger is None:
+            self.yoto_manager = await hass.async_add_executor_job(
+                YotoManager, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+            )
+        else:
+            await self.async_check_and_refresh_token()
         # except AuthenticationError as AuthError:
         # raise ConfigEntryAuthFailed(AuthError) from AuthError
 
