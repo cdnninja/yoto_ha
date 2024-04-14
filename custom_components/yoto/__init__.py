@@ -22,13 +22,12 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[str] = [
     Platform.BINARY_SENSOR,
-    #Platform.SENSOR,
-    #Platform.NUMBER,
+    # Platform.SENSOR,
+    # Platform.NUMBER,
 ]
 
 
 async def async_setup(hass: HomeAssistant, config_entry: ConfigEntry):
-
     return True
 
 
