@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 
 import logging
 
@@ -41,7 +43,8 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=self.scan_interval,
+            update_interval=timedelta(seconds=min(self.scan_interval)
+            )
         )
 
     async def _async_update_data(self):
