@@ -57,7 +57,9 @@ async def async_setup_entry(
         player: YotoPlayer = coordinator.yoto_manger.players[vehicle_id]
         for description in SENSOR_DESCRIPTIONS:
             if getattr(player, description.key, None) is not None:
-                entities.append(YotoBinarySensor(coordinator, description, vehicle))
+                entities.append(
+                    YotoBinarySensor(coordinator, description, player)
+                )
     async_add_entities(entities)
     return True
 

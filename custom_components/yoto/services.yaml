@@ -1,0 +1,7 @@
+update: 
+  fields: 
+    device_id: 
+      required: false
+      selector: 
+        device: 
+          integration: yoto

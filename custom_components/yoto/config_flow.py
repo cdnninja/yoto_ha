@@ -6,15 +6,13 @@ import hashlib
 import logging
 from typing import Any
 
-from hyundai_kia_connect_api import Token, VehicleManager
+from yoto_api import Token, YotoManager
 import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_PASSWORD,
-    CONF_PIN,
-    CONF_REGION,
     CONF_SCAN_INTERVAL,
     CONF_USERNAME,
 )
@@ -23,22 +21,8 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
 from .const import (
-    BRANDS,
-    CONF_BRAND,
-    CONF_FORCE_REFRESH_INTERVAL,
-    CONF_NO_FORCE_REFRESH_HOUR_FINISH,
-    CONF_NO_FORCE_REFRESH_HOUR_START,
-    DEFAULT_FORCE_REFRESH_INTERVAL,
-    DEFAULT_NO_FORCE_REFRESH_HOUR_FINISH,
-    DEFAULT_NO_FORCE_REFRESH_HOUR_START,
-    DEFAULT_PIN,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
-    REGIONS,
-    CONF_ENABLE_GEOLOCATION_ENTITY,
-    CONF_USE_EMAIL_WITH_GEOCODE_API,
-    DEFAULT_ENABLE_GEOLOCATION_ENTITY,
-    DEFAULT_USE_EMAIL_WITH_GEOCODE_API,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,32 +31,25 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
-        vol.Optional(CONF_PIN, default=DEFAULT_PIN): str,
-        vol.Required(CONF_REGION): vol.In(REGIONS),
-        vol.Required(CONF_BRAND): vol.In(BRANDS),
     }
 )
 
 
 async def validate_input(hass: HomeAssistant, user_input: dict[str, Any]) -> Token:
     """Validate the user input allows us to connect."""
-    api = VehicleManager.get_implementation_by_region_brand(
-        user_input[CONF_REGION],
-        user_input[CONF_BRAND],
-        language=hass.config.language,
-    )
-    token: Token = await hass.async_add_executor_job(
-        api.login, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+    
+    ym = await hass.async_add_executor_job(
+        YotoManager.login, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
     )
 
-    if token is None:
+    if ym.token is None:
         raise InvalidAuth
 
-    return token
+    return ym.token
 
 
-class HyundaiKiaConnectOptionFlowHandler(config_entries.OptionsFlow):
-    """Handle an option flow for Hyundai / Kia Connect."""
+class YotoOptionFlowHandler(config_entries.OptionsFlow):
+    """Handle an option flow for Yoto."""
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize option flow instance."""
@@ -84,41 +61,7 @@ class HyundaiKiaConnectOptionFlowHandler(config_entries.OptionsFlow):
                     default=self.config_entry.options.get(
                         CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
                     ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=15, max=999)),
-                vol.Required(
-                    CONF_FORCE_REFRESH_INTERVAL,
-                    default=self.config_entry.options.get(
-                        CONF_FORCE_REFRESH_INTERVAL, DEFAULT_FORCE_REFRESH_INTERVAL
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=45, max=999)),
-                vol.Required(
-                    CONF_NO_FORCE_REFRESH_HOUR_START,
-                    default=self.config_entry.options.get(
-                        CONF_NO_FORCE_REFRESH_HOUR_START,
-                        DEFAULT_NO_FORCE_REFRESH_HOUR_START,
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=23)),
-                vol.Required(
-                    CONF_NO_FORCE_REFRESH_HOUR_FINISH,
-                    default=self.config_entry.options.get(
-                        CONF_NO_FORCE_REFRESH_HOUR_FINISH,
-                        DEFAULT_NO_FORCE_REFRESH_HOUR_FINISH,
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=23)),
-                vol.Optional(
-                    CONF_ENABLE_GEOLOCATION_ENTITY,
-                    default=self.config_entry.options.get(
-                        CONF_ENABLE_GEOLOCATION_ENTITY,
-                        DEFAULT_ENABLE_GEOLOCATION_ENTITY,
-                    ),
-                ): bool,
-                vol.Optional(
-                    CONF_USE_EMAIL_WITH_GEOCODE_API,
-                    default=self.config_entry.options.get(
-                        CONF_USE_EMAIL_WITH_GEOCODE_API,
-                        DEFAULT_USE_EMAIL_WITH_GEOCODE_API,
-                    ),
-                ): bool,
+                ): vol.All(vol.Coerce(int), vol.Range(min=15, max=999))
             }
         )
 
@@ -133,16 +76,16 @@ class HyundaiKiaConnectOptionFlowHandler(config_entries.OptionsFlow):
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Hyundai / Kia Connect."""
+    """Handle a config flow for Yoto"""
 
-    VERSION = 2
+    VERSION = 1
     reauth_entry: ConfigEntry | None = None
 
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry):
         """Initiate options flow instance."""
-        return HyundaiKiaConnectOptionFlowHandler(config_entry)
+        return YotoOptionFlowHandler(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -165,7 +108,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = "unknown"
         else:
             if self.reauth_entry is None:
-                title = f"{BRANDS[user_input[CONF_BRAND]]} {REGIONS[user_input[CONF_REGION]]} {user_input[CONF_USERNAME]}"
+                title = f"{user_input[CONF_USERNAME]}"
                 await self.async_set_unique_id(
                     hashlib.sha256(title.encode("utf-8")).hexdigest()
                 )
