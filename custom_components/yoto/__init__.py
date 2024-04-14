@@ -3,14 +3,9 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     Platform,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_SCAN_INTERVAL,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady, ConfigEntryAuthFailed
-
-import hashlib
 
 from .const import (
     DOMAIN,
