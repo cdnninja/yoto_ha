@@ -54,7 +54,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         """
         # try:
         if self.yoto_manager is None:
-            self.yoto_manager = await hass.async_add_executor_job(
+            self.yoto_manager = await self.hass.async_add_executor_job(
                 YotoManager, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
             )
         else:
