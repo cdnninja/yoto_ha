@@ -5,7 +5,7 @@ import hashlib
 import logging
 from typing import Any
 
-from hyundai_kia_connect_api import Token, VehicleManager
+from yoto_api import Token, YotoManager
 import voluptuous as vol
 
 from homeassistant import config_entries
