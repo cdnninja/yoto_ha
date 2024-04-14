@@ -1,4 +1,5 @@
 """Sensor for Yoto integration."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -38,8 +39,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         key="online",
         name="Online",
         is_on=lambda player: player.engine_is_running,
-        #on_icon="mdi:engine",
-        #off_icon="mdi:engine-off",
+        # on_icon="mdi:engine",
+        # off_icon="mdi:engine-off",
     ),
 )
 
@@ -56,9 +57,7 @@ async def async_setup_entry(
         player: YotoPlayer = coordinator.yoto_manger.players[vehicle_id]
         for description in SENSOR_DESCRIPTIONS:
             if getattr(player, description.key, None) is not None:
-                entities.append(
-                    YotoBinarySensor(coordinator, description, player)
-                )
+                entities.append(YotoBinarySensor(coordinator, description, player))
     async_add_entities(entities)
     return True
 
