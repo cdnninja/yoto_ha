@@ -6,7 +6,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from .const import DOMAIN
 
 
-class YotoConnectEntity(CoordinatorEntity):
+class YotoEntity(CoordinatorEntity):
     """Class for base entity for Hyundai / Kia Connect integration."""
 
     def __init__(self, coordinator, player):
