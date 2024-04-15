@@ -38,7 +38,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="online",
         name="Online",
-        is_on=lambda player: player.engine_is_running,
+        is_on=lambda player: player.online,
         # on_icon="mdi:engine",
         # off_icon="mdi:engine-off",
     ),
