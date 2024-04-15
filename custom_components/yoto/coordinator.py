@@ -35,7 +35,10 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
-        self.yoto_manager = YotoManager(username=config_entry.data.get(CONF_USERNAME), password=config_entry.data.get(CONF_PASSWORD))
+        self.yoto_manager = YotoManager(
+            username=config_entry.data.get(CONF_USERNAME),
+            password=config_entry.data.get(CONF_PASSWORD),
+        )
         self.scan_interval: int = (
             config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL) * 60
         )
@@ -56,18 +59,14 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         # except AuthenticationError as AuthError:
         # raise ConfigEntryAuthFailed(AuthError) from AuthError
 
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.update_player_status
-        )
+        await self.hass.async_add_executor_job(self.yoto_manager.update_player_status)
 
         return self.data
 
     async def async_update_all(self) -> None:
         """Update yoto data."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.update_player_status
-        )
+        await self.hass.async_add_executor_job(self.yoto_manager.update_player_status)
         await self.async_refresh()
 
     async def async_check_and_refresh_token(self):
