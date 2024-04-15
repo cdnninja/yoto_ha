@@ -53,8 +53,8 @@ async def async_setup_entry(
     """Set up binary_sensor platform."""
     coordinator = hass.data[DOMAIN][config_entry.unique_id]
     entities: list[YotoBinarySensor] = []
-    for vehicle_id in coordinator.vehicle_manager.vehicles.keys():
-        player: YotoPlayer = coordinator.yoto_manger.players[vehicle_id]
+    for player_id in coordinator.yoto_manager.players.keys():
+        player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
             if getattr(player, description.key, None) is not None:
                 entities.append(YotoBinarySensor(coordinator, description, player))
