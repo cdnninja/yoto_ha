@@ -61,7 +61,7 @@ class YotoOptionFlowHandler(config_entries.OptionsFlow):
                     default=self.config_entry.options.get(
                         CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
                     ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=15, max=999))
+                ): vol.All(vol.Coerce(int), vol.Range(min=15, max=999)),
             }
         )
 

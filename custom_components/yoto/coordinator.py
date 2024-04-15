@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 
 import logging
 
@@ -33,7 +35,10 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
-        self.yoto_manager = None
+        self.yoto_manager = YotoManager(
+            username=config_entry.data.get(CONF_USERNAME),
+            password=config_entry.data.get(CONF_PASSWORD),
+        )
         self.scan_interval: int = (
             config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL) * 60
         )
@@ -41,7 +46,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=self.scan_interval,
+            update_interval=timedelta(seconds=self.scan_interval),
         )
 
     async def _async_update_data(self):
@@ -50,27 +55,18 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         Allow to update for the first time without further checking
         """
         # try:
-        if self.yoto_manger is None:
-            self.yoto_manager = await hass.async_add_executor_job(
-                YotoManager, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
-            )
-        else:
-            await self.async_check_and_refresh_token()
+        await self.async_check_and_refresh_token()
         # except AuthenticationError as AuthError:
         # raise ConfigEntryAuthFailed(AuthError) from AuthError
 
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.update_all_vehicles_with_cached_state
-        )
+        await self.hass.async_add_executor_job(self.yoto_manager.update_player_status)
 
         return self.data
 
     async def async_update_all(self) -> None:
         """Update yoto data."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.update_all_vehicles_with_cached_state
-        )
+        await self.hass.async_add_executor_job(self.yoto_manager.update_player_status)
         await self.async_refresh()
 
     async def async_check_and_refresh_token(self):
