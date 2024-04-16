@@ -20,6 +20,6 @@ class YotoEntity(CoordinatorEntity):
         return DeviceInfo(
             identifiers={(DOMAIN, self.player.id)},
             manufacturer="Yoto",
-            # model=self.player.model,
+            model=self.player.deviceType,
             name=self.player.name,
         )
