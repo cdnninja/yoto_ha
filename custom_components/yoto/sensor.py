@@ -1,4 +1,5 @@
 """Sensor for Yoto integration."""
+
 from __future__ import annotations
 
 import logging
@@ -17,7 +18,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
-from .coordinator import YotoDataUpdateCoordinator
 from .entity import YotoEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,9 +44,7 @@ async def async_setup_entry(
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
             if getattr(player, description.key, None) is not None:
-                entities.append(
-                    YotoSensor(coordinator, description, player)
-                )
+                entities.append(YotoSensor(coordinator, description, player))
         entities.append(
             YotoEntity(coordinator, coordinator.yoto_manager.players[player_id])
         )
