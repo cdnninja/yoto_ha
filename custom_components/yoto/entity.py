@@ -7,7 +7,7 @@ from .const import DOMAIN
 
 
 class YotoEntity(CoordinatorEntity):
-    """Class for base entity for Hyundai / Kia Connect integration."""
+    """Class for base entity for Yoto integration."""
 
     def __init__(self, coordinator, player):
         """Initialize the base entity."""
