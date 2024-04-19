@@ -11,7 +11,7 @@ from yoto_api import (
     YotoManager,
 )
 
-
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_PASSWORD,
@@ -54,10 +54,10 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         Allow to update for the first time without further checking
         """
-        # try:
-        await self.async_check_and_refresh_token()
-        # except AuthenticationError as AuthError:
-        # raise ConfigEntryAuthFailed(AuthError) from AuthError
+        try:
+            await self.async_check_and_refresh_token()
+        except Exception as AuthError:
+            raise ConfigEntryAuthFailed(AuthError) from AuthError
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_player_status)
 
