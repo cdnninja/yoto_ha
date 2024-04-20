@@ -59,14 +59,12 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         except Exception as AuthError:
             raise ConfigEntryAuthFailed(AuthError) from AuthError
 
-        await self.hass.async_add_executor_job(self.yoto_manager.update_player_status)
+        await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
 
         return self.data
 
     async def async_update_all(self) -> None:
         """Update yoto data."""
-        await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(self.yoto_manager.update_player_status)
         await self.async_refresh()
 
     async def async_check_and_refresh_token(self):
