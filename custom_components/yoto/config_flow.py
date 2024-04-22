@@ -38,10 +38,9 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 async def validate_input(hass: HomeAssistant, user_input: dict[str, Any]) -> Token:
     """Validate the user input allows us to connect."""
 
-    ym = await hass.async_add_executor_job(
-        YotoManager, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
-    )
-    await hass.async_add_executor_job(ym.check_and_refresh_token())
+    ym = YotoManager, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+
+    await hass.async_add_executor_job(ym.check_and_refresh_token)
     if ym.token is None:
         raise InvalidAuth
 
