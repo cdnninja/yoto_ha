@@ -49,6 +49,14 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         key="ambient_light_sensor_reading",
         name="Ambient Light Reading",
     ),
+    SensorEntityDescription(
+        key="wifi_strength",
+        name="WiFi Signal Strength",
+    ),
+    SensorEntityDescription(
+        key="night_light_mode",
+        name="Night Light Status",
+    ),
 )
 
 
