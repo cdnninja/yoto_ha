@@ -54,9 +54,9 @@ class YotoMediaPlayer(MediaPlayerEntity):
     @property
     def state(self) -> MediaPlayerState:
         """Return the playback state."""
-        if not self._currently_playing:
+        if not self.player.is_playing:
             return MediaPlayerState.IDLE
-        if self._currently_playing["is_playing"]:
+        if self.player.is_playing:
             return MediaPlayerState.PLAYING
         return MediaPlayerState.PAUSED
 
