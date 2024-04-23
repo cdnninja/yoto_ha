@@ -43,8 +43,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         # off_icon="mdi:engine-off",
     ),
     YotoBinarySensorEntityDescription(
-        key="night_mode_on",
-        name="Night Mode",
+        key="day_mode_on",
+        name="Day Mode",
         is_on=lambda player: player.night_mode_on,
         # on_icon="mdi:engine",
         # off_icon="mdi:engine-off",
