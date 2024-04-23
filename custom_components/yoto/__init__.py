@@ -18,6 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[str] = [
     Platform.BINARY_SENSOR,
     Platform.SENSOR,
+    Platform.MEDIA_PLAYER,
     # Platform.NUMBER,
 ]
 
