@@ -97,3 +97,9 @@ class YotoSensor(SensorEntity, YotoEntity):
     def native_value(self):
         """Return the value reported by the sensor."""
         return getattr(self.player, self._key)
+
+    @property
+    def native_unit_of_measurement(self):
+        """Return the unit the value was reported in by the sensor"""
+
+        return self._description.native_unit_of_measurement
