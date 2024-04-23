@@ -22,4 +22,5 @@ class YotoEntity(CoordinatorEntity):
             manufacturer="Yoto",
             model=self.player.device_type,
             name=self.player.name,
+            sw_version=self.player.firmware_version,
         )

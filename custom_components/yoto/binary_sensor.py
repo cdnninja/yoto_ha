@@ -10,7 +10,7 @@ from typing import Final
 from yoto_api import YotoPlayer
 
 from homeassistant.components.binary_sensor import (
-    # BinarySensorDeviceClass,
+    BinarySensorDeviceClass,
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
@@ -39,6 +39,33 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         key="online",
         name="Online",
         is_on=lambda player: player.online,
+        # on_icon="mdi:engine",
+        # off_icon="mdi:engine-off",
+    ),
+    YotoBinarySensorEntityDescription(
+        key="night_mode_on",
+        name="Night Mode",
+        is_on=lambda player: player.night_mode_on,
+        # on_icon="mdi:engine",
+        # off_icon="mdi:engine-off",
+    ),
+    YotoBinarySensorEntityDescription(
+        key="bluetooth_audio_connected",
+        name="Bluetooth Audio Connected",
+        is_on=lambda player: player.bluetooth_audio_connected,
+        # on_icon="mdi:engine",
+        # off_icon="mdi:engine-off",
+    ),
+    YotoBinarySensorEntityDescription(
+        key="charging",
+        name="Charging",
+        is_on=lambda player: player.charging,
+        device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+    ),
+    YotoBinarySensorEntityDescription(
+        key="audio_device_connected",
+        name="Audio Device Connected",
+        is_on=lambda player: player.audio_device_connected,
         # on_icon="mdi:engine",
         # off_icon="mdi:engine-off",
     ),

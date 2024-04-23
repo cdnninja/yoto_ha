@@ -11,11 +11,14 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
+    SensorStateClass,
 )
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+from homeassistant.const import (PERCENTAGE, TEMP_CELSIUS)
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -28,6 +31,23 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         name="Last Updated At",
         icon="mdi:update",
         device_class=SensorDeviceClass.TIMESTAMP,
+    ),
+    SensorEntityDescription(
+        key="battery_level_percentage",
+        name="Battery Level",
+        icon="mdi:battery",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="temperature_celcius",
+        name="Temperature",
+        native_unit_of_measurement=TEMP_CELSIUS,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    SensorEntityDescription(
+        key="ambient_light_sensor_reading",
+        name="Ambient Light Reading",
     ),
 )
 
