@@ -48,7 +48,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         # self.data = data
         self._key = "media_player"
         self._attr_unique_id = f"{DOMAIN}_{player.id}_media_player"
-        self._attr_name = f"{player.name} Media Player"
+        self._attr_name = "Media Player"
 
         self._currently_playing: dict | None = {}
         self._restricted_device: bool = False
