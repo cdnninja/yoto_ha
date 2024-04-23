@@ -12,6 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerState
 
 from .const import DOMAIN
+from .entity import YotoEntity
 
 
 async def async_setup_entry(
@@ -29,7 +30,7 @@ async def async_setup_entry(
     return True
 
 
-class YotoMediaPlayer(MediaPlayerEntity):
+class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     """Yoto Media Player class."""
 
     _attr_has_entity_name = True
@@ -42,10 +43,12 @@ class YotoMediaPlayer(MediaPlayerEntity):
         coordinator,
         player: YotoPlayer,
     ) -> None:
-        # self._id = user_id
+        self._id = f"{player.name} Media Player"
         # self.data = data
         self.player = player
+        self._key = "media_player"
         self._attr_unique_id = f"{DOMAIN}_{player.id}_media_player"
+        self._attr_name = f"{player.name} Media Player"
 
         self._currently_playing: dict | None = {}
         self._restricted_device: bool = False
