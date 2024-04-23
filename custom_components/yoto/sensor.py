@@ -18,7 +18,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import (PERCENTAGE, TEMP_CELSIUS)
+from homeassistant.const import PERCENTAGE, TEMP_CELSIUS
 
 from .const import DOMAIN
 from .entity import YotoEntity
