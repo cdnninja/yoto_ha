@@ -42,8 +42,6 @@ class YotoMediaPlayer(MediaPlayerEntity):
         coordinator,
         player: YotoPlayer,
     ) -> None:
-        """Initialize."""
-        super().__init__(coordinator, player)
         # self._id = user_id
         # self.data = data
 
