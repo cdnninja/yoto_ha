@@ -1,9 +1,6 @@
 # yoto_ha
 
-Home Assistant Integration for Yoto. While this currently loads and installs sensors are very limited:
-
--Online Status
--Last Updated
+Home Assistant Integration for Yoto. While this currently loads and installs sensors are very limited. Readme will not always be updated as this is moving quick.
 
 PRs are appreciated to add more.
 
