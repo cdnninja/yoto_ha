@@ -43,9 +43,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         coordinator,
         player: YotoPlayer,
     ) -> None:
+        super().__init__(coordinator, player)
         self._id = f"{player.name} Media Player"
         # self.data = data
-        self.player = player
         self._key = "media_player"
         self._attr_unique_id = f"{DOMAIN}_{player.id}_media_player"
         self._attr_name = f"{player.name} Media Player"
