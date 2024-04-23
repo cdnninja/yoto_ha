@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 
 from yoto_api import YotoPlayer
 
@@ -13,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerState
 
 from .const import DOMAIN
-from .entity import YotoEntity
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -29,6 +28,7 @@ async def async_setup_entry(
     async_add_entities(entities)
     return True
 
+
 class YotoMediaPlayer(MediaPlayerEntity):
     """Yoto Media Player class."""
 
@@ -38,7 +38,8 @@ class YotoMediaPlayer(MediaPlayerEntity):
     _attr_translation_key = "yoto"
 
     def __init__(
-        self, coordinator,
+        self,
+        coordinator,
         player: YotoPlayer,
     ) -> None:
         """Initialize."""
