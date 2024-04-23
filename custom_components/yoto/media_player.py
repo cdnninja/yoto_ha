@@ -65,4 +65,3 @@ class YotoMediaPlayer(MediaPlayerEntity):
         if not self.enabled:
             return
         self.async_write_ha_state()
-
