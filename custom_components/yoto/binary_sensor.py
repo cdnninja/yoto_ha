@@ -96,27 +96,27 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, player)
-        self.entity_description: YotoBinarySensorEntityDescription = description
-        self._attr_unique_id = f"{DOMAIN}_{player.id}_{description.key}"
-        self._attr_name = f"{player.name} {description.name}"
+        self._description = description
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
+        self._attr_name = f"{player.name} {self._description.name}"
         self._attr_entity_category = self._description.entity_category
 
     @property
     def is_on(self) -> bool | None:
         """Return true if the binary sensor is on."""
-        if self.entity_description.is_on is not None:
-            return self.entity_description.is_on(self.player)
+        if self._description.is_on is not None:
+            return self._description.is_on(self.player)
         return None
 
     @property
     def icon(self):
         """Return the icon to use in the frontend, if any."""
         if (
-            self.entity_description.on_icon == self.entity_description.off_icon
+            self._description.on_icon == self._description.off_icon
         ) is None:
             return BinarySensorEntity.icon
         return (
-            self.entity_description.on_icon
+            self._description.on_icon
             if self.is_on
-            else self.entity_description.off_icon
+            else self._description.off_icon
         )
