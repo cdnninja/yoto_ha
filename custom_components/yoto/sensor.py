@@ -18,7 +18,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import PERCENTAGE, UnitOfTemperature
+from homeassistant.const import PERCENTAGE, UnitOfTemperature, EntityCategory
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -31,6 +31,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         name="Last Updated At",
         icon="mdi:update",
         device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
         key="battery_level_percentage",
@@ -52,6 +53,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
     SensorEntityDescription(
         key="wifi_strength",
         name="WiFi Signal Strength",
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
         key="night_light_mode",
@@ -92,6 +94,7 @@ class YotoSensor(SensorEntity, YotoEntity):
         self._attr_name = f"{player.name} {self._description.name}"
         self._attr_state_class = self._description.state_class
         self._attr_device_class = self._description.device_class
+        self._attr_entity_category = self._description.entity_category
 
     @property
     def native_value(self):
