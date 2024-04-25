@@ -11,14 +11,13 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
-    SensorStateClass,
 )
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import PERCENTAGE, UnitOfTemperature, EntityCategory
+from homeassistant.const import UnitOfTemperature, EntityCategory
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -37,7 +36,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         key="battery_level_percentage",
         name="Battery Level",
         device_class=SensorDeviceClass.BATTERY,
-        native_unit_of_measurement='%',
+        native_unit_of_measurement="%",
     ),
     SensorEntityDescription(
         key="temperature_celcius",
@@ -53,7 +52,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         key="wifi_strength",
         name="WiFi Signal Strength",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
-        native_unit_of_measurement='dBm',
+        native_unit_of_measurement="dBm",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
