@@ -40,6 +40,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         key="online",
         name="Online",
         is_on=lambda player: player.online,
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
@@ -51,6 +52,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         key="bluetooth_audio_connected",
         name="Bluetooth Audio Connected",
         is_on=lambda player: player.bluetooth_audio_connected,
+        on_icon="mdi:headphones-bluetooth",
+        off_icon="mdi:bluetooth-off",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
@@ -63,6 +66,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         key="audio_device_connected",
         name="Audio Device Connected",
         is_on=lambda player: player.audio_device_connected,
+        on_icon="mdi:headphones",
+        off_icon="mdi:headphones-off",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
 )
