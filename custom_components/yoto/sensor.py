@@ -36,9 +36,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
     SensorEntityDescription(
         key="battery_level_percentage",
         name="Battery Level",
-        icon="mdi:battery",
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement='%',
     ),
     SensorEntityDescription(
         key="temperature_celcius",
@@ -53,6 +52,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
     SensorEntityDescription(
         key="wifi_strength",
         name="WiFi Signal Strength",
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        native_unit_of_measurement='dBm',
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
