@@ -97,7 +97,7 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
         """Initialize the sensor."""
         super().__init__(coordinator, player)
         self._description = description
-        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._description._key}"
         self._attr_name = f"{player.name} {self._description.name}"
         self._attr_entity_category = self._description.entity_category
 
