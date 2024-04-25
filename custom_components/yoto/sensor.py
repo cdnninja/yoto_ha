@@ -95,6 +95,7 @@ class YotoSensor(SensorEntity, YotoEntity):
         self._attr_state_class = self._description.state_class
         self._attr_device_class = self._description.device_class
         self._attr_entity_category = self._description.entity_category
+
     @property
     def native_value(self):
         """Return the value reported by the sensor."""
