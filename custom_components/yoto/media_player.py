@@ -9,7 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerState
+from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerState, RepeatMode
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -69,6 +69,13 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             return self.player.user_volume / 100
         else:
             return None
+        
+    @property
+    def repeat(self) -> str:
+        if self.player.repeat_all == True:
+            return RepeatMode.ALL
+        elif self.player.repeat_all == False:
+            return RepeatMode.OFF
 
     @callback
     def _handle_devices_update(self) -> None:
