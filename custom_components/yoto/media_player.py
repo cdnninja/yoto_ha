@@ -76,9 +76,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     @property
     def repeat(self) -> str:
-        if self.player.repeat_all == True:
+        if self.player.repeat_all is True:
             return RepeatMode.ALL
-        elif self.player.repeat_all == False:
+        elif self.player.repeat_all is False:
             return RepeatMode.OFF
 
     @callback
