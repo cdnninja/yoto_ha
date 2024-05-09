@@ -57,6 +57,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         self._currently_playing: dict | None = {}
         self._restricted_device: bool = False
 
+    async def media_pause(self) -> None:
+        await self.hass.async_add_executor_job(self.yoto_manager.pause_player, self.player.id)
+
     @property
     def state(self) -> MediaPlayerState:
         """Return the playback state."""
@@ -69,17 +72,23 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def volume_level(self) -> float:
         """Return the playback state."""
-        if self.player.user_volume:
-            return self.player.user_volume / 100
+        if self.player.volume:
+            return self.player.volume / 100
         else:
             return None
+        
+    @property
+    def media_duration(self) -> int:
+        return self.player.track_length
 
     @property
-    def repeat(self) -> str:
-        if self.player.repeat_all is True:
-            return RepeatMode.ALL
-        elif self.player.repeat_all is False:
-            return RepeatMode.OFF
+    def media_position(self) -> int:   
+        return self.player.track_position
+
+    
+    @property
+    def media_title(self) -> str:
+        return self.player.chapter_title
 
     @callback
     def _handle_devices_update(self) -> None:
