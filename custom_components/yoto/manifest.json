@@ -8,10 +8,6 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/cdnninja/yoto_ha/issues",
   "loggers": ["yoto", "yoto_api", "paho_mqtt"],
-<<<<<<< Updated upstream
-  "requirements": ["yoto-api==1.8.0"],
-=======
   "requirements": ["yoto-api==1.10.0"],
->>>>>>> Stashed changes
   "version": "1.5.0"
 }
