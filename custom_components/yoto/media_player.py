@@ -71,11 +71,16 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def state(self) -> MediaPlayerState:
         """Return the playback state."""
-        if not self.player.is_playing:
-            return MediaPlayerState.IDLE
-        if self.player.is_playing:
+        if not self.player.online:
+            return MediaPlayerState.OFF
+        if self.player.playback_status == "paused":
+            return MediaPlayerState.PAUSED 
+        if self.player.playback_status == "playing":
             return MediaPlayerState.PLAYING
-        return MediaPlayerState.PAUSED
+        if self.player.playback_status == "stopped":
+            return MediaPlayerState.IDLE
+        if self.player.online:
+            return MediaPlayerState.ON
 
     @property
     def volume_level(self) -> float:
