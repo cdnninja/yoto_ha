@@ -13,6 +13,7 @@ from homeassistant.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerState,
     RepeatMode,
+    MediaPlayerEntityFeature,
 )
 
 from .const import DOMAIN
@@ -57,8 +58,13 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         self._currently_playing: dict | None = {}
         self._restricted_device: bool = False
 
-    async def media_pause(self) -> None:
-        await self.hass.async_add_executor_job(self.yoto_manager.pause_player, self.player.id)
+    def media_pause(self) -> None:
+        self.coordinator.async_pause_player(self.player.id)
+
+    @property
+    def supported_features(self) -> MediaPlayerEntityFeature:
+        """Return the supported features."""
+        return MediaPlayerEntityFeature.PAUSE
 
     @property
     def state(self) -> MediaPlayerState:

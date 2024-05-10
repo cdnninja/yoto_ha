@@ -73,3 +73,8 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.hass.async_add_executor_job(
             self.yoto_manager.check_and_refresh_token
         )
+
+    async def async_pause_player(self, player_id: str) -> None:
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.pause_player, player_id
+        )
