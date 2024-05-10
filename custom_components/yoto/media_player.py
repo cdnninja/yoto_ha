@@ -12,6 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerState,
+    RepeatMode,
 )
 
 from .const import DOMAIN
@@ -57,9 +58,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         self._restricted_device: bool = False
 
     async def media_pause(self) -> None:
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.pause_player, self.player.id
-        )
+        await self.hass.async_add_executor_job(self.yoto_manager.pause_player, self.player.id)
 
     @property
     def state(self) -> MediaPlayerState:
@@ -77,15 +76,20 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             return self.player.volume / 10
         else:
             return None
-
+        
     @property
     def media_duration(self) -> int:
         return self.player.track_length
 
     @property
-    def media_position(self) -> int:
+    def media_position(self) -> int:   
         return self.player.track_position
+    
+    @property
+    def media_content_id(self) -> str:   
+        return self.player.card_id
 
+    
     @property
     def media_title(self) -> str:
         return self.player.chapter_title
