@@ -12,7 +12,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerState,
-    RepeatMode,
     MediaPlayerEntityFeature,
 )
 
@@ -61,6 +60,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     def media_pause(self) -> None:
         self.coordinator.async_pause_player(self.player.id)
 
+    def media_play(self) -> None:
+        self.coordinator.async_resume_player(self.player.id)
+
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
@@ -82,20 +84,19 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             return self.player.volume / 10
         else:
             return None
-        
+
     @property
     def media_duration(self) -> int:
         return self.player.track_length
 
     @property
-    def media_position(self) -> int:   
+    def media_position(self) -> int:
         return self.player.track_position
-    
+
     @property
-    def media_content_id(self) -> str:   
+    def media_content_id(self) -> str:
         return self.player.card_id
 
-    
     @property
     def media_title(self) -> str:
         return self.player.chapter_title
