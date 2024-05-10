@@ -72,7 +72,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     @property
     def volume_level(self) -> float:
-        """Return the playback state."""
+        """Return the volume"""
         if self.player.volume:
             return self.player.volume / 10
         else:
