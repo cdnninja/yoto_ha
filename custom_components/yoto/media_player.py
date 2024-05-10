@@ -61,6 +61,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     def media_pause(self) -> None:
         self.coordinator.async_pause_player(self.player.id)
 
+    def media_play(self) -> None:
+        self.coordinator.async_resume_player(self.player.id)
+
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
