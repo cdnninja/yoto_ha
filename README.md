@@ -1,10 +1,11 @@
 # yoto_ha
 
-Home Assistant Integration for Yoto. While this currently loads and installs sensors are very limited. Readme will not always be updated as this is moving quick.
+Home Assistant Integration for Yoto. While this currently loads and installs, sensors are very limited. Readme will not always be updated as this is moving quick.
 
 PRs are appreciated to add more.
 
-![image](https://github.com/cdnninja/yoto_ha/assets/6373468/7d289b63-ba2d-4f7d-a7fa-8e498af218ea)
+![image](https://github.com/cdnninja/yoto_ha/assets/6373468/acb63f65-0eab-4d9d-a266-951763e71d63)
+
 
 # Installing
 
