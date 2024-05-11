@@ -57,11 +57,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         self._currently_playing: dict | None = {}
         self._restricted_device: bool = False
 
-    def media_pause(self) -> None:
-        self.coordinator.async_pause_player(self.player.id)
+    async def media_pause(self) -> None:
+        await self.coordinator.async_pause_player(self.player.id)
 
-    def media_play(self) -> None:
-        self.coordinator.async_resume_player(self.player.id)
+    async def media_play(self) -> None:
+        await self.coordinator.async_resume_player(self.player.id)
 
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
