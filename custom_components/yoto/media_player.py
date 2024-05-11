@@ -74,7 +74,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         if not self.player.online:
             return MediaPlayerState.OFF
         if self.player.playback_status == "paused":
-            return MediaPlayerState.PAUSED 
+            return MediaPlayerState.PAUSED
         if self.player.playback_status == "playing":
             return MediaPlayerState.PLAYING
         if self.player.playback_status == "stopped":
