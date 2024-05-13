@@ -6,7 +6,6 @@ PRs are appreciated to add more.
 
 ![image](https://github.com/cdnninja/yoto_ha/assets/6373468/acb63f65-0eab-4d9d-a266-951763e71d63)
 
-
 # Installing
 
 The easiest way to install this integration is via HACS. https://hacs.xyz/
