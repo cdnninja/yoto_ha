@@ -61,12 +61,15 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
         if self.yoto_manager.mqtt_client is None:
-            self.yoto_manager.connect_to_events(self.schedule_update_ha_state)
+            self.yoto_manager.connect_to_events(self.api_callback)
         return self.data
+    
+    def api_callback(self):
+        self.set_update_data(self.data)
 
     async def async_update_all(self) -> None:
         """Update yoto data."""
-        await self.async_refresh()
+        await self._schedule_refresh()
 
     async def async_check_and_refresh_token(self):
         """Refresh token if needed via library."""
