@@ -61,7 +61,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
         if self.yoto_manager.mqtt_client is None:
-            self.yoto_manager.connect_to_events()
+            self.yoto_manager.connect_to_events(self.schedule_update_ha_state)
         return self.data
 
     async def async_update_all(self) -> None:
