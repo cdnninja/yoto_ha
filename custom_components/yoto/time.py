@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass
-import logging
 from datetime import time
 
 from yoto_api import YotoPlayer
@@ -16,7 +13,6 @@ from homeassistant.components.time import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.const import EntityCategory
 
 from .const import DOMAIN
 from .coordinator import YotoDataUpdateCoordinator
@@ -33,6 +29,7 @@ TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
     ),
 )
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -48,6 +45,7 @@ async def async_setup_entry(
                 entities.append(YotoTime(coordinator, description, player))
     async_add_entities(entities)
     return True
+
 
 class YotoTime(TimeEntity, YotoEntity):
     def __init__(
@@ -67,7 +65,6 @@ class YotoTime(TimeEntity, YotoEntity):
     def native_value(self):
         """Return the value reported by the sensor."""
         return getattr(self.player, self._key)
-
 
     async def async_set_value(self, value: time) -> None:
         pass
