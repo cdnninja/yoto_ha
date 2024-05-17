@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import time
+from typing import Final
 
 from yoto_api import YotoPlayer
 
