@@ -19,6 +19,7 @@ PLATFORMS: list[str] = [
     Platform.BINARY_SENSOR,
     Platform.SENSOR,
     Platform.MEDIA_PLAYER,
+    Platform.TIME,
     # Platform.NUMBER,
 ]
 
