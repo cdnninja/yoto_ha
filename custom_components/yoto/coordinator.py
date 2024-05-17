@@ -63,7 +63,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         if self.yoto_manager.mqtt_client is None:
             self.yoto_manager.connect_to_events(self.api_callback)
         return self.data
-    
+
     def api_callback(self):
         self.set_update_data(self.data)
 
