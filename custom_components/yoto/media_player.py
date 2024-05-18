@@ -69,7 +69,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
-        return MediaPlayerEntityFeature.PAUSE | MediaPlayerEntityFeature.PLAY |MediaPlayerEntityFeature.STOP
+        return (
+            MediaPlayerEntityFeature.PAUSE
+            | MediaPlayerEntityFeature.PLAY
+            | MediaPlayerEntityFeature.STOP
+        )
 
     @property
     def state(self) -> MediaPlayerState:
