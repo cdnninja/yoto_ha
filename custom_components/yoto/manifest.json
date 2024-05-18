@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/cdnninja/yoto_ha/issues",
   "loggers": ["yoto", "yoto_api", "paho_mqtt"],
   "requirements": ["yoto-api==1.15.0"],
-  "version": "1.7.2"
+  "version": "1.8.0"
 }
