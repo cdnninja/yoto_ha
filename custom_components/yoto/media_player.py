@@ -63,10 +63,13 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     async def async_media_play(self) -> None:
         await self.coordinator.async_resume_player(self.player.id)
 
+    async def async_media_stop(self) -> None:
+        await self.coordinator.async_stop_player(self.player.id)
+
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
-        return MediaPlayerEntityFeature.PAUSE | MediaPlayerEntityFeature.PLAY
+        return MediaPlayerEntityFeature.PAUSE | MediaPlayerEntityFeature.PLAY |MediaPlayerEntityFeature.STOP
 
     @property
     def state(self) -> MediaPlayerState:
@@ -87,7 +90,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     def volume_level(self) -> float:
         """Return the volume"""
         if self.player.volume:
-            return self.player.volume / 10
+            return self.player.volume / 16
         else:
             return None
 
