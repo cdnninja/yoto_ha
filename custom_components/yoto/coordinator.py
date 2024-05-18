@@ -67,6 +67,10 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def api_callback(self):
         self.async_set_updated_data(self.data)
 
+    async def release(self) -> None:
+        """Disconnect from API."""
+        await self.yoto_manager.disconnect()
+
     async def async_update_all(self) -> None:
         """Update yoto data."""
         await self.async_refresh()
