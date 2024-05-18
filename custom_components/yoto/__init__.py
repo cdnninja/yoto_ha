@@ -11,7 +11,7 @@ from .const import (
     DOMAIN,
 )
 from .coordinator import YotoDataUpdateCoordinator
-from .services import async_setup_services, async_unload_services
+from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
