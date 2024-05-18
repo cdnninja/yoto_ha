@@ -69,7 +69,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def release(self) -> None:
         """Disconnect from API."""
-        await self.yoto_manager.disconnect()
+        self.yoto_manager.disconnect()
 
     async def async_update_all(self) -> None:
         """Update yoto data."""
