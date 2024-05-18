@@ -2,7 +2,7 @@
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity import DeviceInfo
-
+from homeassistant.core import callback
 from .const import DOMAIN
 
 
@@ -24,3 +24,7 @@ class YotoEntity(CoordinatorEntity):
             name=self.player.name,
             sw_version=self.player.firmware_version,
         )
+    
+    @callback
+    def _handle_coordinator_update(self) -> None:
+            self.schedule_update_ha_state()

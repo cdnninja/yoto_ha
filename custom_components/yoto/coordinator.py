@@ -65,11 +65,11 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         return self.data
 
     def api_callback(self):
-        self.set_update_data(self.data)
+        self.async_set_updated_data(self.data)
 
     async def async_update_all(self) -> None:
         """Update yoto data."""
-        await self._schedule_refresh()
+        await self.async_refresh()
 
     async def async_check_and_refresh_token(self):
         """Refresh token if needed via library."""
