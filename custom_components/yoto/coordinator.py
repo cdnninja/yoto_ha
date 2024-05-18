@@ -61,8 +61,15 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
         if self.yoto_manager.mqtt_client is None:
-            self.yoto_manager.connect_to_events()
+            self.yoto_manager.connect_to_events(self.api_callback)
         return self.data
+
+    def api_callback(self):
+        self.async_set_updated_data(self.data)
+
+    async def release(self) -> None:
+        """Disconnect from API."""
+        self.yoto_manager.disconnect()
 
     async def async_update_all(self) -> None:
         """Update yoto data."""

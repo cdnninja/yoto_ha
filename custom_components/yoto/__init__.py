@@ -1,5 +1,5 @@
 import logging
-
+import asyncio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     Platform,
@@ -43,12 +43,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    """Unload a config entry."""
-    if unload_ok := await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
-    ):
-        del hass.data[DOMAIN][config_entry.unique_id]
-    if not hass.data[DOMAIN]:
-        async_unload_services(hass)
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Handle removal of an entry."""
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        release_tasks = set()
+        coordinator = hass.data[DOMAIN][entry.unique_id]
+        release_tasks.add(coordinator.release())
+        hass.data[DOMAIN].pop(entry.unique_id)
+        await asyncio.gather(*release_tasks)
     return unload_ok
