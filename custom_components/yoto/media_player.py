@@ -57,6 +57,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         self._attr_name = "Media Player"
         self._attr_device_class = MediaPlayerDeviceClass.SPEAKER
         self._currently_playing: dict | None = {}
+        self._attr_volume_step = 0.0625
         self._restricted_device: bool = False
 
     async def async_media_pause(self) -> None:
@@ -82,6 +83,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             self.player.id, media_id, cardid, 0, 0, 1
         )
 
+    async def async_set_volume_level(self, volume: float) -> None:
+        await self.coordinator.async_set_volume(self.player.id, volume)
+
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
@@ -90,6 +94,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             | MediaPlayerEntityFeature.PLAY
             | MediaPlayerEntityFeature.STOP
             | MediaPlayerEntityFeature.PLAY_MEDIA
+            | MediaPlayerEntityFeature.VOLUME_SET
         )
 
     @property

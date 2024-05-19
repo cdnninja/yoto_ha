@@ -107,4 +107,11 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             cutoff = 0
         await self.hass.async_add_executor_job(
             self.yoto_manager.play_card, player_id, cardid, secondsin, cutoff, chapter
+
+    async def async_set_volume(self, player_id: str, volume: float) -> None:
+        volume = volume * 100
+        volume = int(round(volume, 0))
+        await self.async_check_and_refresh_token()
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_volume, player_id, volume
         )
