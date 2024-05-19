@@ -15,7 +15,6 @@ from homeassistant.components.media_player import (
     MediaPlayerEntityFeature,
     MediaPlayerDeviceClass,
     MediaPlayerEnqueue,
-
 )
 
 from .const import DOMAIN
