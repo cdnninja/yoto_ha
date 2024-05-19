@@ -80,6 +80,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             MediaPlayerEntityFeature.PAUSE
             | MediaPlayerEntityFeature.PLAY
             | MediaPlayerEntityFeature.STOP
+            | MediaPlayerEntityFeature.VOLUME_SET
         )
 
     @property
