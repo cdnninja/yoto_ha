@@ -1,7 +1,7 @@
 """Media Player for Yoto integration."""
 
 from __future__ import annotations
-
+from typing import Any
 
 from yoto_api import YotoPlayer
 
