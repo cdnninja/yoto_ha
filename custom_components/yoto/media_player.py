@@ -82,6 +82,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         await self.coordinator.async_play_card(
             self.player.id, media_id, cardid, 0, 0, 1
         )
+
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)
 
