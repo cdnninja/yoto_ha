@@ -74,10 +74,10 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         media_type: str,
         media_id: str,
         enqueue: MediaPlayerEnqueue | None = None,
-        announce: bool | None = None, **kwargs: Any
+        announce: bool | None = None,
+        **kwargs: Any,
     ) -> None:
         await self.coordinator.async_play_card(self.player.id, media_id, cardid, 0, 0, 1)
-
 
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
