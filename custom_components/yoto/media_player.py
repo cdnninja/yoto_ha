@@ -13,6 +13,7 @@ from homeassistant.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerState,
     MediaPlayerEntityFeature,
+    MediaPlayerDeviceClass,
 )
 
 from .const import DOMAIN
@@ -53,7 +54,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         self._key = "media_player"
         self._attr_unique_id = f"{DOMAIN}_{player.id}_media_player"
         self._attr_name = "Media Player"
-
+        self._attr_device_class = MediaPlayerDeviceClass.SPEAKER
         self._currently_playing: dict | None = {}
         self._restricted_device: bool = False
 
