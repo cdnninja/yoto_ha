@@ -1,7 +1,7 @@
 """Media Player for Yoto integration."""
 
 from __future__ import annotations
-
+from typing import Any
 
 from yoto_api import YotoPlayer
 
@@ -14,6 +14,7 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
     MediaPlayerEntityFeature,
     MediaPlayerDeviceClass,
+    MediaPlayerEnqueue,
 )
 
 from .const import DOMAIN
@@ -68,6 +69,21 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     async def async_media_stop(self) -> None:
         await self.coordinator.async_stop_player(self.player.id)
 
+    async def async_play_media(
+        self,
+        media_type: str,
+        media_id: str,
+        enqueue: MediaPlayerEnqueue | None = None,
+        announce: bool | None = None,
+        **kwargs: Any,
+    ) -> None:
+        cardid = kwargs["cardid"]
+        if cardid is None:
+            cardid = 1
+        await self.coordinator.async_play_card(
+            self.player.id, media_id, cardid, 0, 0, 1
+        )
+
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)
 
@@ -78,6 +94,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             MediaPlayerEntityFeature.PAUSE
             | MediaPlayerEntityFeature.PLAY
             | MediaPlayerEntityFeature.STOP
+            | MediaPlayerEntityFeature.PLAY_MEDIA
             | MediaPlayerEntityFeature.VOLUME_SET
         )
 
