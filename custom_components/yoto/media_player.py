@@ -15,7 +15,6 @@ from homeassistant.components.media_player import (
     MediaPlayerEntityFeature,
     MediaPlayerDeviceClass,
     MediaPlayerEnqueue,
-
 )
 
 from .const import DOMAIN
@@ -77,7 +76,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         announce: bool | None = None,
         **kwargs: Any,
     ) -> None:
-        await self.coordinator.async_play_card(self.player.id, media_id, cardid, 0, 0, 1)
+        await self.coordinator.async_play_card(
+            self.player.id, media_id, cardid, 0, 0, 1
+        )
 
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
