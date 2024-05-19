@@ -68,10 +68,8 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     async def async_media_stop(self) -> None:
         await self.coordinator.async_stop_player(self.player.id)
 
-
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)
-
 
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:

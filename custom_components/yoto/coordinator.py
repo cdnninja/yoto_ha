@@ -101,4 +101,6 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         volume = volume * 100
         volume = int(round(volume, 0))
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(self.yoto_manager.set_volume, player_id, volume)
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_volume, player_id, volume
+        )
