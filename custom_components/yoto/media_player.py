@@ -67,6 +67,16 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     async def async_media_stop(self) -> None:
         await self.coordinator.async_stop_player(self.player.id)
 
+    async def async_play_media(
+        self,
+        media_type: str,
+        media_id: str,
+        enqueue: MediaPlayerEnqueue | None = None,
+        announce: bool | None = None, **kwargs: Any
+    ) -> None:
+        await self.coordinator.async_play_card(self.player.id)
+
+
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
@@ -74,6 +84,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             MediaPlayerEntityFeature.PAUSE
             | MediaPlayerEntityFeature.PLAY
             | MediaPlayerEntityFeature.STOP
+            | MediaPlayerEntityFeature.PLAY_MEDIA
         )
 
     @property

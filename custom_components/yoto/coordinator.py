@@ -96,3 +96,13 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_stop_player(self, player_id: str) -> None:
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(self.yoto_manager.stop_player, player_id)
+
+    async def async_play_card(self, player_id: str, cardid: str, secondsin: int, cutoff: int, chapter: int) -> None:
+        await self.async_check_and_refresh_token()
+        if secondsin is None: 
+            secondsin = 0
+        if cutoff is None:
+            cutoff = 0    
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.play_card, player_id, cardid, secondsin, cutoff, chapter
+        )
