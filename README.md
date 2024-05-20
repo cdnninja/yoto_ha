@@ -4,7 +4,7 @@ Home Assistant Integration for Yoto. Readme will not always be updated as this i
 
 PRs are appreciated to add more.
 
-![image](https://github.com/cdnninja/yoto_ha/assets/6373468/acb63f65-0eab-4d9d-a266-951763e71d63)
+![image](https://github.com/cdnninja/yoto_ha/assets/6373468/182ef4c8-d8af-406a-b749-bc77b62d717e)
 
 # Installing
 
