@@ -98,11 +98,23 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.hass.async_add_executor_job(self.yoto_manager.stop_player, player_id)
 
     async def async_play_card(
-        self, player_id: str, cardid: str, secondsin: int = 0, cutoff: int = 0, chapter: int = 1, trackkey: int = 1
+        self,
+        player_id: str,
+        cardid: str,
+        secondsin: int = 0,
+        cutoff: int = 0,
+        chapter: int = 1,
+        trackkey: int = 1,
     ) -> None:
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
-            self.yoto_manager.play_card, player_id, cardid, secondsin, cutoff, chapter, trackkey
+            self.yoto_manager.play_card,
+            player_id,
+            cardid,
+            secondsin,
+            cutoff,
+            chapter,
+            trackkey,
         )
 
     async def async_set_volume(self, player_id: str, volume: float) -> None:
