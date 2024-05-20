@@ -77,11 +77,8 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         announce: bool | None = None,
         **kwargs: Any,
     ) -> None:
-        cardid = kwargs["cardid"]
-        if cardid is None:
-            cardid = 1
         await self.coordinator.async_play_card(
-            self.player.id, media_id, cardid, 0, 0, 1
+            self.player.id, media_id
         )
 
     async def async_set_volume_level(self, volume: float) -> None:
