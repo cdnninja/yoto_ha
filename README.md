@@ -17,6 +17,12 @@ The easiest way to install this integration is via HACS. https://hacs.xyz/
 2. After that you can adjust your HACS filter to not show all integrations and click install.
 3. Next you must go to the integration page and "add" the integration to set it up.
 
+# Services Working
+
+Play/Pause
+Play Media/Card via service call
+Stop Media
+
 # Troubleshooting
 
 You can enable logging for this integration specifically and share your logs, so I can have a deep dive investigation. To enable logging, enable via the gui or update your configuration.yaml like this, we can get more information in Configuration -> Logs page
