@@ -10,7 +10,7 @@ from yoto_api import YotoPlayer
 from homeassistant.components.light import (
     LightEntity,
     LightEntityDescription,
-    ColorMode
+    ColorMode,
 )
 
 from homeassistant.config_entries import ConfigEntry
@@ -23,11 +23,11 @@ from .entity import YotoEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-SENSOR_DESCRIPTIONS: Final[tuple[LightEntityDescription, ...]] = (
-    LightEntityDescription(
-        key="light",
-        name="Light",
-    ))
+SENSOR_DESCRIPTIONS: Final[tuple[LightEntityDescription, ...]] = LightEntityDescription(
+    key="light",
+    name="Light",
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -66,7 +66,7 @@ class YotoSensor(LightEntity, YotoEntity):
     @property
     def color_mode(self):
         """Return the color modes the sensor supports."""
-        return ColorMode.RGBW	
+        return ColorMode.RGBW
 
     @property
     def supported_color_modes(self):

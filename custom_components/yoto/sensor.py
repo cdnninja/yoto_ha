@@ -17,7 +17,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import UnitOfTemperature, EntityCategory, LIGHT_LUX
+from homeassistant.const import UnitOfTemperature, EntityCategory
 
 from .const import DOMAIN
 from .entity import YotoEntity
