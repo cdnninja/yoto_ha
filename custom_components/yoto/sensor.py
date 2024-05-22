@@ -17,7 +17,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import UnitOfTemperature, EntityCategory
+from homeassistant.const import UnitOfTemperature, EntityCategory, LIGHT_LUX
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -47,7 +47,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
     SensorEntityDescription(
         key="ambient_light_sensor_reading",
         name="Ambient Light Reading",
-        native_unit_of_measurement="lx",
+        native_unit_of_measurement=LIGHT_LUX,
         device_class=SensorDeviceClass.ILLUMINANCE,
     ),
     SensorEntityDescription(
