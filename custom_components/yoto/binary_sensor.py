@@ -50,10 +50,11 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     ),
     YotoBinarySensorEntityDescription(
         key="bluetooth_audio_connected",
-        name="Bluetooth Audio Connected",
+        name="Bluetooth Audio",
         is_on=lambda player: player.bluetooth_audio_connected,
         on_icon="mdi:headphones-bluetooth",
         off_icon="mdi:bluetooth-off",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
@@ -64,8 +65,9 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     ),
     YotoBinarySensorEntityDescription(
         key="audio_device_connected",
-        name="Audio Device Connected",
+        name="Audio Device",
         is_on=lambda player: player.audio_device_connected,
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
         on_icon="mdi:headphones",
         off_icon="mdi:headphones-off",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -104,6 +106,7 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
         self._description = description
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._description.key}"
         self._attr_name = f"{player.name} {self._description.name}"
+        self._attr_device_class = self._description.device_class
         self._attr_entity_category = self._description.entity_category
 
     @property

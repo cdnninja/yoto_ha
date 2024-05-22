@@ -17,7 +17,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import UnitOfTemperature, EntityCategory
+from homeassistant.const import UnitOfTemperature, EntityCategory, LIGHT_LUX
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -27,7 +27,7 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
     SensorEntityDescription(
         key="last_updated_at",
-        name="Last Updated At",
+        name="Last Updated",
         icon="mdi:update",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -47,6 +47,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
     SensorEntityDescription(
         key="ambient_light_sensor_reading",
         name="Ambient Light Reading",
+        native_unit_of_measurement=UnitOfTemperature.LIGHT_LUX,
     ),
     SensorEntityDescription(
         key="wifi_strength",
