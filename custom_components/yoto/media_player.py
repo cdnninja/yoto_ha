@@ -130,7 +130,10 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     @property
     def media_title(self) -> str:
-        return self.player.chapter_title
+        if self.player.chapter_title == self.player.track_title:
+            return self.player.chapter_title
+        else:
+            return self.player.chapter_title + " - " + self.player.track_title
 
     @callback
     def _handle_devices_update(self) -> None:
