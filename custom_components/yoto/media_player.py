@@ -134,7 +134,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             return self.player.chapter_title
         elif self.player.chapter_title and self.player.track_title:
             return self.player.chapter_title + " - " + self.player.track_title
-        else: 
+        else:
             return self.player.chapter_title
 
     @callback
