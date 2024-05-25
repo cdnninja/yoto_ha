@@ -23,12 +23,6 @@ from .entity import YotoEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-SENSOR_DESCRIPTIONS: Final[tuple[LightEntityDescription, ...]] = LightEntityDescription(
-    key="light",
-    name="Light",
-)
-
-
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -39,9 +33,7 @@ async def async_setup_entry(
     entities = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
-        for description in SENSOR_DESCRIPTIONS:
-            if getattr(player, description.key, None) is not None:
-                entities.append(YotoSensor(coordinator, description, player))
+        entities.append(YotoSensor(coordinator, player))
     async_add_entities(entities)
     return True
 
