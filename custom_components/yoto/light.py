@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Final
 
 from yoto_api import YotoPlayer
 
@@ -22,6 +21,7 @@ from .const import DOMAIN
 from .entity import YotoEntity
 
 _LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
