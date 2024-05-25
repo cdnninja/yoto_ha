@@ -137,7 +137,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def media_image_url(self) -> str:
         if self.media_content_id in self.coordinator.yoto_manager.library:
-            return self.coordinator.yoto_manager.library[self.media_content_id].cover_image_large
+            return self.coordinator.yoto_manager.library[
+                self.media_content_id
+            ].cover_image_large
         else:
             return None
 
