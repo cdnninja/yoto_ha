@@ -119,11 +119,27 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def media_duration(self) -> int:
         return self.player.track_length
-    
+
+    @property
+    def media_album_artist(self) -> str:
+        if self.media_content_id in self.coordinator.yoto_manager.library:
+            return self.coordinator.yoto_manager.library[self.media_content_id].author
+        else:
+            return None
+
+    @property
+    def media_album_name(self) -> str:
+        if self.media_content_id in self.coordinator.yoto_manager.library:
+            return self.coordinator.yoto_manager.library[self.media_content_id].title
+        else:
+            return None
+
     @property
     def media_image_url(self) -> str:
         if self.media_content_id in self.coordinator.yoto_manager.library:
-            return self.coordinator.yoto_manager.library[self.media_content_id].cover_image_large
+            return self.coordinator.yoto_manager.library[
+                self.media_content_id
+            ].cover_image_large
         else:
             return None
 
