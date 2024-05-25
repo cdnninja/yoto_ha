@@ -47,7 +47,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
     SensorEntityDescription(
         key="ambient_light_sensor_reading",
         name="Ambient Light Reading",
-        native_unit_of_measurement=UnitOfTemperature.LIGHT_LUX,
+        native_unit_of_measurement=LIGHT_LUX,
+        device_class=SensorDeviceClass.ILLUMINANCE,
     ),
     SensorEntityDescription(
         key="wifi_strength",

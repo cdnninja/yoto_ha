@@ -121,6 +121,29 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         return self.player.track_length
 
     @property
+    def media_album_artist(self) -> str:
+        if self.media_content_id in self.coordinator.yoto_manager.library:
+            return self.coordinator.yoto_manager.library[self.media_content_id].author
+        else:
+            return None
+
+    @property
+    def media_album_name(self) -> str:
+        if self.media_content_id in self.coordinator.yoto_manager.library:
+            return self.coordinator.yoto_manager.library[self.media_content_id].title
+        else:
+            return None
+
+    @property
+    def media_image_url(self) -> str:
+        if self.media_content_id in self.coordinator.yoto_manager.library:
+            return self.coordinator.yoto_manager.library[
+                self.media_content_id
+            ].cover_image_large
+        else:
+            return None
+
+    @property
     def media_position(self) -> int:
         return self.player.track_position
 
@@ -132,8 +155,10 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     def media_title(self) -> str:
         if self.player.chapter_title == self.player.track_title:
             return self.player.chapter_title
-        else:
+        elif self.player.chapter_title and self.player.track_title:
             return self.player.chapter_title + " - " + self.player.track_title
+        else:
+            return self.player.chapter_title
 
     @callback
     def _handle_devices_update(self) -> None:
