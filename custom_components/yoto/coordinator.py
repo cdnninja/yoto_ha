@@ -105,7 +105,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             config.day_mode_time = str(value)
         if key == "night_mode_time":
             config.night_mode_time = str(value)
-        await self.hass.async_add_executor_job(self.yoto_manager.set_player_config, player_id, config)
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
 
     async def async_play_card(
         self,
