@@ -21,11 +21,11 @@ from .entity import YotoEntity
 
 TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
     TimeEntityDescription(
-        key="config.day_mode_time",
+        key="day_mode_time",
         name="Day Mode",
     ),
     TimeEntityDescription(
-        key="config.night_mode_time",
+        key="night_mode_time",
         name="Night Mode",
     ),
 )
@@ -65,7 +65,7 @@ class YotoTime(TimeEntity, YotoEntity):
     @property
     def native_value(self):
         """Return the value reported by the sensor."""
-        return getattr(self.player, self._key)
+        return getattr(self.player.config, self._key)
 
     async def async_set_value(self, value: time) -> None:
         await self.coordinator.async_set_time(self.player.id, self.key, value)
