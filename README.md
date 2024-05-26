@@ -26,12 +26,12 @@ The easiest way to install this integration is via HACS. https://hacs.xyz/
 
 # Troubleshooting
 
-You can enable logging for this integration specifically and share your logs, so I can have a deep dive investigation. To enable logging, enable via the gui or update your configuration.yaml like this, we can get more information in 
+You can enable logging for this integration specifically and share your logs, so I can have a deep dive investigation. To enable logging, enable via the gui or update your configuration.yaml like this, we can get more information in
 '''yaml config
 Configuration -> Logs page
 logger:
-    default: warning
+default: warning
 logs:
-    custom_components.yoto: debug
-    yoto_api: debug
+custom_components.yoto: debug
+yoto_api: debug
 '''
