@@ -68,4 +68,4 @@ class YotoTime(TimeEntity, YotoEntity):
         return getattr(self.player.config, self._key)
 
     async def async_set_value(self, value: time) -> None:
-        await self.coordinator.async_set_time(self.player.id, self.key, value)
+        await self.coordinator.async_set_time(self.player.id, self._key, value)
