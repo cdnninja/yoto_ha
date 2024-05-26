@@ -21,11 +21,11 @@ from .entity import YotoEntity
 
 TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
     TimeEntityDescription(
-        key="day_mode_time",
+        key="config.day_mode_time",
         name="Day Mode",
     ),
     TimeEntityDescription(
-        key="night_mode_time",
+        key="config.night_mode_time",
         name="Night Mode",
     ),
 )
