@@ -69,3 +69,4 @@ class YotoTime(TimeEntity, YotoEntity):
 
     async def async_set_value(self, value: time) -> None:
         await self.coordinator.async_set_time(self.player.id, self._key, value)
+        self.async_write_ha_state()
