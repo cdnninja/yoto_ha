@@ -19,15 +19,19 @@ The easiest way to install this integration is via HACS. https://hacs.xyz/
 
 # Services Working
 
-Play/Pause
-Play Media/Card via service call
-Stop Media
+- Play/Pause
+- Play Media/Card via service call
+- Stop Media
+- Set Time for Day and Night Modes
 
 # Troubleshooting
 
 You can enable logging for this integration specifically and share your logs, so I can have a deep dive investigation. To enable logging, enable via the gui or update your configuration.yaml like this, we can get more information in Configuration -> Logs page
+
+```yaml config
 logger:
-default: warning
-logs:
-custom_components.yoto: debug
-yoto_api: debug
+  default: warning
+  logs:
+    custom_components.yoto: debug
+    yoto_api: debug
+```

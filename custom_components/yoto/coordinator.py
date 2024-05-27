@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from datetime import timedelta
+from datetime import time
 
 
 import logging
 
 from yoto_api import (
     YotoManager,
+    YotoPlayerConfig,
 )
 
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -96,6 +98,17 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_stop_player(self, player_id: str) -> None:
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(self.yoto_manager.stop_player, player_id)
+
+    async def async_set_time(self, player_id: str, key: str, value: time) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        if key == "day_mode_time":
+            config.day_mode_time = value
+        if key == "night_mode_time":
+            config.night_mode_time = value
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
 
     async def async_play_card(
         self,
