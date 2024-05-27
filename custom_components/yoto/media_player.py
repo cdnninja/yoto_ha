@@ -121,7 +121,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         return self.player.track_length
 
     @property
-    def media_album_artist(self) -> str:
+    def media_artist(self) -> str:
         if self.media_content_id in self.coordinator.yoto_manager.library:
             return self.coordinator.yoto_manager.library[self.media_content_id].author
         else:
