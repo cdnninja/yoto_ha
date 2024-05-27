@@ -103,9 +103,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "day_mode_time":
-            config.day_mode_time = str(value)
+            config.day_mode_time = value
         if key == "night_mode_time":
-            config.night_mode_time = str(value)
+            config.night_mode_time = value
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_player_config, player_id, config
         )
