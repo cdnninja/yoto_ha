@@ -62,6 +62,8 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             raise ConfigEntryAuthFailed(AuthError) from AuthError
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
+        if len(self.yoto_manager.library.keys()) == 0:
+            await self.hass.async_add_executor_job(self.yoto_manager.update_cards)
         if len(self.yoto_manager.mqtt_client.keys()) == 0:
             self.yoto_manager.connect_to_events(self.api_callback)
         return self.data
