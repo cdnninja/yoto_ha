@@ -20,7 +20,7 @@ PLATFORMS: list[str] = [
     Platform.SENSOR,
     Platform.MEDIA_PLAYER,
     Platform.TIME,
-    # Platform.NUMBER,
+    Platform.NUMBER,
 ]
 
 
