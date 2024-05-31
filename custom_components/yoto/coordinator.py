@@ -111,6 +111,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_player_config, player_id, config
         )
+
     async def async_set_max_volume(self, player_id: str, key: str, value: time) -> None:
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
