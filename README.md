@@ -6,6 +6,16 @@ PRs are appreciated to add more.
 
 ![image](https://github.com/cdnninja/yoto_ha/assets/6373468/182ef4c8-d8af-406a-b749-bc77b62d717e)
 
+# Supported Device Features
+
+Not all devices expose all sensors/entities. Only sensors/entites supported by your device will be available in the integration.
+
+|                      | v1 | v2  | v3  | mini |
+|----------------------|----|-----|-----|------|
+| Temperature Sensor   | ?  | no  | yes | no   |
+| Night Light          | ?  | yes | yes | no   |
+| Ambient Light Sensor | ?  | yes | yes | no   |
+
 # Installing
 
 The easiest way to install this integration is via HACS. https://hacs.xyz/
