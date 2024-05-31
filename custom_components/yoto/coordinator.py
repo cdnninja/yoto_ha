@@ -112,6 +112,28 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             self.yoto_manager.set_player_config, player_id, config
         )
 
+    async def async_set_max_volume(self, player_id: str, key: str, value: time) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        if key == "night_max_volume_limit":
+            config.night_max_volume_limit = int(value)
+        if key == "day_max_volume_limit":
+            config.day_max_volume_limit = int(value)
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
+
+    async def async_set_brightness(self, player_id: str, key: str, value: time) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        if key == "night_display_brightness":
+            config.night_display_brightness = int(value)
+        if key == "day_display_brightness":
+            config.day_display_brightness = int(value)
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
+
     async def async_play_card(
         self,
         player_id: str,
