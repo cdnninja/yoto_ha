@@ -10,11 +10,11 @@ PRs are appreciated to add more.
 
 Not all devices expose all sensors/entities. Only sensors/entites supported by your device will be available in the integration.
 
-|                      | v1 | v2  | v3  | mini |
-|----------------------|----|-----|-----|------|
-| Temperature Sensor   | ?  | no  | yes | no   |
-| Night Light          | ?  | yes | yes | no   |
-| Ambient Light Sensor | ?  | yes | yes | no   |
+|                      | v1  | v2  | v3  | mini |
+| -------------------- | --- | --- | --- | ---- |
+| Temperature Sensor   | ?   | no  | yes | no   |
+| Night Light          | ?   | yes | yes | no   |
+| Ambient Light Sensor | ?   | yes | yes | no   |
 
 # Installing
 
