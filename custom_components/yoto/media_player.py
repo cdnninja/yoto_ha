@@ -54,7 +54,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         # self.data = data
         self._key = "media_player"
         self._attr_unique_id = f"{DOMAIN}_{player.id}_media_player"
-        self._attr_name = "Media Player"
+        self._attr_name = None
         self._attr_device_class = MediaPlayerDeviceClass.SPEAKER
         self._currently_playing: dict | None = {}
         self._attr_volume_step = 0.0625
