@@ -30,6 +30,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     NumberEntityDescription(
         key="night_max_volume_limit",
         name="Night Max Volume",
+        icon="mdi:volume-high",
         native_min_value=0,
         native_max_value=16,
         native_step=1,
@@ -37,6 +38,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     NumberEntityDescription(
         key="day_max_volume_limit",
         name="Day Max Volume",
+        icon="mdi:volume-high",
         native_min_value=0,
         native_max_value=16,
         native_step=1,
@@ -44,6 +46,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     NumberEntityDescription(
         key="day_display_brightness",
         name="Day Display Brightness",
+        icon="mdi:brightness-percent",
         native_min_value=0,
         native_max_value=100,
         native_step=1,
@@ -52,6 +55,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     NumberEntityDescription(
         key="night_display_brightness",
         name="Night Display Brightness",
+        icon="mdi:brightness-percent",
         native_min_value=0,
         native_max_value=100,
         native_step=1,
