@@ -71,7 +71,7 @@ async def async_setup_entry(
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
-            if getattr(player, description.key, None) is not None:
+            if getattr(player.config, description.key, None) is not None:
                 entities.append(YotoNumber(coordinator, description, player))
     async_add_entities(entities)
     return True
