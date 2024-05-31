@@ -8,7 +8,7 @@ PRs are appreciated to add more.
 
 # Supported Device Features
 
-Not all devices expose all sensors/entities. Only sensors/entites supported by your device will be available in the integration.
+Not all devices expose all sensors/entities. Only sensors/entities supported by your device will be available in the integration.
 
 |                      | v1  | v2  | v3  | mini |
 | -------------------- | --- | --- | --- | ---- |
