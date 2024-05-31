@@ -51,7 +51,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     ),
     NumberEntityDescription(
         key="night_display_brightness",
-        name="Day Display Brightness",
+        name="Night Display Brightness",
         native_min_value=0,
         native_max_value=100,
         native_step=1,
