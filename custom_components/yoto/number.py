@@ -35,7 +35,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_step=1,
     ),
     NumberEntityDescription(
-        key="config.night_day_volume_limit",
+        key="config.day_max_volume_limit",
         name="Day Max Volume",
         native_min_value=0,
         native_max_value=16,
@@ -120,4 +120,6 @@ class YotoNumber(NumberEntity, YotoEntity):
         return self._description.native_unit_of_measurement
 
     async def async_set_native_value(self, value: float) -> None:
-        pass
+        await self.coordinator.async_set_max_volume(self.player.id, self._key, value)
+        self.async_write_ha_state()
+
