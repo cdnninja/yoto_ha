@@ -121,7 +121,14 @@ class YotoNumber(NumberEntity, YotoEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         if self._key == "day_max_volume_limit" or self._key == "day_max_volume_limit":
-            await self.coordinator.async_set_max_volume(self.player.id, self._key, value)
-        if self._key == "day_display_brightness" or self._key == "night_display_brightness":
-            await self.coordinator.async_set_brightness(self.player.id, self._key, value)
+            await self.coordinator.async_set_max_volume(
+                self.player.id, self._key, value
+            )
+        if (
+            self._key == "day_display_brightness"
+            or self._key == "night_display_brightness"
+        ):
+            await self.coordinator.async_set_brightness(
+                self.player.id, self._key, value
+            )
         self.async_write_ha_state()
