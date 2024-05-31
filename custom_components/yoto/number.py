@@ -122,4 +122,3 @@ class YotoNumber(NumberEntity, YotoEntity):
     async def async_set_native_value(self, value: float) -> None:
         await self.coordinator.async_set_max_volume(self.player.id, self._key, value)
         self.async_write_ha_state()
-
