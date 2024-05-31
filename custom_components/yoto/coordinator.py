@@ -116,9 +116,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "night_max_volume_limit":
-            config.night_max_volume_limit = value
+            config.night_max_volume_limit = int(value)
         if key == "day_max_volume_limit":
-            config.day_max_volume_limit = value
+            config.day_max_volume_limit = int(value)
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_player_config, player_id, config
         )
