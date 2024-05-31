@@ -28,21 +28,21 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     NumberEntityDescription(
-        key="config.night_max_volume_limit",
+        key="night_max_volume_limit",
         name="Night Max Volume",
         native_min_value=0,
         native_max_value=16,
         native_step=1,
     ),
     NumberEntityDescription(
-        key="config.day_max_volume_limit",
+        key="day_max_volume_limit",
         name="Day Max Volume",
         native_min_value=0,
         native_max_value=16,
         native_step=1,
     ),
     NumberEntityDescription(
-        key="config.day_display_brightness",
+        key="day_display_brightness",
         name="Day Display Brightness",
         native_min_value=0,
         native_max_value=100,
@@ -50,7 +50,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_unit_of_measurement=PERCENTAGE,
     ),
     NumberEntityDescription(
-        key="config.night_display_brightness",
+        key="night_display_brightness",
         name="Day Display Brightness",
         native_min_value=0,
         native_max_value=100,
@@ -96,7 +96,7 @@ class YotoNumber(NumberEntity, YotoEntity):
     @property
     def native_value(self) -> float | None:
         """Return the entity value to represent the entity state."""
-        return getattr(self.vehicle, self._key)
+        return getattr(self.player.config, self._key)
 
     @property
     def native_min_value(self):
