@@ -55,7 +55,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         name="Day Display Brightness",
         native_min_value=0,
         native_max_value=100,
-        native_step=1
+        native_step=1,
         native_unit_of_measurement=PERCENTAGE,
     ),
 )
