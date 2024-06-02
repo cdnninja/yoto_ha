@@ -73,14 +73,12 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             return True
         else:
             return False
-    
+
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs):
         """Turn the entity off."""
-        await self.coordinator.async_set_brightness(
-                self.player.id, self._key, "auto"
-            )
+        await self.coordinator.async_set_brightness(self.player.id, self._key, "auto")
         self.async_write_ha_state()
