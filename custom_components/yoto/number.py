@@ -104,7 +104,7 @@ class YotoNumber(NumberEntity, YotoEntity):
             self._key == "day_display_brightness"
             or self._key == "night_display_brightness"
         ):
-            if getattr(self.player.config, self._key) == "auto"
+            if getattr(self.player.config, self._key) == "auto":
                 return 100
         else:
             return getattr(self.player.config, self._key)
