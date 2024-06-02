@@ -21,6 +21,7 @@ PLATFORMS: list[str] = [
     Platform.MEDIA_PLAYER,
     Platform.TIME,
     Platform.NUMBER,
+    Platform.SWITCH,
 ]
 
 
