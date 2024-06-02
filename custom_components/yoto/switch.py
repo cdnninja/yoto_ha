@@ -7,7 +7,7 @@ from typing import Final
 
 from yoto_api import YotoPlayer
 
-from homeassistant.components.number import (
+from homeassistant.components.switch import (
     SwitchEntity,
     SwitchEntityDescription,
 )
