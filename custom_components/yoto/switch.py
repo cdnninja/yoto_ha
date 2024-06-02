@@ -28,11 +28,11 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
         key="night_display_brightness",
-        name="Night Auto Brightness",
+        name="Night Auto Display Brightness",
     ),
     SwitchEntityDescription(
         key="day_display_brightness",
-        name="Day Auto Brightness",
+        name="Day Auto Display Brightness",
     ),
 )
 
@@ -67,12 +67,14 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
         self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
-        self._attr_device_class = self._description.device_class
 
     @property
     def is_on(self) -> bool | None:
         """Return the entity value to represent the entity state."""
-        return getattr(self.player.config, self._key)
+        if getattr(self.player.config, self._key) == "auto":
+            return True
+        else:
+            return False
     
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
@@ -81,4 +83,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         
     async def async_turn_on(self, **kwargs):
         """Turn the entity off."""
+        await self.coordinator.async_set_brightness(
+                self.player.id, self._key, "auto"
+            )
         self.async_write_ha_state()
