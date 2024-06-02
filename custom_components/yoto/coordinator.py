@@ -127,9 +127,15 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "night_display_brightness":
-            config.night_display_brightness = int(value)
+            if value == "auto":
+                config.night_display_brightness = value
+            else:
+                config.night_display_brightness = int(value)
         if key == "day_display_brightness":
-            config.day_display_brightness = int(value)
+            if value == "auto":
+                config.day_display_brightness = value
+            else:
+                config.day_display_brightness = int(value)
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_player_config, player_id, config
         )
