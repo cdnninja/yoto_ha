@@ -12,8 +12,6 @@ from homeassistant.components.number import (
     SwitchEntityDescription,
 )
 
-from homeassistant.const import PERCENTAGE
-
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -79,8 +77,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
         self.async_write_ha_state()
-        
-        
+
     async def async_turn_on(self, **kwargs):
         """Turn the entity off."""
         await self.coordinator.async_set_brightness(
