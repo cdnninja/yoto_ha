@@ -61,6 +61,13 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_step=1,
         native_unit_of_measurement=PERCENTAGE,
     ),
+    NumberEntityDescription(
+        key="sleep_timer_seconds_remaining",
+        name="Sleep Timer Seconds Remaining",
+        native_min_value=0,
+        native_max_value=46500,
+        native_step=1,
+    )
 )
 
 
@@ -94,7 +101,6 @@ class YotoNumber(NumberEntity, YotoEntity):
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
         self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
-        self._attr_mode = NumberMode.SLIDER
         self._attr_device_class = self._description.device_class
 
     @property
@@ -108,6 +114,7 @@ class YotoNumber(NumberEntity, YotoEntity):
                 return 100
         else:
             return getattr(self.player.config, self._key)
+        
 
     @property
     def native_min_value(self):
@@ -135,11 +142,15 @@ class YotoNumber(NumberEntity, YotoEntity):
             await self.coordinator.async_set_max_volume(
                 self.player.id, self._key, value
             )
-        if (
+        elif (
             self._key == "day_display_brightness"
             or self._key == "night_display_brightness"
         ):
             await self.coordinator.async_set_brightness(
                 self.player.id, self._key, value
+            )
+        elif self._key == "sleep_timer_seconds_remaining":
+            await self.coordinator.async_set_sleep_timer(
+                self.player.id, value
             )
         self.async_write_ha_state()
