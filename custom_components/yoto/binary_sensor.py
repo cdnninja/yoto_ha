@@ -72,6 +72,12 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         off_icon="mdi:headphones-off",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
+    YotoBinarySensorEntityDescription(
+        key="sleep_timer_active",
+        name="Sleep Timer",
+        is_on=lambda player: player.sleep_timer_active,
+        device_class=BinarySensorDeviceClass.RUNNING,
+    ),
 )
 
 
