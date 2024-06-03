@@ -10,7 +10,6 @@ from yoto_api import YotoPlayer
 from homeassistant.components.number import (
     NumberEntity,
     NumberEntityDescription,
-    NumberMode,
 )
 
 from homeassistant.const import PERCENTAGE
@@ -67,7 +66,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_min_value=0,
         native_max_value=46500,
         native_step=1,
-    )
+    ),
 )
 
 
@@ -114,7 +113,6 @@ class YotoNumber(NumberEntity, YotoEntity):
                 return 100
         else:
             return getattr(self.player.config, self._key)
-        
 
     @property
     def native_min_value(self):
@@ -150,7 +148,5 @@ class YotoNumber(NumberEntity, YotoEntity):
                 self.player.id, self._key, value
             )
         elif self._key == "sleep_timer_seconds_remaining":
-            await self.coordinator.async_set_sleep_timer(
-                self.player.id, value
-            )
+            await self.coordinator.async_set_sleep_timer(self.player.id, value)
         self.async_write_ha_state()
