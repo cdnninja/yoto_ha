@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from .utils import rgetattr
 from typing import Final
 
 from yoto_api import YotoPlayer
@@ -27,7 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     NumberEntityDescription(
-        key="night_max_volume_limit",
+        key="config.night_max_volume_limit",
         name="Night Max Volume",
         icon="mdi:volume-high",
         native_min_value=0,
@@ -35,7 +36,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_step=1,
     ),
     NumberEntityDescription(
-        key="day_max_volume_limit",
+        key="config.day_max_volume_limit",
         name="Day Max Volume",
         icon="mdi:volume-high",
         native_min_value=0,
@@ -43,7 +44,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_step=1,
     ),
     NumberEntityDescription(
-        key="day_display_brightness",
+        key="config.day_display_brightness",
         name="Day Display Brightness",
         icon="mdi:brightness-percent",
         native_min_value=0,
@@ -52,7 +53,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_unit_of_measurement=PERCENTAGE,
     ),
     NumberEntityDescription(
-        key="night_display_brightness",
+        key="config.night_display_brightness",
         name="Night Display Brightness",
         icon="mdi:brightness-percent",
         native_min_value=0,
@@ -81,7 +82,7 @@ async def async_setup_entry(
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
-            if getattr(player.config, description.key, None) is not None:
+            if rgetattr(player, description.key) is not None:
                 entities.append(YotoNumber(coordinator, description, player))
     async_add_entities(entities)
     return True
@@ -106,12 +107,12 @@ class YotoNumber(NumberEntity, YotoEntity):
     def native_value(self) -> float | None:
         """Return the entity value to represent the entity state."""
         if (
-            self._key == "day_display_brightness"
-            or self._key == "night_display_brightness"
-        ) and getattr(self.player.config, self._key) == "auto":
+            self._key == "config.day_display_brightness"
+            or self._key == "config.night_display_brightness"
+        ) and rgetattr(self.player, self._key) == "auto":
             return 100
         else:
-            return getattr(self.player.config, self._key)
+            return rgetattr(self.player, self._key)
 
     @property
     def native_min_value(self):
@@ -134,13 +135,13 @@ class YotoNumber(NumberEntity, YotoEntity):
         return self._description.native_unit_of_measurement
 
     async def async_set_native_value(self, value: float) -> None:
-        if self._key == "day_max_volume_limit" or self._key == "night_max_volume_limit":
+        if self._key == "config.day_max_volume_limit" or self._key == "config.night_max_volume_limit":
             await self.coordinator.async_set_max_volume(
                 self.player.id, self._key, value
             )
         elif (
-            self._key == "day_display_brightness"
-            or self._key == "night_display_brightness"
+            self._key == "config.day_display_brightness"
+            or self._key == "config.night_display_brightness"
         ):
             await self.coordinator.async_set_brightness(
                 self.player.id, self._key, value
