@@ -54,7 +54,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         # self.data = data
         self._key = "media_player"
         self._attr_unique_id = f"{DOMAIN}_{player.id}_media_player"
-        self._attr_name = "Media Player"
+        self._attr_name = None
         self._attr_device_class = MediaPlayerDeviceClass.SPEAKER
         self._currently_playing: dict | None = {}
         self._attr_volume_step = 0.0625
@@ -121,7 +121,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         return self.player.track_length
 
     @property
-    def media_album_artist(self) -> str:
+    def media_artist(self) -> str:
         if self.media_content_id in self.coordinator.yoto_manager.library:
             return self.coordinator.yoto_manager.library[self.media_content_id].author
         else:

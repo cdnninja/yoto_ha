@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from datetime import timedelta
+from datetime import time
 
 
 import logging
 
 from yoto_api import (
     YotoManager,
+    YotoPlayerConfig,
 )
 
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -60,7 +62,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             raise ConfigEntryAuthFailed(AuthError) from AuthError
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
-        if len(self.yoto_manager.mqtt_client.keys()) == 0:
+        if len(self.yoto_manager.library.keys()) == 0:
+            await self.hass.async_add_executor_job(self.yoto_manager.update_cards)
+        if self.yoto_manager.mqtt_client is None:
             self.yoto_manager.connect_to_events(self.api_callback)
         return self.data
 
@@ -97,6 +101,45 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(self.yoto_manager.stop_player, player_id)
 
+    async def async_set_time(self, player_id: str, key: str, value: time) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        if key == "day_mode_time":
+            config.day_mode_time = value
+        if key == "night_mode_time":
+            config.night_mode_time = value
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
+
+    async def async_set_max_volume(self, player_id: str, key: str, value: time) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        if key == "config.night_max_volume_limit":
+            config.night_max_volume_limit = int(value)
+        if key == "config.day_max_volume_limit":
+            config.day_max_volume_limit = int(value)
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
+
+    async def async_set_brightness(self, player_id: str, key: str, value: time) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        if key == "config.night_display_brightness":
+            if value == "auto":
+                config.night_display_brightness = value
+            else:
+                config.night_display_brightness = int(value)
+        if key == "config.day_display_brightness":
+            if value == "auto":
+                config.day_display_brightness = value
+            else:
+                config.day_display_brightness = int(value)
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
+
     async def async_play_card(
         self,
         player_id: str,
@@ -123,4 +166,10 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_volume, player_id, volume
+        )
+
+    async def async_set_sleep_timer(self, player_id: str, time: int) -> None:
+        await self.async_check_and_refresh_token()
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_sleep, player_id, int(time)
         )

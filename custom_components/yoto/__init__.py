@@ -21,7 +21,8 @@ PLATFORMS: list[str] = [
     Platform.MEDIA_PLAYER,
     Platform.TIME,
     Platform.LIGHT,
-    # Platform.NUMBER,
+    Platform.NUMBER,
+    Platform.SWITCH,
 ]
 
 
@@ -34,6 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     coordinator = YotoDataUpdateCoordinator(hass, config_entry)
     try:
         await coordinator.async_config_entry_first_refresh()
+        await asyncio.sleep(2)
     except Exception as ex:
         raise ConfigEntryNotReady(f"Config Not Ready: {ex}")
 
