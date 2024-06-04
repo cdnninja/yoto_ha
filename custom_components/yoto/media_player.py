@@ -164,19 +164,28 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     def extra_state_attributes(self):
         """Return device specific state attributes."""
         if self.media_content_id in self.coordinator.yoto_manager.library:
-            if self.player.chapter_key in self.coordinator.yoto_manager.library[
-                self.media_content_id
-            ].chapters:
-                if self.player.track_key in self.coordinator.yoto_manager.library[
-                    self.media_content_id
-                ].chapters[self.player.chapter_key].tracks:
+            if (
+                self.player.chapter_key
+                in self.coordinator.yoto_manager.library[self.media_content_id].chapters
+            ):
+                if (
+                    self.player.track_key
+                    in self.coordinator.yoto_manager.library[self.media_content_id]
+                    .chapters[self.player.chapter_key]
+                    .tracks
+                ):
                     return {
                         "media_chapter_icon": self.coordinator.yoto_manager.library[
-                        self.media_content_id
-                    ].chapters[self.player.chapter_key].icon,
+                            self.media_content_id
+                        ]
+                        .chapters[self.player.chapter_key]
+                        .icon,
                         "media_track_icon": self.coordinator.yoto_manager.library[
-                        self.media_content_id
-                    ].chapters[self.player.chapter_key].tracks[self.player.track_key].icon,
+                            self.media_content_id
+                        ]
+                        .chapters[self.player.chapter_key]
+                        .tracks[self.player.track_key]
+                        .icon,
                     }
         else:
             return {}
