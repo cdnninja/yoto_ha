@@ -5,11 +5,11 @@ def rgetattr(obj, attr):
     _this_func = rgetattr
     sp = attr.split(".", 1)
     if len(sp) == 1:
-        l, r = sp[0], ""
+        left, right = sp[0], ""
     else:
-        l, r = sp
+        left, right = sp
 
-    obj = getattr(obj, l)
-    if r:
-        obj = _this_func(obj, r)
+    obj = getattr(obj, left)
+    if right:
+        obj = _this_func(obj, right)
     return obj
