@@ -108,9 +108,8 @@ class YotoNumber(NumberEntity, YotoEntity):
         if (
             self._key == "day_display_brightness"
             or self._key == "night_display_brightness"
-        ):
-            if getattr(self.player.config, self._key) == "auto":
-                return 100
+        ) and getattr(self.player.config, self._key) == "auto":
+            return 100
         else:
             return getattr(self.player.config, self._key)
 
@@ -132,11 +131,10 @@ class YotoNumber(NumberEntity, YotoEntity):
     @property
     def native_unit_of_measurement(self):
         """Return the unit the value was reported in by the sensor"""
-
         return self._description.native_unit_of_measurement
 
     async def async_set_native_value(self, value: float) -> None:
-        if self._key == "day_max_volume_limit" or self._key == "day_max_volume_limit":
+        if self._key == "day_max_volume_limit" or self._key == "night_max_volume_limit":
             await self.coordinator.async_set_max_volume(
                 self.player.id, self._key, value
             )
