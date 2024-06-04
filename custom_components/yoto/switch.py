@@ -27,10 +27,12 @@ SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
         key="night_display_brightness",
         name="Night Auto Display Brightness",
+        icon="mdi:brightness-auto",
     ),
     SwitchEntityDescription(
         key="day_display_brightness",
         name="Day Auto Display Brightness",
+        icon="mdi:brightness-auto",
     ),
 )
 
