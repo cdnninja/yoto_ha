@@ -171,5 +171,5 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_set_sleep_timer(self, player_id: str, time: int) -> None:
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
-            self.yoto_manager.set_sleep, player_id, str(int(time))
+            self.yoto_manager.set_sleep, player_id, int(time)
         )
