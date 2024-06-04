@@ -135,7 +135,10 @@ class YotoNumber(NumberEntity, YotoEntity):
         return self._description.native_unit_of_measurement
 
     async def async_set_native_value(self, value: float) -> None:
-        if self._key == "config.day_max_volume_limit" or self._key == "config.night_max_volume_limit":
+        if (
+            self._key == "config.day_max_volume_limit"
+            or self._key == "config.night_max_volume_limit"
+        ):
             await self.coordinator.async_set_max_volume(
                 self.player.id, self._key, value
             )
