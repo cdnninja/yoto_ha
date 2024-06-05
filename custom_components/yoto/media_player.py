@@ -176,16 +176,28 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
                     .chapters[self.player.chapter_key]
                     .tracks
                 ):
-                    if self.coordinator.yoto_manager.library[
-                            self.media_content_id
-                        ].chapters[self.player.chapter_key].icon:
-                        state_attributes["media_chapter_icon"] = self.coordinator.yoto_manager.library[
-                                self.media_content_id
-                            ].chapters[self.player.chapter_key].icon
-                    if self.coordinator.yoto_manager.library[
-                            self.media_content_id].chapters[self.player.chapter_key].tracks[self.player.track_key].icon:
-                        state_attributes["media_track_icon"] =  self.coordinator.yoto_manager.library[
-                                self.media_content_id].chapters[self.player.chapter_key].tracks[self.player.track_key].icon
+                    if (
+                        self.coordinator.yoto_manager.library[self.media_content_id]
+                        .chapters[self.player.chapter_key]
+                        .icon
+                    ):
+                        state_attributes["media_chapter_icon"] = (
+                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            .chapters[self.player.chapter_key]
+                            .icon
+                        )
+                    if (
+                        self.coordinator.yoto_manager.library[self.media_content_id]
+                        .chapters[self.player.chapter_key]
+                        .tracks[self.player.track_key]
+                        .icon
+                    ):
+                        state_attributes["media_track_icon"] = (
+                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            .chapters[self.player.chapter_key]
+                            .tracks[self.player.track_key]
+                            .icon
+                        )
         return state_attributes
 
     @callback
