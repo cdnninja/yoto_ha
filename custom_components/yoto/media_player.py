@@ -163,6 +163,8 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def extra_state_attributes(self):
         """Return device specific state attributes."""
+        state_attributes: dict[str, Any] = {}
+
         if self.media_content_id in self.coordinator.yoto_manager.library:
             if (
                 self.player.chapter_key
@@ -174,21 +176,12 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
                     .chapters[self.player.chapter_key]
                     .tracks
                 ):
-                    return {
-                        "media_chapter_icon": self.coordinator.yoto_manager.library[
+                    state_attributes["media_chapter_icon"] = self.coordinator.yoto_manager.library[
                             self.media_content_id
-                        ]
-                        .chapters[self.player.chapter_key]
-                        .icon,
-                        "media_track_icon": self.coordinator.yoto_manager.library[
-                            self.media_content_id
-                        ]
-                        .chapters[self.player.chapter_key]
-                        .tracks[self.player.track_key]
-                        .icon,
-                    }
-        else:
-            return {}
+                        ].chapters[self.player.chapter_key].icon
+                    state_attributes["media_track_icon"] =  self.coordinator.yoto_manager.library[
+                            self.media_content_id].chapters[self.player.chapter_key].tracks[self.player.track_key].icon,
+        return state_attributes
 
     @callback
     def _handle_devices_update(self) -> None:
