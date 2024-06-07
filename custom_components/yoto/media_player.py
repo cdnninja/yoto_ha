@@ -9,12 +9,17 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from .browse_media import browse_node, browse_top_level
+
+
 from homeassistant.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerState,
     MediaPlayerEntityFeature,
     MediaPlayerDeviceClass,
     MediaPlayerEnqueue,
+    BrowseMedia,
+    MediaType
 )
 
 from .const import DOMAIN
@@ -82,6 +87,31 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)
 
+    async def async_browse_media(
+        self,
+        media_content_type: MediaType | str | None = None,
+        media_content_id: str | None = None,
+    ) -> BrowseMedia:
+        """Implement the websocket media browsing helper."""
+        self.thumbnail_cache = {}
+        if media_content_type in (None, "library"):
+            return await browse_top_level(self._volumio)
+
+        return await browse_node(
+            self, self._volumio, media_content_type, media_content_id
+        )
+
+    async def async_get_browse_image(
+        self,
+        media_content_type: MediaType | str,
+        media_content_id: str,
+        media_image_id: str | None = None,
+    ) -> tuple[bytes | None, str | None]:
+        """Get album art from Volumio."""
+        cached_url = self.thumbnail_cache.get(media_content_id)
+        image_url = self._volumio.canonic_url(cached_url)
+        return await self._async_fetch_image(image_url)
+    
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
@@ -91,6 +121,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             | MediaPlayerEntityFeature.STOP
             | MediaPlayerEntityFeature.PLAY_MEDIA
             | MediaPlayerEntityFeature.VOLUME_SET
+            | MediaPlayerEntityFeature.BROWSE_MEDIA
         )
 
     @property
