@@ -160,6 +160,46 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         else:
             return self.player.chapter_title
 
+    @property
+    def extra_state_attributes(self):
+        """Return device specific state attributes."""
+        state_attributes: dict[str, Any] = {}
+
+        if self.media_content_id in self.coordinator.yoto_manager.library:
+            if (
+                self.player.chapter_key
+                in self.coordinator.yoto_manager.library[self.media_content_id].chapters
+            ):
+                if (
+                    self.player.track_key
+                    in self.coordinator.yoto_manager.library[self.media_content_id]
+                    .chapters[self.player.chapter_key]
+                    .tracks
+                ):
+                    if (
+                        self.coordinator.yoto_manager.library[self.media_content_id]
+                        .chapters[self.player.chapter_key]
+                        .icon
+                    ):
+                        state_attributes["media_chapter_icon"] = (
+                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            .chapters[self.player.chapter_key]
+                            .icon
+                        )
+                    if (
+                        self.coordinator.yoto_manager.library[self.media_content_id]
+                        .chapters[self.player.chapter_key]
+                        .tracks[self.player.track_key]
+                        .icon
+                    ):
+                        state_attributes["media_track_icon"] = (
+                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            .chapters[self.player.chapter_key]
+                            .tracks[self.player.track_key]
+                            .icon
+                        )
+        return state_attributes
+
     @callback
     def _handle_devices_update(self) -> None:
         """Handle updated data from the coordinator."""
