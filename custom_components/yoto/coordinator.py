@@ -182,5 +182,5 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         elif key == "night_ambient_colour":
             config.night_ambient_colour = color
         await self.hass.async_add_executor_job(
-            self.yoto_manager.set_player_config, player_id, int(time)
+            self.yoto_manager.set_player_config, player_id, color
         )
