@@ -66,9 +66,6 @@ class YotoLight(LightEntity, YotoEntity):
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
         self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
-        self._attr_state_class = self._description.state_class
-        self._attr_device_class = self._description.device_class
-        self._attr_entity_category = self._description.entity_category
 
     @property
     def color_mode(self):
