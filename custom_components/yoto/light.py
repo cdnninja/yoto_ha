@@ -80,8 +80,7 @@ class YotoLight(LightEntity, YotoEntity):
     @property
     def rgb_color(self):
         """Return the RGB color"""
-        _LOGGER.debug(f"{DOMAIN} - HEx: {rgetattr(self.player, self._key)}")
-        hex_val = input(rgetattr(self.player, self._key)).lstrip("#")
+        hex_val = rgetattr(self.player, self._key).lstrip("#")
         rgb_val = tuple(int(hex_val[i : i + 2], 16) for i in (0, 2, 4))
         _LOGGER.debug(f"{DOMAIN} - RGV: {rgb_val}")
         return rgb_val
