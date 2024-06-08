@@ -83,14 +83,14 @@ class YotoLight(LightEntity, YotoEntity):
     @property
     def rgb_color(self):
         """Return the RGB color"""
-        hex_val = input(getattr(self.player, self._key)).lstrip("#")
+        hex_val = input(rgetattr(self.player, self._key)).lstrip("#")
         rgb_val = tuple(int(hex_val[i : i + 2], 16) for i in (0, 2, 4))
         return rgb_val
 
     @property
     def is_on(self):
         """Return if the light is on."""
-        status = getattr(self.player, self._key)
+        status = rgetattr(self.player, self._key)
         if status != "#0":
             return True
         else:
