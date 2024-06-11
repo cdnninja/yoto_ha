@@ -177,9 +177,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_set_light(self, player_id: str, key: str, color: str) -> None:
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
-        if key == "day_ambient_colour":
+        if key == "config.day_ambient_colour":
             config.day_ambient_colour = color
-        elif key == "night_ambient_colour":
+        elif key == "config.night_ambient_colour":
             config.night_ambient_colour = color
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_player_config, player_id, config
