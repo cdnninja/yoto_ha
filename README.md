@@ -31,8 +31,11 @@ The easiest way to install this integration is via HACS. https://hacs.xyz/
 
 - Play/Pause
 - Play Media/Card via service call
-- Stop Media
-- Set Time for Day and Night Modes
+- Stop Media via service call
+- Set Time for Day/Night Modes
+- Set display brightness Day/Night including auto
+- Set Day/Night light color, this can be any color not just in app!
+- Set Day/Night max volume
 
 # Troubleshooting
 
