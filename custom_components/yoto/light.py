@@ -102,6 +102,6 @@ class YotoLight(LightEntity, YotoEntity):
     async def async_turn_on(self, **kwargs):
         """Turn device on."""
         rgb = kwargs[ATTR_RGB_COLOR]
-        hex_color = '#%02x%02x%02x' % rgb
+        hex_color = "#%02x%02x%02x" % rgb
         await self.coordinator.async_set_light(self.player.id, self._key, hex_color)
         self.async_write_ha_state()
