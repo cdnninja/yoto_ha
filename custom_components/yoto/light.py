@@ -12,6 +12,7 @@ from homeassistant.components.light import (
     LightEntity,
     LightEntityDescription,
     ColorMode,
+    ATTR_RGB_COLOR,
 )
 
 from homeassistant.config_entries import ConfigEntry
@@ -100,6 +101,8 @@ class YotoLight(LightEntity, YotoEntity):
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs):
-        """Turn device off."""
-        await self.coordinator.async_set_light(self.player.id, self._key, "#ffffff")
+        """Turn device on."""
+        rgb = kwargs[ATTR_RGB_COLOR]
+        hex_color = '#%02x%02x%02x' % rgb
+        await self.coordinator.async_set_light(self.player.id, self._key, hex_color)
         self.async_write_ha_state()
