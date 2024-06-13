@@ -108,7 +108,7 @@ class YotoLight(LightEntity, YotoEntity):
             hex_color = "#%02x%02x%02x" % rgb
         elif ATTR_BRIGHTNESS in kwargs:
             # Placeholder for now.  Not sure we can use this yet. Need to see how my v3 handles dimmed rgb values
-            brightness = kwargs[ATTR_BRIGHTNESS]
+            # brightness = kwargs[ATTR_BRIGHTNESS]
             hex_color = "#ffffff"
         else:
             hex_color = "#ffffff"
