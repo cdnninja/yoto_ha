@@ -13,6 +13,7 @@ from homeassistant.components.light import (
     LightEntityDescription,
     ColorMode,
     ATTR_RGB_COLOR,
+    ATTR_BRIGHTNESS,
 )
 
 from homeassistant.config_entries import ConfigEntry
@@ -101,7 +102,15 @@ class YotoLight(LightEntity, YotoEntity):
 
     async def async_turn_on(self, **kwargs):
         """Turn device on."""
-        rgb = kwargs[ATTR_RGB_COLOR]
-        hex_color = "#%02x%02x%02x" % rgb
+        _LOGGER.debug(f"{DOMAIN} - Turn on light Args: {kwargs}")
+        if ATTR_RGB_COLOR in kwargs:
+            rgb = kwargs[ATTR_RGB_COLOR]
+            hex_color = "#%02x%02x%02x" % rgb
+        elif ATTR_BRIGHTNESS in kwargs:
+            # Placeholder for now.  Not sure we can use this yet. Need to see how my v3 handles dimmed rgb values
+            brightness = kwargs[ATTR_BRIGHTNESS]
+            hex_color = "#ffffff"
+        else:
+            hex_color = "#ffffff"
         await self.coordinator.async_set_light(self.player.id, self._key, hex_color)
         self.async_write_ha_state()
