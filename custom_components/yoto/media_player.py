@@ -205,4 +205,5 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         """Handle updated data from the coordinator."""
         if not self.enabled:
             return
-        self.async_write_ha_state()
+        else:
+            self.async_write_ha_state()
