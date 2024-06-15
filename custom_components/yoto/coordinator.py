@@ -75,7 +75,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
                 not in self.yoto_manager.library[player.card_id].chapters
             ):
                 self.hass.add_job(self.async_update_card_detail, player.card_id)
-        self.async_set_updated_data(self.data)
+        self.async_update_listeners()
 
     async def release(self) -> None:
         """Disconnect from API."""
