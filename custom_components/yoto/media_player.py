@@ -3,10 +3,12 @@
 from __future__ import annotations
 from typing import Any
 
+import logging
+
 from yoto_api import YotoPlayer
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from homeassistant.components.media_player import (
@@ -19,6 +21,8 @@ from homeassistant.components.media_player import (
 
 from .const import DOMAIN
 from .entity import YotoEntity
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -199,11 +203,3 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
                             .icon
                         )
         return state_attributes
-
-    @callback
-    def _handle_devices_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        if not self.enabled:
-            return
-        else:
-            self.async_write_ha_state()
