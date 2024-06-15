@@ -1,4 +1,4 @@
-# yoto_ha 
+# yoto_ha
 
 Home Assistant Integration for Yoto. Readme will not always be updated as this is moving quick.
 
