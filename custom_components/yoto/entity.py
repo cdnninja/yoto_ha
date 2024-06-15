@@ -5,7 +5,6 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.core import callback
 from .const import DOMAIN
 
-import asyncio
 
 import logging
 
@@ -47,9 +46,9 @@ class YotoEntity(CoordinatorEntity):
                     in self.coordinator.yoto_manager.library[self.player.card_id].chapters
                 ):
                     _LOGGER.debug(f"{DOMAIN} - updating card details:  {self.player.card_id}")
-                    return asyncio.run_coroutine_threadsafe(                    
-                        self.coordinator.async_update_card_detail(self.player.card_id),   
-                else: 
-                    _LOGGER.debug(f"{DOMAIN} - Chapter Details not missing")              
-            
+                    return asyncio.run_coroutine_threadsafe(
+                        self.coordinator.async_update_card_detail(self.player.card_id),
+                else:
+                    _LOGGER.debug(f"{DOMAIN} - Chapter Details not missing")
+
 """

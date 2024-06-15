@@ -8,7 +8,7 @@ import logging
 from yoto_api import YotoPlayer
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from homeassistant.components.media_player import (
@@ -203,4 +203,3 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
                             .icon
                         )
         return state_attributes
-
