@@ -186,7 +186,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     async def async_update_card_detail(self, cardId):
-        """ Get chapter and titles for the card"""
+        """Get chapter and titles for the card"""
         await self.hass.async_add_executor_job(
             self.yoto_manager.update_card_detail(cardId)
         )
