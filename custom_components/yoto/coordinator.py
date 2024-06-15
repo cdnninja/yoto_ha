@@ -69,7 +69,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         return self.data
 
     def api_callback(self):
-        for player in self.yoto_manager.players:
+        for player in self.yoto_manager.players.values():
             if not (
                 player.chapter_key
                 in self.yoto_manager.library[player.card_id].chapters
@@ -195,5 +195,5 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_update_card_detail(self, cardId):
         """Get chapter and titles for the card"""
         await self.hass.async_add_executor_job(
-            self.yoto_manager.update_card_detail(cardId)
+            self.yoto_manager.update_card_detail, cardId
         )
