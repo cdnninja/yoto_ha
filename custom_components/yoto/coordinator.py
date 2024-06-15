@@ -70,11 +70,12 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
     def api_callback(self):
         for player in self.yoto_manager.players.values():
-            if (
-                player.chapter_key
-                not in self.yoto_manager.library[player.card_id].chapters
-            ):
-                self.hass.add_job(self.async_update_card_detail, player.card_id)
+            if self.player.card_id and self.player.chapter_key:
+                if (
+                    player.chapter_key
+                    not in self.yoto_manager.library[player.card_id].chapters
+                ):
+                    self.hass.add_job(self.async_update_card_detail, player.card_id)
         self.async_update_listeners()
 
     async def release(self) -> None:
