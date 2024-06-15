@@ -70,13 +70,12 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
     def api_callback(self):
         for player in self.yoto_manager.players:
-            if not (
+            if (
                 player.chapter_key
-                in self.yoto_manager.library[player.card_id].chapters
+                not in self.yoto_manager.library[player.card_id].chapters
             ):
                 self.hass.add_job(self.async_update_card_detail, player.card_id)
         self.async_set_updated_data(self.data)
-
 
     async def release(self) -> None:
         """Disconnect from API."""
