@@ -172,7 +172,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             if self.media_content_id in self.coordinator.yoto_manager.library:
                 if (
                     self.player.chapter_key
-                    in self.coordinator.yoto_manager.library[self.media_content_id].chapters
+                    in self.coordinator.yoto_manager.library[
+                        self.media_content_id
+                    ].chapters
                 ):
                     if (
                         self.player.track_key
@@ -186,7 +188,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
                             .icon
                         ):
                             state_attributes["media_chapter_icon"] = (
-                                self.coordinator.yoto_manager.library[self.media_content_id]
+                                self.coordinator.yoto_manager.library[
+                                    self.media_content_id
+                                ]
                                 .chapters[self.player.chapter_key]
                                 .icon
                             )
@@ -197,7 +201,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
                             .icon
                         ):
                             state_attributes["media_track_icon"] = (
-                                self.coordinator.yoto_manager.library[self.media_content_id]
+                                self.coordinator.yoto_manager.library[
+                                    self.media_content_id
+                                ]
                                 .chapters[self.player.chapter_key]
                                 .tracks[self.player.track_key]
                                 .icon
