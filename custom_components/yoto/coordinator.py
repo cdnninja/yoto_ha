@@ -62,12 +62,21 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             raise ConfigEntryAuthFailed(AuthError) from AuthError
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
+        if len(self.yoto_manager.library.keys()) == 0:
+            await self.hass.async_add_executor_job(self.yoto_manager.update_library)
         if self.yoto_manager.mqtt_client is None:
             self.yoto_manager.connect_to_events(self.api_callback)
         return self.data
 
     def api_callback(self):
+        for player in self.yoto_manager.players:
+            if not (
+                player.chapter_key
+                in self.yoto_manager.library[player.card_id].chapters
+            ):
+                self.hass.add_job(self.async_update_card_detail, player.card_id)
         self.async_set_updated_data(self.data)
+
 
     async def release(self) -> None:
         """Disconnect from API."""
