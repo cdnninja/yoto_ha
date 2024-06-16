@@ -74,7 +74,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
                 if (
                     player.card_id not in self.yoto_manager.library
                     or self.yoto_manager.library[
-                        self.media_content_id
+                        player.card_id
                     ].chapters
                 ):
                     self.hass.add_job(self.async_update_card_detail, player.card_id)
