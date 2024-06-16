@@ -19,7 +19,7 @@ from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
     MediaPlayerEnqueue,
     BrowseMedia,
-    MediaType
+    MediaType,
 )
 
 from .const import DOMAIN
@@ -111,7 +111,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         cached_url = self.thumbnail_cache.get(media_content_id)
         image_url = self._volumio.canonic_url(cached_url)
         return await self._async_fetch_image(image_url)
-    
+
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
