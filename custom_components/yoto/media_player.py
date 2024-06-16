@@ -3,10 +3,12 @@
 from __future__ import annotations
 from typing import Any
 
+import logging
+
 from yoto_api import YotoPlayer
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .browse_media import browse_node, browse_top_level
@@ -24,6 +26,8 @@ from homeassistant.components.media_player import (
 
 from .const import DOMAIN
 from .entity import YotoEntity
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -191,9 +195,53 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         else:
             return self.player.chapter_title
 
-    @callback
-    def _handle_devices_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        if not self.enabled:
-            return
-        self.async_write_ha_state()
+    @property
+    def extra_state_attributes(self):
+        """Return device specific state attributes."""
+        state_attributes: dict[str, Any] = {}
+        if self.player.card_id and self.player.chapter_key:
+            if (
+                self.media_content_id in self.coordinator.yoto_manager.library
+                and self.coordinator.yoto_manager.library[
+                    self.media_content_id
+                ].chapters
+            ):
+                if (
+                    self.player.chapter_key
+                    in self.coordinator.yoto_manager.library[
+                        self.media_content_id
+                    ].chapters
+                ):
+                    if (
+                        self.player.track_key
+                        in self.coordinator.yoto_manager.library[self.media_content_id]
+                        .chapters[self.player.chapter_key]
+                        .tracks
+                    ):
+                        if (
+                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            .chapters[self.player.chapter_key]
+                            .icon
+                        ):
+                            state_attributes["media_chapter_icon"] = (
+                                self.coordinator.yoto_manager.library[
+                                    self.media_content_id
+                                ]
+                                .chapters[self.player.chapter_key]
+                                .icon
+                            )
+                        if (
+                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            .chapters[self.player.chapter_key]
+                            .tracks[self.player.track_key]
+                            .icon
+                        ):
+                            state_attributes["media_track_icon"] = (
+                                self.coordinator.yoto_manager.library[
+                                    self.media_content_id
+                                ]
+                                .chapters[self.player.chapter_key]
+                                .tracks[self.player.track_key]
+                                .icon
+                            )
+        return state_attributes

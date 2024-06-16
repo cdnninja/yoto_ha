@@ -63,13 +63,26 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
         if len(self.yoto_manager.library.keys()) == 0:
-            await self.hass.async_add_executor_job(self.yoto_manager.update_cards)
+            await self.hass.async_add_executor_job(self.yoto_manager.update_library)
         if self.yoto_manager.mqtt_client is None:
             self.yoto_manager.connect_to_events(self.api_callback)
         return self.data
 
     def api_callback(self):
-        self.async_set_updated_data(self.data)
+        for player in self.yoto_manager.players.values():
+            if player.card_id and player.chapter_key:
+                if (
+                    player.card_id not in self.yoto_manager.library
+                    or not self.yoto_manager.library[player.card_id].chapters
+                ):
+                    self.hass.add_job(self.async_update_card_detail, player.card_id)
+                else:
+                    if (
+                        player.chapter_key
+                        not in self.yoto_manager.library[player.card_id].chapters
+                    ):
+                        self.hass.add_job(self.async_update_card_detail, player.card_id)
+        self.async_update_listeners()
 
     async def release(self) -> None:
         """Disconnect from API."""
@@ -172,4 +185,22 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_sleep, player_id, int(time)
+        )
+
+    async def async_set_light(self, player_id: str, key: str, color: str) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        if key == "config.day_ambient_colour":
+            config.day_ambient_colour = color
+        elif key == "config.night_ambient_colour":
+            config.night_ambient_colour = color
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
+
+    async def async_update_card_detail(self, cardId):
+        """Get chapter and titles for the card"""
+        _LOGGER.debug(f"{DOMAIN} - Updating Card details for:  {cardId}")
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.update_card_detail, cardId
         )
