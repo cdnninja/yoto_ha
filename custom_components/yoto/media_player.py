@@ -169,7 +169,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         """Return device specific state attributes."""
         state_attributes: dict[str, Any] = {}
         if self.player.card_id and self.player.chapter_key:
-            if self.media_content_id in self.coordinator.yoto_manager.library:
+            if self.media_content_id in self.coordinator.yoto_manager.library and self.coordinator.yoto_manager.library[
+                        self.media_content_id
+                    ].chapters:
                 if (
                     self.player.chapter_key
                     in self.coordinator.yoto_manager.library[
