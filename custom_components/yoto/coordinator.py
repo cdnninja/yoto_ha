@@ -165,12 +165,12 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         if trackkey is None:
             if chapter is not None:
                 trackkey = chapter
-            else: 
+            else:
                 trackkey = 1
         if chapter is None:
             if trackkey is not None:
-                chapter = trackkey        
-            else:    
+                chapter = trackkey
+            else:
                 chapter = 1
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
