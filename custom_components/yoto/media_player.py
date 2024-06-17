@@ -25,7 +25,6 @@ from homeassistant.components.media_player import (
 
 from .const import DOMAIN
 from .entity import YotoEntity
-from .utils import split_media_id
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,8 +85,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         announce: bool | None = None,
         **kwargs: Any,
     ) -> None:
-        cardid, chapterid, trackid = split_media_id(media_id)
-        await self.coordinator.async_play_card(self.player.id, cardid, chapterid, trackid)
+        await self.coordinator.async_play_card(self.player.id, media_id)
 
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)
@@ -98,35 +96,97 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         media_content_id: str | None = None,
     ) -> BrowseMedia:
         """Implement the websocket media browsing helper."""
+         
+        _LOGGER.debug(f"{DOMAIN} - Browse Media id:  {media_content_id} content type: {media_content_type}")
 
         if media_content_id in (None, "library"):
-            children = await self.async_convert_library_to_browse_media()
-            return BrowseMedia(
-                media_content_id="Root",
-                media_class=MediaClass.DIRECTORY,
-                media_content_type=MediaType.MUSIC,
-                title="Yoto Library",
-                can_expand=True,
-                can_play=False,
-                children=children,
-                children_media_class=MediaClass.MUSIC,
-            )
+            return await self.async_convert_library_to_browse_media()
+        else: 
+            _LOGGER.debug(f"{DOMAIN} - Getting chapters")
+
+            return await self.async_convert_chapter_to_browse_media(media_content_id) 
 
     async def async_convert_library_to_browse_media(self) -> list:
         children = []
-        for card in self.coordinator.yoto_manager.library.values():
+        
+        for item in self.coordinator.yoto_manager.library.values():
             children.append(
                 BrowseMedia(
-                    media_content_id=card.id,
+                    media_content_id=item.id,
                     media_class=MediaClass.MUSIC,
                     media_content_type=MediaType.MUSIC,
-                    title=card.title,
-                    can_expand=False,
+                    title=item.title,
+                    can_expand=True,
                     can_play=True,
-                    thumbnail=card.cover_image_large,
+                    thumbnail=item.cover_image_large,
                 )
             )
-        return children
+        return BrowseMedia(
+            media_content_id="Root",
+            media_class=MediaClass.DIRECTORY,
+            media_content_type=MediaType.MUSIC,
+            title="Yoto Library",
+            can_expand=True,
+            can_play=False,
+            children=children,
+            children_media_class=MediaClass.MUSIC,
+        )
+    
+    async def async_convert_chapter_to_browse_media(self, cardid: str) -> list:
+        children = []
+        _LOGGER.debug(f"{DOMAIN} - Chapters:  {self.coordinator.yoto_manager.library[cardid].chapters}")
+        if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
+            await self.coordinator.async_update_card_detail(cardid)
+        for item in self.coordinator.yoto_manager.library[cardid].chapters.values():
+            _LOGGER.debug(f"{DOMAIN} - Chapter processing:  {item}")
+            children.append(
+                BrowseMedia(
+                    media_content_id=cardid + "-" + item.key,
+                    media_class=MediaClass.MUSIC,
+                    media_content_type=MediaType.MUSIC,
+                    title=item.title,
+                    can_expand=False,
+                    can_play=True,
+                    thumbnail=item.icon,
+                )
+            )
+        _LOGGER.debug(f"{DOMAIN} - Browse media:  {children}")
+        return BrowseMedia(
+            media_content_id=cardid,
+            media_class=MediaClass.MUSIC,
+            media_content_type=MediaType.MUSIC,
+            title=self.coordinator.yoto_manager.library[cardid].title,
+            can_expand=False,
+            can_play=True,
+            children=children,
+            children_media_class=MediaClass.MUSIC,
+        )
+    
+    async def async_convert_track_to_browse_media(self, cardid: str, chapterid: str) -> list:
+        children = []
+        if self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks:
+            for item in self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks.values():
+                children.append(
+                    BrowseMedia(
+                        media_content_id=cardid + "-" + chapterid + "-" + item.key,
+                        media_class=MediaClass.MUSIC,
+                        media_content_type=MediaType.MUSIC,
+                        title=item.title,
+                        can_expand=False,
+                        can_play=True,
+                        thumbnail=item.icon,
+                    )
+                )
+        return BrowseMedia(
+            media_content_id=cardid,
+            media_class=MediaClass.MUSIC,
+            media_content_type=MediaType.MUSIC,
+            title=self.coordinator.yoto_manager.library[cardid].chapters[chapterid].title,
+            can_expand=False,
+            can_play=True,
+            children=children,
+            children_media_class=MediaClass.MUSIC,
+        )
 
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
