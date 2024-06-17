@@ -11,8 +11,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .browse_media import browse_node, browse_top_level
-
 
 from homeassistant.components.media_player import (
     MediaPlayerEntity,
@@ -101,15 +99,32 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
         if media_content_id in (None, "library"):
             children = await self.async_convert_library_to_browse_media()
-            return BrowseMedia(media_content_id="Root", media_class=MediaClass.DIRECTORY, media_content_type=MediaType.MUSIC, title="Yoto Library", can_expand=True, can_play=False, children=children, children_media_class=MediaClass.MUSIC)
-        
-    
+            return BrowseMedia(
+                media_content_id="Root",
+                media_class=MediaClass.DIRECTORY,
+                media_content_type=MediaType.MUSIC,
+                title="Yoto Library",
+                can_expand=True,
+                can_play=False,
+                children=children,
+                children_media_class=MediaClass.MUSIC,
+            )
+
     async def async_convert_library_to_browse_media(self) -> list:
         children = []
         for card in self.coordinator.yoto_manager.library.values():
-            children.append(BrowseMedia(media_content_id=card.id,media_class=MediaClass.MUSIC, media_content_type=MediaType.MUSIC, title=card.title, can_expand=False, can_play=True))
+            children.append(
+                BrowseMedia(
+                    media_content_id=card.id,
+                    media_class=MediaClass.MUSIC,
+                    media_content_type=MediaType.MUSIC,
+                    title=card.title,
+                    can_expand=False,
+                    can_play=True,
+                )
+            )
         return children
-    
+
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
         """Return the supported features."""
