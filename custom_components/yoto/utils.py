@@ -13,3 +13,17 @@ def rgetattr(obj, attr):
     if right:
         obj = _this_func(obj, right)
     return obj
+
+
+def split_media_id(text):
+    # a synthetic media idea in the format of cardid-chapterid-trackid
+    parts = text.split("-")
+    if len(parts) >= 3:
+        cardid, chapterid, trackid = parts
+    elif len(parts) == 2:
+        cardid, chapterid = parts
+        trackid = None
+    else:
+        cardid = text
+        chapterid = trackid = None
+    return cardid, chapterid, trackid
