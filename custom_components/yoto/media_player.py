@@ -87,7 +87,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         **kwargs: Any,
     ) -> None:
         cardid, chapterid, trackid = split_media_id(media_id)
-        await self.coordinator.async_play_card(self.player.id, cardid, chapterid, trackid)
+        await self.coordinator.async_play_card(
+            self.player.id, cardid, chapterid, trackid
+        )
 
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)

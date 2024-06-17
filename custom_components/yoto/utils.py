@@ -17,7 +17,7 @@ def rgetattr(obj, attr):
 
 def split_media_id(text):
     # a synthetic media idea in the format of cardid-chapterid-trackid
-    parts = text.split('-')
+    parts = text.split("-")
     if len(parts) >= 3:
         cardid, chapterid, trackid = parts
     elif len(parts) == 2:
