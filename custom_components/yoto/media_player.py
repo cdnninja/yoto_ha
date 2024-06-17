@@ -78,6 +78,26 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     async def async_media_stop(self) -> None:
         await self.coordinator.async_stop_player(self.player.id)
 
+    async def async_media_next_track(self) -> None:
+        cardid, chapterid, trackid = split_media_id(self.media_content_id)
+        if chapterid:
+            chapterid = chapterid + 1
+        if trackid:
+            trackid = trackid + 1
+        await self.coordinator.async_play_card(
+            player_id=self.player.id, cardid=cardid, chapter=chapterid, trackkey=trackid
+        )
+
+    async def async_media_previous_track(self) -> None:
+        cardid, chapterid, trackid = split_media_id(self.media_content_id)
+        if chapterid:
+            chapterid = chapterid - 1
+        if trackid:
+            trackid = trackid - 1
+        await self.coordinator.async_play_card(
+            player_id=self.player.id, cardid=cardid, chapter=chapterid, trackkey=trackid
+        )
+
     async def async_play_media(
         self,
         media_type: str,
@@ -215,6 +235,8 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             | MediaPlayerEntityFeature.PLAY_MEDIA
             | MediaPlayerEntityFeature.VOLUME_SET
             | MediaPlayerEntityFeature.BROWSE_MEDIA
+            | MediaPlayerEntityFeature.PREVIOUS_TRACK
+            | MediaPlayerEntityFeature.NEXT_TRACK
         )
 
     @property
@@ -246,23 +268,23 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     @property
     def media_artist(self) -> str:
-        if self.media_content_id in self.coordinator.yoto_manager.library:
-            return self.coordinator.yoto_manager.library[self.media_content_id].author
+        if self.player.card_id in self.coordinator.yoto_manager.library:
+            return self.coordinator.yoto_manager.library[self.player.card_id].author
         else:
             return None
 
     @property
     def media_album_name(self) -> str:
-        if self.media_content_id in self.coordinator.yoto_manager.library:
-            return self.coordinator.yoto_manager.library[self.media_content_id].title
+        if self.player.card_id in self.coordinator.yoto_manager.library:
+            return self.coordinator.yoto_manager.library[self.player.card_id].title
         else:
             return None
 
     @property
     def media_image_url(self) -> str:
-        if self.media_content_id in self.coordinator.yoto_manager.library:
+        if self.player.card_id in self.coordinator.yoto_manager.library:
             return self.coordinator.yoto_manager.library[
-                self.media_content_id
+                self.player.card_id
             ].cover_image_large
         else:
             return None
@@ -273,7 +295,16 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     @property
     def media_content_id(self) -> str:
-        return self.player.card_id
+        if self.player.card_id and self.player.chapter_key and self.player.track_key:
+            return (
+                self.player.card_id
+                + "-"
+                + self.player.chapter_key
+                + "-"
+                + self.player.track_key
+            )
+        else:
+            return None
 
     @property
     def media_title(self) -> str:
@@ -290,44 +321,42 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         state_attributes: dict[str, Any] = {}
         if self.player.card_id and self.player.chapter_key:
             if (
-                self.media_content_id in self.coordinator.yoto_manager.library
-                and self.coordinator.yoto_manager.library[
-                    self.media_content_id
-                ].chapters
+                self.player.card_id in self.coordinator.yoto_manager.library
+                and self.coordinator.yoto_manager.library[self.player.card_id].chapters
             ):
                 if (
                     self.player.chapter_key
                     in self.coordinator.yoto_manager.library[
-                        self.media_content_id
+                        self.player.card_id
                     ].chapters
                 ):
                     if (
                         self.player.track_key
-                        in self.coordinator.yoto_manager.library[self.media_content_id]
+                        in self.coordinator.yoto_manager.library[self.player.card_id]
                         .chapters[self.player.chapter_key]
                         .tracks
                     ):
                         if (
-                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            self.coordinator.yoto_manager.library[self.player.card_id]
                             .chapters[self.player.chapter_key]
                             .icon
                         ):
                             state_attributes["media_chapter_icon"] = (
                                 self.coordinator.yoto_manager.library[
-                                    self.media_content_id
+                                    self.player.card_id
                                 ]
                                 .chapters[self.player.chapter_key]
                                 .icon
                             )
                         if (
-                            self.coordinator.yoto_manager.library[self.media_content_id]
+                            self.coordinator.yoto_manager.library[self.player.card_id]
                             .chapters[self.player.chapter_key]
                             .tracks[self.player.track_key]
                             .icon
                         ):
                             state_attributes["media_track_icon"] = (
                                 self.coordinator.yoto_manager.library[
-                                    self.media_content_id
+                                    self.player.card_id
                                 ]
                                 .chapters[self.player.chapter_key]
                                 .tracks[self.player.track_key]
