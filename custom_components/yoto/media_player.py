@@ -87,8 +87,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         **kwargs: Any,
     ) -> None:
         cardid, chapterid, trackid = split_media_id(media_id)
+        _LOGGER.debug(
+            f"{DOMAIN} - Media requested:  {media_id} Cardid:  {cardid}, chapterid:  {chapterid}, trackid: {trackid}"
+        )
         await self.coordinator.async_play_card(
-            self.player.id, cardid, chapterid, trackid
+            player_id=self.player.id, cardid=cardid, chapter=chapterid, trackkey=trackid
         )
 
     async def async_set_volume_level(self, volume: float) -> None:
@@ -108,8 +111,6 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         if media_content_id in (None, "library"):
             return await self.async_convert_library_to_browse_media()
         else:
-            _LOGGER.debug(f"{DOMAIN} - Getting chapters")
-
             return await self.async_convert_chapter_to_browse_media(media_content_id)
 
     async def async_convert_library_to_browse_media(self) -> list:
