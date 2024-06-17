@@ -30,7 +30,7 @@ The easiest way to install this integration is via HACS. https://hacs.xyz/
 # Services Working
 
 - Play/Pause
-- Play Media/Card via service call
+- Play Media/Card via service call (format of media id is cardid-chapterid-trackid,  if you leave off chapterid/trackid will start at chapter and track 1.)
 - Stop Media via service call
 - Set Time for Day/Night Modes
 - Set display brightness Day/Night including auto
