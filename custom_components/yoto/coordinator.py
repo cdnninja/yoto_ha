@@ -65,7 +65,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         if len(self.yoto_manager.library.keys()) == 0:
             await self.hass.async_add_executor_job(self.yoto_manager.update_library)
         if self.yoto_manager.mqtt_client is None:
-            await self.hass.async_add_executor_job(self.yoto_manager.connect_to_events, self.api_callback)
+            await self.hass.async_add_executor_job(
+                self.yoto_manager.connect_to_events, self.api_callback
+            )
         return self.data
 
     def api_callback(self):
