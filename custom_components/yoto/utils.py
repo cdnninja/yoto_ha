@@ -1,4 +1,5 @@
 """utils.py"""
+
 import re
 
 
@@ -29,8 +30,8 @@ def split_media_id(text):
         chapterid = trackid = None
     return cardid, chapterid, trackid
 
-def parse_key(text):
 
+def parse_key(text):
     match = re.match(r"(\w+)\[(\d+)\]", text)
 
     if match:
