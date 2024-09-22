@@ -48,7 +48,7 @@ async def async_setup_entry(
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for index in range(len(player.config.alarms)):
-            alarm_description =  SwitchEntityDescription(
+            alarm_description = SwitchEntityDescription(
                 key="alarms",
                 index=index,
                 name="Alarm " + str(index) + "1",
@@ -81,7 +81,10 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     @property
     def is_on(self) -> bool | None:
         """Return the entity value to represent the entity state."""
-        if self._key == "night_display_brightness" or self._key == "day_display_brightness":
+        if (
+            self._key == "night_display_brightness"
+            or self._key == "day_display_brightness"
+        ):
             if getattr(self.player.config, self._key) == "auto":
                 return True
             else:
@@ -91,16 +94,26 @@ class YotoSwitch(SwitchEntity, YotoEntity):
 
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
-        if self._key == "night_display_brightness" or self._key == "day_display_brightness":
-            await self.coordinator.async_set_brightness(self.player.id, self._key, "100")
+        if (
+            self._key == "night_display_brightness"
+            or self._key == "day_display_brightness"
+        ):
+            await self.coordinator.async_set_brightness(
+                self.player.id, self._key, "100"
+            )
         elif self._key.startswith("alarms"):
             pass
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs):
         """Turn the entity off."""
-        if self._key == "night_display_brightness" or self._key == "day_display_brightness":
-            await self.coordinator.async_set_brightness(self.player.id, self._key, "auto")
+        if (
+            self._key == "night_display_brightness"
+            or self._key == "day_display_brightness"
+        ):
+            await self.coordinator.async_set_brightness(
+                self.player.id, self._key, "auto"
+            )
         elif self._key.startswith("alarms"):
             pass
         self.async_write_ha_state()
