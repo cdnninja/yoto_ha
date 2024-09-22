@@ -47,6 +47,13 @@ async def async_setup_entry(
     entities = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
+        for index in range(len(player.config.alarms)):
+            SENSOR_DESCRIPTIONS = SENSOR_DESCRIPTIONS + SwitchEntityDescription(
+                key="alarms["+ index +"]",
+                name="Alarm " + index+1,
+                icon="mdi:alarm",
+            )
+
         for description in SENSOR_DESCRIPTIONS:
             if getattr(player.config, description.key, None) is not None:
                 entities.append(YotoSwitch(coordinator, description, player))
