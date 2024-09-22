@@ -49,8 +49,8 @@ async def async_setup_entry(
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for index in range(len(player.config.alarms)):
             SENSOR_DESCRIPTIONS = SENSOR_DESCRIPTIONS + SwitchEntityDescription(
-                key="alarms["+ index +"]",
-                name="Alarm " + index+1,
+                key="alarms[" + index + "]",
+                name="Alarm " + index + 1,
                 icon="mdi:alarm",
             )
 
