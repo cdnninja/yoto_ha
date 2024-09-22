@@ -20,6 +20,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
 from .entity import YotoEntity
+from .utils import parse_key
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,8 +50,7 @@ async def async_setup_entry(
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for index in range(len(player.config.alarms)):
             alarm_description = SwitchEntityDescription(
-                key="alarms",
-                index=index,
+                key="alarms[" + str(index) + "]",
                 name="Alarm " + str(index) + "1",
                 icon="mdi:alarm",
             )
@@ -73,8 +73,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         super().__init__(coordinator, player)
         self._description = description
         self._key = self._description.key
-        self._index = self._description.index
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
+        self._attribute, self._index = parse_key(self._key)
         self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
 
@@ -90,7 +90,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             else:
                 return False
         elif self._key.startswith("alarms"):
-            return getattr(self.player.config, self._key)[self._index]
+            return getattr(self.player.config, self._attribute)[self._index]
 
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""

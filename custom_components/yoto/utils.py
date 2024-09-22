@@ -1,4 +1,5 @@
 """utils.py"""
+import re
 
 
 def rgetattr(obj, attr):
@@ -27,3 +28,12 @@ def split_media_id(text):
         cardid = text
         chapterid = trackid = None
     return cardid, chapterid, trackid
+
+def parse_key(text):
+
+    match = re.match(r"(\w+)\[(\d+)\]", text)
+
+    if match:
+        object1 = match.group(1)  # This will be 'alarms'
+        object2 = int(match.group(2))  # This will be 1
+    return object1, object2
