@@ -51,7 +51,7 @@ async def async_setup_entry(
         for index in range(len(player.config.alarms)):
             alarm_description = SwitchEntityDescription(
                 key="alarms[" + str(index) + "]",
-                name="Alarm " + str(index) + "1",
+                name="Alarm " + str(index + 1),
                 icon="mdi:alarm",
             )
             entities.append(YotoSwitch(coordinator, alarm_description, player))
@@ -74,7 +74,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         self._description = description
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
-        self._attribute, self._index = parse_key(self._key)
+        if self._key.startswith("alarms"):
+            self._attribute, self._index = parse_key(self._key)
         self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
 
@@ -90,7 +91,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             else:
                 return False
         elif self._key.startswith("alarms"):
-            return getattr(self.player.config, self._attribute)[self._index]
+            return getattr(self.player.config, self._attribute)[self._index].enabled
 
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
