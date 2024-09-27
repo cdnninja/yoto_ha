@@ -1,6 +1,6 @@
 # yoto_ha
 
-Home Assistant Integration for Yoto. Readme will not always be updated as this is moving quick.
+Home Assistant Integration for Yoto. 
 
 PRs are appreciated to add more.
 
