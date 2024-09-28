@@ -210,6 +210,15 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             self.yoto_manager.set_player_config, player_id, config
         )
 
+    async def async_enable_disable_alarm(self, player_id: str, alarm: int, enable: bool) -> None:
+        await self.async_check_and_refresh_token()
+        config = YotoPlayerConfig()
+        config.alarms = self.yoto_manager.players[player_id].config.alarms
+        config.alarms[alarm].enabled = enable
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.set_player_config, player_id, config
+        )
+
     async def async_update_card_detail(self, cardId):
         """Get chapter and titles for the card"""
         _LOGGER.debug(f"{DOMAIN} - Updating Card details for:  {cardId}")
