@@ -1,6 +1,6 @@
 # yoto_ha
 
-Home Assistant Integration for Yoto. 
+Home Assistant Integration for Yoto.
 
 PRs are appreciated to add more.
 

@@ -210,7 +210,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             self.yoto_manager.set_player_config, player_id, config
         )
 
-    async def async_enable_disable_alarm(self, player_id: str, alarm: int, enable: bool) -> None:
+    async def async_enable_disable_alarm(
+        self, player_id: str, alarm: int, enable: bool
+    ) -> None:
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         config.alarms = self.yoto_manager.players[player_id].config.alarms

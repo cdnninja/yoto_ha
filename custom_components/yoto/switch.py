@@ -103,7 +103,9 @@ class YotoSwitch(SwitchEntity, YotoEntity):
                 self.player.id, self._key, "100"
             )
         elif self._key.startswith("alarms"):
-            await self.coordinator.async_enable_disable_alarm(self.player.id, self._index, False)
+            await self.coordinator.async_enable_disable_alarm(
+                self.player.id, self._index, False
+            )
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs):
@@ -116,5 +118,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
                 self.player.id, self._key, "auto"
             )
         elif self._key.startswith("alarms"):
-            await self.coordinator.async_enable_disable_alarm(self.player.id, self._index, True)
+            await self.coordinator.async_enable_disable_alarm(
+                self.player.id, self._index, True
+            )
         self.async_write_ha_state()
