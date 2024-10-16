@@ -17,7 +17,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import UnitOfTemperature, EntityCategory, LIGHT_LUX
+from homeassistant.const import UnitOfTemperature, EntityCategory, LIGHT_LUX, PERCENTAGE
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -36,7 +36,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         key="battery_level_percentage",
         name="Battery Level",
         device_class=SensorDeviceClass.BATTERY,
-        native_unit_of_measurement="%",
+        native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
         key="temperature_celcius",
