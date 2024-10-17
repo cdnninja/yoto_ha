@@ -17,7 +17,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.const import UnitOfTemperature, EntityCategory, LIGHT_LUX, PERCENTAGE
+from homeassistant.const import UnitOfTemperature, EntityCategory, LIGHT_LUX, PERCENTAGE, SIGNAL_STRENGTH_DECIBELS_MILLIWATT
 
 from .const import DOMAIN
 from .entity import YotoEntity
@@ -54,7 +54,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         key="wifi_strength",
         name="WiFi Signal Strength",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
-        native_unit_of_measurement="dBm",
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
