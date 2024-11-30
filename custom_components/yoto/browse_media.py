@@ -1,5 +1,8 @@
 """Support for media browsing."""
 
+import logging
+
+
 from homeassistant.components.media_player import BrowseMedia, MediaClass, MediaType
 
 from .const import DOMAIN
