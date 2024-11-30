@@ -1,6 +1,5 @@
 """Support for media browsing."""
 
-
 from homeassistant.components.media_player import BrowseMedia, MediaClass, MediaType
 
 from .const import DOMAIN
@@ -34,6 +33,7 @@ async def async_convert_library_to_browse_media(self) -> list:
         children=children,
         children_media_class=MediaClass.MUSIC,
     )
+
 
 async def async_convert_chapter_to_browse_media(self, cardid: str) -> list:
     children = []
@@ -93,21 +93,20 @@ async def async_convert_track_to_browse_media(
         media_content_id=cardid,
         media_class=MediaClass.MUSIC,
         media_content_type=MediaType.MUSIC,
-        title=self.coordinator.yoto_manager.library[cardid]
-        .chapters[chapterid]
-        .title,
+        title=self.coordinator.yoto_manager.library[cardid].chapters[chapterid].title,
         can_expand=False,
         can_play=True,
         children=children,
         children_media_class=MediaClass.MUSIC,
     )
 
-async def build_item_response(        
-        self,
-        media_content_type: MediaType | str | None = None,
-        media_content_id: str | None = None,
-        ) -> BrowseMedia:
-        if media_content_id in (None, "library"):
-            return await self.async_convert_library_to_browse_media()
-        else:
-            return await self.async_convert_chapter_to_browse_media(media_content_id)
+
+async def build_item_response(
+    self,
+    media_content_type: MediaType | str | None = None,
+    media_content_id: str | None = None,
+) -> BrowseMedia:
+    if media_content_id in (None, "library"):
+        return await self.async_convert_library_to_browse_media()
+    else:
+        return await self.async_convert_chapter_to_browse_media(media_content_id)

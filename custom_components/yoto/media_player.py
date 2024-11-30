@@ -20,7 +20,6 @@ from homeassistant.components.media_player import (
     MediaPlayerEnqueue,
     BrowseMedia,
     MediaType,
-    MediaClass,
 )
 
 from .browse_media import build_item_response
@@ -128,13 +127,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         _LOGGER.debug(
             f"{DOMAIN} - Browse Media id:  {media_content_id} content type: {media_content_type}"
         )
-        return await build_item_response(media_content_type,media_content_id)
-
-
-
-
-
-
+        return await build_item_response(media_content_type, media_content_id)
 
     @property
     def supported_features(self) -> MediaPlayerEntityFeature:
