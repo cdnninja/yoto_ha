@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_get_media_source(hass: HomeAssistant):
-    """Set up Xbox media source."""
+    """Set up Yoto media source."""
     entry = hass.config_entries.async_entries(DOMAIN)[0]
     client = hass.data[DOMAIN][entry.entry_id]["client"]
     return YotoSource(hass, client)
@@ -48,16 +48,16 @@ class YotoMediaItem:
 
 
 class YotoSource(MediaSource):
-    """Provide Xbox screenshots and gameclips as media sources."""
+    """Provide Yoto tracks as media sources."""
 
-    name: str = "Xbox Game Media"
+    name: str = "Yoto Track Media"
 
-    def __init__(self, hass: HomeAssistant, client: XboxLiveClient) -> None:
+    def __init__(self, hass: HomeAssistant, client: YotoClient) -> None:
         """Initialize Xbox source."""
         super().__init__(DOMAIN)
 
         self.hass: HomeAssistant = hass
-        self.client: XboxLiveClient = client
+        self.yotoManager: YotoManager = client
 
     async def async_resolve_media(self, item: MediaSourceItem) -> PlayMedia:
         """Resolve media to a url."""
@@ -101,7 +101,7 @@ class YotoSource(MediaSource):
             identifier="",
             media_class=MediaClass.DIRECTORY,
             media_content_type="",
-            title="Xbox Game Media",
+            title="Yoto Track",
             can_play=False,
             can_expand=True,
             children=[_build_game_item(game, images) for game in games.values()],
