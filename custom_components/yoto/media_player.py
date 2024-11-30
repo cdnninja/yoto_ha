@@ -265,6 +265,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def media_duration(self) -> int:
         return self.player.track_length
+    
+    @property
+    def media_image_remotely_accessible(self) -> bool:
+        """If the image url is remotely accessible."""
+        return True
 
     @property
     def media_artist(self) -> str:
