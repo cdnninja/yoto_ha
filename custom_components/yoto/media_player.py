@@ -114,6 +114,16 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             player_id=self.player.id, cardid=cardid, chapter=chapterid, trackkey=trackid
         )
 
+    async def async_media_seek(self, position: float) -> None:
+        """Send seek command."""
+        await self.coordinator.async_play_card(
+            player_id=self.player.id,
+            cardid=self.player.card_id,
+            chapter=self.player.chapter_key,
+            trackkey=self.player.track_key,
+            secondsin=int(position),
+        )
+
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)
 
@@ -237,6 +247,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             | MediaPlayerEntityFeature.BROWSE_MEDIA
             | MediaPlayerEntityFeature.PREVIOUS_TRACK
             | MediaPlayerEntityFeature.NEXT_TRACK
+            | MediaPlayerEntityFeature.SEEK
         )
 
     @property
@@ -272,6 +283,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             return self.coordinator.yoto_manager.library[self.player.card_id].author
         else:
             return None
+
+    @property
+    def media_image_remotely_accessible(self) -> bool:
+        """If the image url is remotely accessible."""
+        return True
 
     @property
     def media_album_name(self) -> str:
