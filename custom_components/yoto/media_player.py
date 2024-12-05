@@ -116,7 +116,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     async def async_media_seek(self, position: float) -> None:
         """Send seek command."""
-        #self._remote.cmus.seek(position)
+        # self._remote.cmus.seek(position)
 
     async def async_set_volume_level(self, volume: float) -> None:
         await self.coordinator.async_set_volume(self.player.id, volume)
