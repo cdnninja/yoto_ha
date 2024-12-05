@@ -283,12 +283,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             return self.coordinator.yoto_manager.library[self.player.card_id].author
         else:
             return None
-        
+
     @property
     def media_image_remotely_accessible(self) -> bool:
         """If the image url is remotely accessible."""
         return True
-
 
     @property
     def media_album_name(self) -> str:
