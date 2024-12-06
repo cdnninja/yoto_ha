@@ -111,7 +111,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             f"{DOMAIN} - Media requested:  {media_id} Cardid:  {cardid}, chapterid:  {chapterid}, trackid: {trackid}"
         )
         await self.coordinator.async_play_card(
-            player_id=self.player.id, cardid=cardid, chapter=chapterid, trackkey=trackid, secondsin=int(time)
+            player_id=self.player.id,
+            cardid=cardid,
+            chapter=chapterid,
+            trackkey=trackid,
+            secondsin=int(time),
         )
 
     async def async_media_seek(self, position: float) -> None:
