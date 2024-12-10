@@ -18,17 +18,23 @@ def rgetattr(obj, attr):
 
 
 def split_media_id(text):
-    # a synthetic media idea in the format of cardid-chapterid-trackid
+    # a synthetic media idea in the format of cardid-chapterid-trackid-seconds
     parts = text.split("-")
-    if len(parts) >= 3:
+    if len(parts) == 4:
+        cardid, chapterid, trackid, time = parts
+    elif len(parts) == 3:
         cardid, chapterid, trackid = parts
+        time = 0
     elif len(parts) == 2:
         cardid, chapterid = parts
         trackid = None
+        time = 0
     else:
         cardid = text
-        chapterid = trackid = None
-    return cardid, chapterid, trackid
+        chapterid = None
+        trackid = None
+        time = 0
+    return cardid, chapterid, trackid, time
 
 
 def parse_key(text):
