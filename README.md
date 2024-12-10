@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.yoto.total">
+
 # yoto_ha
 
 Home Assistant Integration for Yoto.
