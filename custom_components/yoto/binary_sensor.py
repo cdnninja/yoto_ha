@@ -96,6 +96,7 @@ async def async_setup_entry(
                 entities.append(YotoBinarySensor(coordinator, description, player))
     async_add_entities(entities)
 
+
 class YotoBinarySensor(BinarySensorEntity, YotoEntity):
     """Yoto binary sensor class."""
 
