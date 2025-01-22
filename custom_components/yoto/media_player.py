@@ -79,7 +79,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         await self.coordinator.async_stop_player(self.player.id)
 
     async def async_media_next_track(self) -> None:
-        cardid, chapterid, trackid = split_media_id(self.media_content_id)
+        cardid, chapterid, trackid, time = split_media_id(self.media_content_id)
         if chapterid:
             chapterid = int(chapterid) + 1
         if trackid:
@@ -89,7 +89,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         )
 
     async def async_media_previous_track(self) -> None:
-        cardid, chapterid, trackid = split_media_id(self.media_content_id)
+        cardid, chapterid, trackid, time = split_media_id(self.media_content_id)
         if chapterid:
             chapterid = int(chapterid) - 1
         if trackid:
