@@ -1,0 +1,48 @@
+{
+  "title": "Yoto",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Yoto - Autenticação",
+        "description": "Configure o seu Yoto para integrar com o Home Assistant.",
+        "data": {
+          "username": "Nome de Utilizador",
+          "password": "Palavra-passe"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Yoto - Reautenticação",
+        "description": "A sua conta não conseguiu autenticar. Clique em Enviar para reconfigurar."
+      }
+    },
+    "abort": {
+      "already_configured": "Dispositivo já configurado"
+    },
+    "error": {
+      "invalid_auth": "Falha no login nos servidores Yoto. Utilize a aplicação oficial para sair e voltar a entrar e tente novamente!",
+      "unknown": "Erro desconhecido"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Yoto - Configuração",
+        "data": {
+          "scan_interval": "Intervalo de Verificação (min)"
+        }
+      }
+    }
+  },
+  "services": {
+    "update": {
+      "name": "Atualizar",
+      "description": "Atualizar dados do leitor a partir da cache do serviço",
+      "fields": {
+        "device_id": {
+          "name": "Leitor",
+          "description": "Leitor Alvo"
+        }
+      }
+    }
+  }
+}
