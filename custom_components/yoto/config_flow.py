@@ -52,14 +52,13 @@ async def validate_input(hass: HomeAssistant, user_input: dict[str, Any]) -> Tok
 class YotoOptionFlowHandler(config_entries.OptionsFlow):
     """Handle an option flow for Yoto."""
 
-
     async def async_step_init(self, user_input=None) -> FlowResult:
         """Handle options init setup."""
         if user_input is not None:
             return self.async_create_entry(
                 title=self.config_entry.title, data=user_input
             )
-        
+
         schema = vol.Schema(
             {
                 vol.Required(
