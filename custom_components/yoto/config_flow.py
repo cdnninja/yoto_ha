@@ -52,9 +52,14 @@ async def validate_input(hass: HomeAssistant, user_input: dict[str, Any]) -> Tok
 class YotoOptionFlowHandler(config_entries.OptionsFlow):
     """Handle an option flow for Yoto."""
 
-    def __init__(self) -> None:
-        """Initialize option flow instance."""
-        self.schema = vol.Schema(
+    async def async_step_init(self, user_input=None) -> FlowResult:
+        """Handle options init setup."""
+        if user_input is not None:
+            return self.async_create_entry(
+                title=self.config_entry.title, data=user_input
+            )
+
+        schema = vol.Schema(
             {
                 vol.Required(
                     CONF_SCAN_INTERVAL,
@@ -65,14 +70,7 @@ class YotoOptionFlowHandler(config_entries.OptionsFlow):
             }
         )
 
-    async def async_step_init(self, user_input=None) -> FlowResult:
-        """Handle options init setup."""
-        if user_input is not None:
-            return self.async_create_entry(
-                title=self.config_entry.title, data=user_input
-            )
-
-        return self.async_show_form(step_id="init", data_schema=self.schema)
+        return self.async_show_form(step_id="init", data_schema=schema)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -83,7 +81,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry: ConfigEntry):
+    def async_get_options_flow(config_entry: ConfigEntry) -> YotoOptionFlowHandler:
         """Initiate options flow instance."""
         return YotoOptionFlowHandler()
 
