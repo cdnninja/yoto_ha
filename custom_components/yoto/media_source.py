@@ -1,42 +1,138 @@
-from homeassistant.components.media_source import MediaSource, BrowseMediaSource
+"""Provide the Yoto Media Source."""
+
+import logging
+
+
+from homeassistant.components.media_source import MediaSource, BrowseMediaSource, MediaSourceItem
+from homeassistant.core import HomeAssistant
+from homeassistant.components.media_player import BrowseError, MediaClass, MediaType
+
+from .const import DOMAIN
+from .coordinator import YotoDataUpdateCoordinator
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 class YotoMediaSource(MediaSource):
     """Provide media sources for Yoto Media Player."""
 
-    async def async_browse_media(self, hass, media_content_id):
+    def __init__(self, hass: HomeAssistant) -> None:
+        """Initialize YotoMediaSource."""
+        super().__init__(DOMAIN)
+        self.hass = hass
+        self.coordinator = None
+        
+
+    async def async_browse_media(self, item: MediaSourceItem) -> BrowseMediaSource:
         """Browse media for Yoto."""
-        if media_content_id is None:
-            # Return the root of the media source
+        if self.coordinator is None:
+            self.coordinator = self.hass.data[DOMAIN][0]
+        if item is None:
+            return await self.async_convert_library_to_browse_media()
+        else:
+            return await self.async_convert_chapter_to_browse_media(item)
+        
+    async def async_convert_library_to_browse_media(self) -> list:
+        children = []
+
+        for item in self.coordinator.yoto_manager.library.values():
+            children.append(
+                BrowseMediaSource(
+                        domain=DOMAIN,
+                        media_content_id=item.id,
+                        media_class=MediaClass.MUSIC,
+                        media_content_type=MediaType.MUSIC,
+                        title=item.title,
+                        can_play=True,
+                        can_expand=True,
+                        thumbnail=item.cover_image_large,
+                )
+            )
             return BrowseMediaSource(
-                domain="yoto_ha",
+                domain=DOMAIN,
                 identifier=None,
-                media_class="directory",
-                media_content_type="library",
-                title="Yoto Media Source",
+                media_class=MediaClass.DIRECTORY,
+                media_content_type=MediaType.MUSIC,
+                title="Yoto Library",
                 can_play=False,
                 can_expand=True,
-                children=[
-                    BrowseMediaSource(
-                        domain="yoto_ha",
-                        identifier="yoto_playlist_1",
-                        media_class="playlist",
-                        media_content_type="playlist",
-                        title="Yoto Playlist 1",
-                        can_play=True,
-                        can_expand=False,
-                    ),
-                    BrowseMediaSource(
-                        domain="yoto_ha",
-                        identifier="yoto_playlist_2",
-                        media_class="playlist",
-                        media_content_type="playlist",
-                        title="Yoto Playlist 2",
-                        can_play=True,
-                        can_expand=False,
-                    ),
-                ],
+                children=children,
+                children_media_class=MediaClass.MUSIC,
             )
-        # Handle specific media content browsing
-        # Add logic to return children or media items for the given content ID
-        return None
+    async def async_convert_chapter_to_browse_media(self, cardid: MediaSourceItem) -> list:
+        children = []
+        _LOGGER.debug(
+            f"{DOMAIN} - Chapters:  {self.coordinator.yoto_manager.library[cardid].chapters}"
+        )
+        if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
+            await self.coordinator.async_update_card_detail(cardid)
+        for item in self.coordinator.yoto_manager.library[cardid].chapters.values():
+            _LOGGER.debug(f"{DOMAIN} - Chapter processing:  {item}")
+            children.append(
+                BrowseMediaSource(
+                    domain=DOMAIN,
+                    media_content_id=cardid + "-" + item.key,
+                    media_class=MediaClass.MUSIC,
+                    media_content_type=MediaType.MUSIC,
+                    title=item.title,
+                    can_expand=False,
+                    can_play=True,
+                    thumbnail=item.icon,
+                )
+            )
+        _LOGGER.debug(f"{DOMAIN} - Browse media:  {children}")
+        return BrowseMediaSource(
+            domain=DOMAIN,
+            media_content_id=cardid,
+            media_class=MediaClass.MUSIC,
+            media_content_type=MediaType.MUSIC,
+            title=self.coordinator.yoto_manager.library[cardid].title,
+            can_expand=False,
+            can_play=True,
+            children=children,
+            children_media_class=MediaClass.MUSIC,
+        )
+
+    async def async_convert_track_to_browse_media(
+        self, cardid: str, chapterid: str
+    ) -> list:
+        children = []
+        if self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks:
+            for item in (
+                self.coordinator.yoto_manager.library[cardid]
+                .chapters[chapterid]
+                .tracks.values()
+            ):
+                children.append(
+                    BrowseMediaSource(
+                        domain=DOMAIN,
+                        media_content_id=cardid + "-" + chapterid + "-" + item.key,
+                        media_class=MediaClass.MUSIC,
+                        media_content_type=MediaType.MUSIC,
+                        title=item.title,
+                        can_expand=False,
+                        can_play=True,
+                        thumbnail=item.icon,
+                    )
+                )
+        return BrowseMediaSource(
+            domain=DOMAIN,
+            media_content_id=cardid,
+            media_class=MediaClass.MUSIC,
+            media_content_type=MediaType.MUSIC,
+            title=self.coordinator.yoto_manager.library[cardid]
+            .chapters[chapterid]
+            .title,
+            can_expand=False,
+            can_play=True,
+            children=children,
+            children_media_class=MediaClass.MUSIC,
+        )
+
+        
+
+    
+async def async_get_media_source(hass: HomeAssistant) -> YotoMediaSource:
+    """Return the Yoto media source instance."""
+    return YotoMediaSource(hass)
