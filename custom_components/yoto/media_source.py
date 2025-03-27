@@ -1,5 +1,6 @@
 from homeassistant.components.media_source import MediaSource, BrowseMediaSource
 
+
 class YotoMediaSource(MediaSource):
     """Provide media sources for Yoto Media Player."""
 
