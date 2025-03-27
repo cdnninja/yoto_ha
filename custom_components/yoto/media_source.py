@@ -3,15 +3,17 @@
 import logging
 
 
-from homeassistant.components.media_source import MediaSource, BrowseMediaSource, MediaSourceItem
+from homeassistant.components.media_source import (
+    MediaSource,
+    BrowseMediaSource,
+    MediaSourceItem,
+)
 from homeassistant.core import HomeAssistant
-from homeassistant.components.media_player import BrowseError, MediaClass, MediaType
+from homeassistant.components.media_player import MediaClass, MediaType
 
 from .const import DOMAIN
-from .coordinator import YotoDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
-
 
 
 class YotoMediaSource(MediaSource):
@@ -22,7 +24,6 @@ class YotoMediaSource(MediaSource):
         super().__init__(DOMAIN)
         self.hass = hass
         self.coordinator = None
-        
 
     async def async_browse_media(self, item: MediaSourceItem | None,
 ) -> BrowseMediaSource:
@@ -40,14 +41,14 @@ class YotoMediaSource(MediaSource):
         for item in self.coordinator.yoto_manager.library.values():
             children.append(
                 BrowseMediaSource(
-                        domain=DOMAIN,
-                        media_content_id=item.id,
-                        media_class=MediaClass.MUSIC,
-                        media_content_type=MediaType.MUSIC,
-                        title=item.title,
-                        can_play=True,
-                        can_expand=True,
-                        thumbnail=item.cover_image_large,
+                    domain=DOMAIN,
+                    media_content_id=item.id,
+                    media_class=MediaClass.MUSIC,
+                    media_content_type=MediaType.MUSIC,
+                    title=item.title,
+                    can_play=True,
+                    can_expand=True,
+                    thumbnail=item.cover_image_large,
                 )
             )
             return BrowseMediaSource(
@@ -131,9 +132,7 @@ class YotoMediaSource(MediaSource):
             children_media_class=MediaClass.MUSIC,
         )
 
-        
 
-    
 async def async_get_media_source(hass: HomeAssistant) -> YotoMediaSource:
     """Return the Yoto media source instance."""
     return YotoMediaSource(hass)
