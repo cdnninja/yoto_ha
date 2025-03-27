@@ -38,7 +38,6 @@ class YotoMediaSource(MediaSource):
             _LOGGER.debug(f"{DOMAIN} - Browsing media:  {item.identifier}")
             _LOGGER.debug(f"{DOMAIN} - Browsing media:  {item}")
 
-
             return await self.async_convert_chapter_to_browse_media(item.identifier)
 
     async def async_convert_library_to_browse_media(self) -> list:
