@@ -48,7 +48,6 @@ class YotoMediaSource(MediaSource):
                 BrowseMediaSource(
                     domain=DOMAIN,
                     identifier=item.id,
-                    media_content_id=item.id,
                     media_class=MediaClass.MUSIC,
                     media_content_type=MediaType.MUSIC,
                     title=item.title,
@@ -82,7 +81,6 @@ class YotoMediaSource(MediaSource):
                 BrowseMediaSource(
                     domain=DOMAIN,
                     identifier=cardid + "-" + item.key,
-                    media_content_id=cardid + "-" + item.key,
                     media_class=MediaClass.MUSIC,
                     media_content_type=MediaType.MUSIC,
                     title=item.title,
@@ -95,7 +93,6 @@ class YotoMediaSource(MediaSource):
         return BrowseMediaSource(
             domain=DOMAIN,
             identifier=cardid,
-            media_content_id=cardid,
             media_class=MediaClass.MUSIC,
             media_content_type=MediaType.MUSIC,
             title=self.coordinator.yoto_manager.library[cardid].title,
@@ -118,7 +115,7 @@ class YotoMediaSource(MediaSource):
                 children.append(
                     BrowseMediaSource(
                         domain=DOMAIN,
-                        media_content_id=cardid + "-" + chapterid + "-" + item.key,
+                        identifier=cardid + "-" + chapterid + "-" + item.key,
                         media_class=MediaClass.MUSIC,
                         media_content_type=MediaType.MUSIC,
                         title=item.title,
@@ -129,7 +126,7 @@ class YotoMediaSource(MediaSource):
                 )
         return BrowseMediaSource(
             domain=DOMAIN,
-            media_content_id=cardid,
+            identifier=cardid,
             media_class=MediaClass.MUSIC,
             media_content_type=MediaType.MUSIC,
             title=self.coordinator.yoto_manager.library[cardid]
