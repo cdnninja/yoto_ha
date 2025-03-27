@@ -77,7 +77,7 @@ class YotoSource(MediaSource):
 
         return await self._build_media_items(title, category)
 
-    async def _build_game_library(self):
+    async def _build_game_library(self) -> BrowseMediaSource:
         """Display installed games across all consoles."""
         apps = await self.client.smartglass.get_installed_apps()
         games = {
@@ -108,7 +108,7 @@ class YotoSource(MediaSource):
             children_media_class=MediaClass.GAME,
         )
 
-    async def _build_media_items(self, title, category):
+    async def _build_media_items(self, title, category) -> BrowseMediaSource:
         """Fetch requested gameclip/screenshot media."""
         title_id, _, thumbnail = title.split("#", 2)
         owner, kind = category.split("#", 1)
@@ -129,7 +129,7 @@ class YotoSource(MediaSource):
                 else:
                     return None
                 items = [
-                    XboxMediaItem(
+                    YotoMediaItem(
                         item.user_caption
                         or dt_util.as_local(
                             dt_util.parse_datetime(item.date_recorded)
@@ -154,7 +154,7 @@ class YotoSource(MediaSource):
                 else:
                     return None
                 items = [
-                    XboxMediaItem(
+                    YotoMediaItem(
                         item.user_caption
                         or dt_util.as_local(item.date_taken).strftime(
                             "%b. %d, %Y %I:%M%p"
@@ -180,7 +180,7 @@ class YotoSource(MediaSource):
         )
 
 
-def _build_game_item(item: InstalledPackage, images: dict[str, list[Image]]):
+def _build_game_item(item: InstalledPackage, images: dict[str, list[Image]]) -> BrowseMediaSource:
     """Build individual game."""
     thumbnail = ""
     image = _find_media_image(images.get(item.one_store_product_id, []))
@@ -202,7 +202,7 @@ def _build_game_item(item: InstalledPackage, images: dict[str, list[Image]]):
     )
 
 
-def _build_categories(title):
+def _build_categories(title) -> BrowseMediaSource:
     """Build base categories for Xbox media."""
     _, name, thumbnail = title.split("#", 2)
     base = BrowseMediaSource(
@@ -238,7 +238,7 @@ def _build_categories(title):
     return base
 
 
-def _build_media_item(title: str, category: str, item: XboxMediaItem):
+def _build_media_item(title: str, category: str, item: YotoMediaItem) -> BrowseMediaSource:
     """Build individual media item."""
     kind = category.split("#", 1)[1]
     return BrowseMediaSource(
