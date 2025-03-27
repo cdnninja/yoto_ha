@@ -32,7 +32,7 @@ class YotoMediaSource(MediaSource):
         """Browse media for Yoto."""
         if self.coordinator is None:
             self.coordinator = next(iter(self.hass.data[DOMAIN].values()))
-        if item is None:
+        if item.identifier is None:
             return await self.async_convert_library_to_browse_media()
         else:
             _LOGGER.debug(f"{DOMAIN} - Browsing media:  {item.identifier}")
@@ -48,6 +48,7 @@ class YotoMediaSource(MediaSource):
             children.append(
                 BrowseMediaSource(
                     domain=DOMAIN,
+                    identifier=item.id,
                     media_content_id=item.id,
                     media_class=MediaClass.MUSIC,
                     media_content_type=MediaType.MUSIC,
@@ -81,6 +82,7 @@ class YotoMediaSource(MediaSource):
             children.append(
                 BrowseMediaSource(
                     domain=DOMAIN,
+                    identifier=cardid + "-" + item.key,
                     media_content_id=cardid + "-" + item.key,
                     media_class=MediaClass.MUSIC,
                     media_content_type=MediaType.MUSIC,
@@ -93,6 +95,7 @@ class YotoMediaSource(MediaSource):
         _LOGGER.debug(f"{DOMAIN} - Browse media:  {children}")
         return BrowseMediaSource(
             domain=DOMAIN,
+            identifier=cardid,
             media_content_id=cardid,
             media_class=MediaClass.MUSIC,
             media_content_type=MediaType.MUSIC,
