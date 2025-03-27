@@ -180,7 +180,9 @@ class YotoSource(MediaSource):
         )
 
 
-def _build_game_item(item: InstalledPackage, images: dict[str, list[Image]]) -> BrowseMediaSource:
+def _build_game_item(
+    item: InstalledPackage, images: dict[str, list[Image]]
+) -> BrowseMediaSource:
     """Build individual game."""
     thumbnail = ""
     image = _find_media_image(images.get(item.one_store_product_id, []))
@@ -238,7 +240,9 @@ def _build_categories(title) -> BrowseMediaSource:
     return base
 
 
-def _build_media_item(title: str, category: str, item: YotoMediaItem) -> BrowseMediaSource:
+def _build_media_item(
+    title: str, category: str, item: YotoMediaItem
+) -> BrowseMediaSource:
     """Build individual media item."""
     kind = category.split("#", 1)[1]
     return BrowseMediaSource(
