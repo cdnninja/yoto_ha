@@ -7,11 +7,13 @@ from homeassistant.components.media_source import (
     MediaSource,
     BrowseMediaSource,
     MediaSourceItem,
+    PlayMedia
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.components.media_player import MediaClass, MediaType
 
 from .const import DOMAIN
+from .utils import split_media_id
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +26,28 @@ class YotoMediaSource(MediaSource):
         super().__init__(DOMAIN)
         self.hass = hass
         self.coordinator = None
+
+    async def async_resolve_media(self, item: MediaSourceItem) -> PlayMedia:
+        """Provides the URL to play the media."""
+        _LOGGER.debug(f"{DOMAIN} - Resolve media: {item.identifier}")
+        cardid, chapterid, trackid, time = split_media_id(item.identifier)
+        if trackid is None:
+            if chapterid is not None:
+                trackid = chapterid
+            else:
+                trackid = 1
+        if chapterid is None:
+            if trackid is not None:
+                chapterid = trackid
+            else:
+                chapterid = 1
+        track = self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks[trackid]
+        if track.format == "aac":
+            mime = "audio/aac"
+        elif track.format == "mp3":
+            mime = "audio/mpeg"
+        return PlayMedia(track.trackUrl, mime)
+
 
     async def async_browse_media(
         self,
