@@ -7,7 +7,7 @@ from homeassistant.components.media_source import (
     MediaSource,
     BrowseMediaSource,
     MediaSourceItem,
-    PlayMedia
+    PlayMedia,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.components.media_player import MediaClass, MediaType
@@ -41,13 +41,16 @@ class YotoMediaSource(MediaSource):
                 chapterid = trackid
             else:
                 chapterid = 1
-        track = self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks[trackid]
+        track = (
+            self.coordinator.yoto_manager.library[cardid]
+            .chapters[chapterid]
+            .tracks[trackid]
+        )
         if track.format == "aac":
             mime = "audio/aac"
         elif track.format == "mp3":
             mime = "audio/mpeg"
         return PlayMedia(track.trackUrl, mime)
-
 
     async def async_browse_media(
         self,
