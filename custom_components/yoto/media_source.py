@@ -21,6 +21,8 @@ _LOGGER = logging.getLogger(__name__)
 class YotoMediaSource(MediaSource):
     """Provide media sources for Yoto Media Player."""
 
+    name: str = "Yoto Media"
+
     def __init__(self, hass: HomeAssistant) -> None:
         """Initialize YotoMediaSource."""
         super().__init__(DOMAIN)
@@ -29,7 +31,6 @@ class YotoMediaSource(MediaSource):
 
     async def async_resolve_media(self, item: MediaSourceItem) -> PlayMedia:
         """Provides the URL to play the media."""
-        _LOGGER.debug(f"{DOMAIN} - Resolve media: {item.identifier}")
         cardid, chapterid, trackid, time = split_media_id(item.identifier)
         if trackid is None:
             if chapterid is not None:
@@ -93,9 +94,7 @@ class YotoMediaSource(MediaSource):
 
     async def async_convert_chapter_to_browse_media(self, cardid: str) -> list:
         children = []
-        _LOGGER.debug(
-            f"{DOMAIN} - Chapters:  {self.coordinator.yoto_manager.library[cardid].chapters}"
-        )
+
         if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
             await self.coordinator.async_update_card_detail(cardid)
         for item in self.coordinator.yoto_manager.library[cardid].chapters.values():
@@ -112,7 +111,6 @@ class YotoMediaSource(MediaSource):
                     thumbnail=item.icon,
                 )
             )
-        _LOGGER.debug(f"{DOMAIN} - Browse media:  {children}")
         return BrowseMediaSource(
             domain=DOMAIN,
             identifier=cardid,

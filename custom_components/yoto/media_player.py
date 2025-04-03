@@ -49,9 +49,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     """Yoto Media Player class."""
 
     _attr_has_entity_name = True
-    _attr_media_image_remotely_accessible = False
+    _attr_media_image_remotely_accessible = True
     _attr_name = None
-    _attr_translation_key = "yoto"
+    _attr_translation_key = "Yoto Media Player"
 
     def __init__(
         self,
