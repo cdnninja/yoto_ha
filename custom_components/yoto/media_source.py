@@ -35,14 +35,10 @@ class YotoMediaSource(MediaSource):
         if item.identifier is None:
             return await self.async_convert_library_to_browse_media()
         else:
-            _LOGGER.debug(f"{DOMAIN} - Browsing media:  {item.identifier}")
-            _LOGGER.debug(f"{DOMAIN} - Browsing media:  {item}")
-
             return await self.async_convert_chapter_to_browse_media(item.identifier)
 
     async def async_convert_library_to_browse_media(self) -> list:
         children = []
-
         for item in self.coordinator.yoto_manager.library.values():
             children.append(
                 BrowseMediaSource(
@@ -56,17 +52,17 @@ class YotoMediaSource(MediaSource):
                     thumbnail=item.cover_image_large,
                 )
             )
-            return BrowseMediaSource(
-                domain=DOMAIN,
-                identifier=None,
-                media_class=MediaClass.DIRECTORY,
-                media_content_type=MediaType.MUSIC,
-                title="Yoto Library",
-                can_play=False,
-                can_expand=True,
-                children=children,
-                children_media_class=MediaClass.MUSIC,
-            )
+        return BrowseMediaSource(
+            domain=DOMAIN,
+            identifier=None,
+            media_class=MediaClass.DIRECTORY,
+            media_content_type=MediaType.MUSIC,
+            title="Yoto Library",
+            can_play=False,
+            can_expand=True,
+            children=children,
+            children_media_class=MediaClass.MUSIC,
+        )
 
     async def async_convert_chapter_to_browse_media(self, cardid: str) -> list:
         children = []
