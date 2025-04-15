@@ -127,7 +127,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             self.yoto_manager.set_player_config, player_id, config
         )
 
-    async def async_set_max_volume(self, player_id: str, key: str, value: time) -> None:
+    async def async_set_max_volume(self, player_id: str, key: str, value: int) -> None:
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "config.night_max_volume_limit":
@@ -138,7 +138,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             self.yoto_manager.set_player_config, player_id, config
         )
 
-    async def async_set_brightness(self, player_id: str, key: str, value: time) -> None:
+    async def async_set_brightness(self, player_id: str, key: str, value: str) -> None:
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "config.night_display_brightness":
