@@ -141,12 +141,12 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_set_brightness(self, player_id: str, key: str, value: str) -> None:
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
-        if key == "config.night_display_brightness" or key == "night_display_brightness_switch":
+        if key == "config.night_display_brightness" or key == "night_display_brightness":
             if value == "auto":
                 config.night_display_brightness = value
             else:
                 config.night_display_brightness = int(value)
-        if key == "config.day_display_brightness" or key == "day_display_brightness_switch":
+        if key == "config.day_display_brightness" or key == "day_display_brightness":
             if value == "auto":
                 config.day_display_brightness = value
             else:
