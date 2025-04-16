@@ -26,12 +26,12 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
-        key="night_display_brightness_switch",
+        key="night_display_brightness",
         name="Night Auto Display Brightness",
         icon="mdi:brightness-auto",
     ),
     SwitchEntityDescription(
-        key="day_display_brightness_switch",
+        key="day_display_brightness",
         name="Day Auto Display Brightness",
         icon="mdi:brightness-auto",
     ),
@@ -73,7 +73,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         super().__init__(coordinator, player)
         self._description = description
         self._key = self._description.key
-        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_switch_{self._key}"
         if self._key.startswith("alarms"):
             self._attribute, self._index = parse_key(self._key)
         self._attr_icon = self._description.icon
@@ -83,8 +83,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     def is_on(self) -> bool | None:
         """Return the entity value to represent the entity state."""
         if (
-            self._key == "night_display_brightness_switch"
-            or self._key == "day_display_brightness_switch"
+            self._key == "night_display_brightness"
+            or self._key == "day_display_brightness"
         ):
             if getattr(self.player.config, self._key) == "auto":
                 return True
@@ -96,12 +96,10 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
         if (
-            self._key == "night_display_brightness_switch"
-            or self._key == "day_display_brightness_switch"
+            self._key == "night_display_brightness"
+            or self._key == "day_display_brightness"
         ):
-            await self.coordinator.async_set_brightness(
-                self.player.id, self._key, "0"
-            )
+            await self.coordinator.async_set_brightness(self.player.id, self._key, "0")
         elif self._key.startswith("alarms"):
             await self.coordinator.async_enable_disable_alarm(
                 self.player.id, self._index, False
@@ -111,8 +109,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     async def async_turn_on(self, **kwargs):
         """Turn the entity off."""
         if (
-            self._key == "night_display_brightness_switch"
-            or self._key == "day_display_brightness_switch"
+            self._key == "night_display_brightness"
+            or self._key == "day_display_brightness"
         ):
             await self.coordinator.async_set_brightness(
                 self.player.id, self._key, "auto"
