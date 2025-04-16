@@ -100,7 +100,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             or self._key == "day_display_brightness_switch"
         ):
             await self.coordinator.async_set_brightness(
-                self.player.id, self._key, "100"
+                self.player.id, self._key, "0"
             )
         elif self._key.startswith("alarms"):
             await self.coordinator.async_enable_disable_alarm(

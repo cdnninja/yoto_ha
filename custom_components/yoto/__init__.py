@@ -1,15 +1,12 @@
 import logging
 import asyncio
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    Platform,
-)
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import (
-    DOMAIN,
-)
+from .media_source import YotoMediaSource
+from .const import DOMAIN
 from .coordinator import YotoDataUpdateCoordinator
 from .services import async_setup_services
 
@@ -43,6 +40,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     hass.data[DOMAIN][config_entry.unique_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
     async_setup_services(hass)
+
+    # Register the media source
+    hass.data.setdefault("media_source", {})
+    hass.data["media_source"][DOMAIN] = YotoMediaSource(hass)
+
     return True
 
 
