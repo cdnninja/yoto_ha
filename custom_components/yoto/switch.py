@@ -26,12 +26,12 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
-        key="night_display_brightness",
+        key="night_display_brightness_switch",
         name="Night Auto Display Brightness",
         icon="mdi:brightness-auto",
     ),
     SwitchEntityDescription(
-        key="day_display_brightness",
+        key="day_display_brightness_switch",
         name="Day Auto Display Brightness",
         icon="mdi:brightness-auto",
     ),
@@ -83,8 +83,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     def is_on(self) -> bool | None:
         """Return the entity value to represent the entity state."""
         if (
-            self._key == "night_display_brightness"
-            or self._key == "day_display_brightness"
+            self._key == "night_display_brightness_switch"
+            or self._key == "day_display_brightness_switch"
         ):
             if getattr(self.player.config, self._key) == "auto":
                 return True
@@ -96,8 +96,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
         if (
-            self._key == "night_display_brightness"
-            or self._key == "day_display_brightness"
+            self._key == "night_display_brightness_switch"
+            or self._key == "day_display_brightness_switch"
         ):
             await self.coordinator.async_set_brightness(
                 self.player.id, self._key, "100"
@@ -111,8 +111,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
     async def async_turn_on(self, **kwargs):
         """Turn the entity off."""
         if (
-            self._key == "night_display_brightness"
-            or self._key == "day_display_brightness"
+            self._key == "night_display_brightness_switch"
+            or self._key == "day_display_brightness_switch"
         ):
             await self.coordinator.async_set_brightness(
                 self.player.id, self._key, "auto"
