@@ -26,7 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
-        key="night_display_brightness_switch",
+        key="night_display_brightness",
         name="Night Auto Display Brightness",
         icon="mdi:brightness-auto",
     ),
