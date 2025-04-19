@@ -91,9 +91,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the initial step."""
 
         if user_input is None:
-            return self.async_show_form(
-                step_id="user", data_schema=DATA_SCHEMA
-            )
+            return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
 
         errors = {}
 
@@ -132,26 +130,26 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         _LOGGER.debug("Reauth step called")
 
         if user_input:
-             username = user_input[CONF_USERNAME]
-             password = user_input[CONF_PASSWORD]
- 
-             manager = YotoManager(username, password)
-             login = await self.hass.async_add_executor_job(manager.login)
-             if login:
-                 return self.async_update_reload_and_abort(
-                     self._get_reauth_entry(),
-                     data_updates={
-                         CONF_USERNAME: username,
-                         CONF_PASSWORD: password,
-                     },
-                 )
- 
+            username = user_input[CONF_USERNAME]
+            password = user_input[CONF_PASSWORD]
+
+            manager = YotoManager(username, password)
+            login = await self.hass.async_add_executor_job(manager.login)
+            if login:
+                return self.async_update_reload_and_abort(
+                    self._get_reauth_entry(),
+                    data_updates={
+                        CONF_USERNAME: username,
+                        CONF_PASSWORD: password,
+                    },
+                )
+
         return self.async_show_form(
-             step_id="reauth_confirm",
-             data_schema=DATA_SCHEMA,
-             description_placeholders={"name": "VeSync"},
-             errors={"base": "invalid_auth"},
-         )
+            step_id="reauth_confirm",
+            data_schema=DATA_SCHEMA,
+            description_placeholders={"name": "VeSync"},
+            errors={"base": "invalid_auth"},
+        )
 
 
 class InvalidAuth(HomeAssistantError):
