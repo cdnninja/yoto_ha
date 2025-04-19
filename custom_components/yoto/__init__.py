@@ -3,12 +3,15 @@ import asyncio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed
+from yoto_api import AuthenticationError
+
 
 from .media_source import YotoMediaSource
 from .const import DOMAIN
 from .coordinator import YotoDataUpdateCoordinator
 from .services import async_setup_services
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,8 +36,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     try:
         await coordinator.async_config_entry_first_refresh()
         await asyncio.sleep(2)
-    except Exception as ex:
-        raise ConfigEntryNotReady(f"Config Not Ready: {ex}")
+    except AuthenticationError as ex:
+        _LOGGER.error(f"Authentication error: {ex}")
+        raise ConfigEntryAuthFailed from ex
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][config_entry.unique_id] = coordinator
