@@ -38,10 +38,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         await asyncio.sleep(2)
     except AuthenticationError as ex:
         _LOGGER.error(f"Authentication error: {ex}")
-
-        raise ConfigEntryAuthFailed
-    except Exception as ex:
-        raise ConfigEntryNotReady(f"Config Not Ready: {ex}")
+        raise ConfigEntryAuthFailed from ex
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][config_entry.unique_id] = coordinator
