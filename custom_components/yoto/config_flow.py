@@ -27,7 +27,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-STEP_USER_DATA_SCHEMA = vol.Schema(
+DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
@@ -92,7 +92,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is None:
             return self.async_show_form(
-                step_id="user", data_schema=STEP_USER_DATA_SCHEMA
+                step_id="user", data_schema=DATA_SCHEMA
             )
 
         errors = {}
@@ -120,25 +120,38 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_abort(reason="reauth_successful")
 
         return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+            step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
     async def async_step_reauth(self, user_input=None):
         """Perform reauth upon an API authentication error."""
-        self.reauth_entry = self.hass.config_entries.async_get_entry(
-            self.context["entry_id"]
-        )
         return await self.async_step_reauth_confirm()
 
     async def async_step_reauth_confirm(self, user_input=None):
         """Dialog that informs the user that reauth is required."""
-        if user_input is None:
-            return self.async_show_form(
-                step_id="reauth_confirm",
-                data_schema=vol.Schema({}),
-            )
-        self._reauth_config = True
-        return await self.async_step_user()
+        _LOGGER.debug("Reauth step called")
+
+        if user_input:
+             username = user_input[CONF_USERNAME]
+             password = user_input[CONF_PASSWORD]
+ 
+             manager = YotoManager(username, password)
+             login = await self.hass.async_add_executor_job(manager.login)
+             if login:
+                 return self.async_update_reload_and_abort(
+                     self._get_reauth_entry(),
+                     data_updates={
+                         CONF_USERNAME: username,
+                         CONF_PASSWORD: password,
+                     },
+                 )
+ 
+        return self.async_show_form(
+             step_id="reauth_confirm",
+             data_schema=DATA_SCHEMA,
+             description_placeholders={"name": "VeSync"},
+             errors={"base": "invalid_auth"},
+         )
 
 
 class InvalidAuth(HomeAssistantError):

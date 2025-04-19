@@ -60,7 +60,8 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             await self.async_check_and_refresh_token()
         except AuthenticationError as ex:
-            raise ConfigEntryAuthFailed(f"Config Not Ready: {ex}")
+            _LOGGER.error(f"Authentication error: {ex}")
+            raise ConfigEntryAuthFailed
 
         await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
         if len(self.yoto_manager.library.keys()) == 0:
