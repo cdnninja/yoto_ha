@@ -8,6 +8,6 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/cdnninja/yoto_ha/issues",
   "loggers": ["yoto", "yoto_api", "paho_mqtt"],
-  "requirements": ["yoto-api==1.26.5"],
+  "requirements": ["yoto-api==1.26.6"],
   "version": "1.24.5"
 }
