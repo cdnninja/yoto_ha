@@ -54,6 +54,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         Allow to update for the first time without further checking
         """
+
         try:
             await self.async_check_and_refresh_token()
         except AuthenticationError as ex:

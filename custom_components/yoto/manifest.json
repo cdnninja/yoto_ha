@@ -1,13 +1,21 @@
 {
   "domain": "yoto",
   "name": "Yoto",
-  "codeowners": ["@cdnninja"],
+  "codeowners": [
+    "@cdnninja"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/cdnninja/yoto_ha",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/cdnninja/yoto_ha/issues",
-  "loggers": ["yoto", "yoto_api", "paho_mqtt"],
-  "requirements": ["yoto-api==2.0.3"],
+  "loggers": [
+    "yoto",
+    "yoto_api",
+    "paho_mqtt"
+  ],
+  "requirements": [
+    "yoto-api==2.1.0"
+  ],
   "version": "1.24.5"
 }

@@ -116,7 +116,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.debug("Login task is done, checking results")
             if self.login_task.exception():
                 return self.async_show_progress_done(next_step_id="timeout")
-            self.token = self.ym.token
+            self.token = self.ym.token.refresh_token
 
             return self.async_show_progress_done(next_step_id="finish_login")
 
