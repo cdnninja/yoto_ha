@@ -39,12 +39,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     except AuthenticationError as ex:
         _LOGGER.error(f"Authentication error: {ex}")
         raise ConfigEntryAuthFailed from ex
-    
+
     async def _handle_shutdown(event):
         new_data = dict(config_entry.data)
         coordinator = hass.data[DOMAIN][config_entry.unique_id]
         new_data[CONF_TOKEN] = coordinator.yoto_manager.token.refresh_token
-        _LOGGER.debug(f"Storing token on HA shutdown.")
+        _LOGGER.debug("Storing token on HA shutdown.")
         hass.config_entries.async_update_entry(config_entry, data=new_data)
 
     hass.bus.async_listen_once("homeassistant_stop", _handle_shutdown)
@@ -66,7 +66,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     new_data = dict(entry.data)
     coordinator = hass.data[DOMAIN][entry.unique_id]
     new_data[CONF_TOKEN] = coordinator.yoto_manager.token.refresh_token
-    _LOGGER.debug(f"Storing token on unload")
+    _LOGGER.debug("Storing token on unload")
     hass.config_entries.async_update_entry(entry, data=new_data)
 
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
