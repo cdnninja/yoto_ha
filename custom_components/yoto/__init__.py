@@ -67,7 +67,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Migrate old entry."""
 
     if entry.version < 2:
-        _LOGGER.debug("Migrating entry to version 2. Current data: %s", entry.data)
+        _LOGGER.debug("Migrating entry to version 2.")
         data = dict(entry.data)
         data.pop(CONF_USERNAME, None)
         data.pop(CONF_PASSWORD, None)

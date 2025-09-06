@@ -2,7 +2,7 @@
   "title": "Yoto",
   "config": {
     "progress": {
-      "wait_for_device": "To authenticate, open the following URL and login at Yoto:\n{url}\nIf the code is not automatically copied, paste the following code to authorize the integration:\n\n```{code}```"
+      "wait_for_device": "To authenticate, open the following URL and login at Yoto:\n{url}"
     },
     "step": {
       "device_code": {

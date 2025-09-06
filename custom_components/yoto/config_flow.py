@@ -91,8 +91,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.debug("Initiating device activation")
             self.ym = await self.hass.async_add_executor_job(YotoManager)
             assert self.ym is not None
-            yoto_device_url = self.ym.device_verification_url()
-            user_code = URL(yoto_device_url).query["user_code"]
+            urlObject = await self.hass.async_add_executor_job(self.ym.device_code_flow_start)
+            yoto_device_url = urlObject["verification_uri_complete"]
 
         async def _wait_for_login() -> None:
             """Wait for the user to login."""
@@ -121,7 +121,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             progress_action="wait_for_device",
             description_placeholders={
                 "url": yoto_device_url,
-                "code": user_code,
             },
             progress_task=self.login_task,
         )
@@ -133,21 +132,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the finalization of reauth."""
         _LOGGER.debug("Finalizing reauth")
         assert self.ym is not None
-        ym_me = await self.hass.async_add_executor_job(self.ym.get_me)
-
-        if "homes" not in tado_me or len(tado_me["homes"]) == 0:
-            return self.async_abort(reason="no_homes")
-
-        home = tado_me["homes"][0]
-        unique_id = str(home["id"])
-        name = home["name"]
+        unique_id = next(iter(self.ym.players))
 
         if self.source != SOURCE_REAUTH:
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
 
             return self.async_create_entry(
-                title=name,
+                title=unique_id,
                 data={CONF_TOKEN: self.token},
             )
 
