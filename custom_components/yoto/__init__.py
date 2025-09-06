@@ -59,7 +59,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         coordinator = hass.data[DOMAIN][entry.unique_id]
         release_tasks.add(coordinator.release())
         new_data = dict(entry.data)
-        new_data[CONF_TOKEN] = coordinator.ym.token
+        new_data[CONF_TOKEN] = coordinator.yoto_manager.token
         hass.config_entries.async_update_entry(entry, data=new_data)
         hass.data[DOMAIN].pop(entry.unique_id)
         await asyncio.gather(*release_tasks)
