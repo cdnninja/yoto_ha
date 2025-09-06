@@ -33,7 +33,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
-        self.yoto_manager = YotoManager()
+        self.yoto_manager = YotoManager(client_id="KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult")
         if config_entry.data.get(CONF_TOKEN):
             self.yoto_manager.set_token(config_entry.data.get(CONF_TOKEN))
         else:
