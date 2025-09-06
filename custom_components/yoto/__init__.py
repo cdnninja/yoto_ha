@@ -1,7 +1,7 @@
 import logging
 import asyncio
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from yoto_api import AuthenticationError
@@ -61,3 +61,16 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.unique_id)
         await asyncio.gather(*release_tasks)
     return unload_ok
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate old entry."""
+
+    if entry.version < 2:
+        _LOGGER.debug("Migrating entry to version 2. Current data: %s", entry.data)
+        data = dict(entry.data)
+        data.pop(CONF_USERNAME, None)
+        data.pop(CONF_PASSWORD, None)
+        hass.config_entries.async_update_entry(entry=entry, data=data, version=2)
+        _LOGGER.debug("Migration to version 2 successful")
+    return True

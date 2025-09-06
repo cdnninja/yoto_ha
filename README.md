@@ -8,6 +8,7 @@ PRs are appreciated to add more.
 
 ![image](https://github.com/cdnninja/yoto_ha/assets/6373468/a02dac1e-609c-4536-9588-9bf5c7bba013)
 
+
 # Supported Device Features
 
 Not all devices expose all sensors/entities. Only sensors/entities supported by your device will be available in the integration.
@@ -22,12 +23,6 @@ Not all devices expose all sensors/entities. Only sensors/entities supported by 
 
 The easiest way to install this integration is via HACS. https://hacs.xyz/
 
-1. Once HACS is installed you add this as a custom repository:
-
-![image](https://github.com/cdnninja/yoto_ha/assets/6373468/7aab0d92-f899-4c21-b51a-d6a5804d04fc)
-
-2. After that you can adjust your HACS filter to not show all integrations and click install.
-3. Next you must go to the integration page and "add" the integration to set it up.
 
 # Services Working
 

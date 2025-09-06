@@ -17,9 +17,7 @@ from yoto_api import (
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
-    CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -27,6 +25,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    CONF_CLIENT_ID,
+    CONF_TOKEN
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,10 +38,11 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
-        self.yoto_manager = YotoManager(
-            username=config_entry.data.get(CONF_USERNAME),
-            password=config_entry.data.get(CONF_PASSWORD),
-        )
+        self.yoto_manager = YotoManager()
+        if config_entry.data.get(CONF_TOKEN):
+            self.yoto_manager.set_token(config_entry.data.get(CONF_TOKEN))
+        else: 
+            raise ConfigEntryAuthFailed("No token configured")
         self.scan_interval: int = (
             config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL) * 60
         )
