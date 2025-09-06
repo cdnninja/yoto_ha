@@ -54,13 +54,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Handle removal of an entry."""
+    new_data = dict(entry.data)
+    coordinator = hass.data[DOMAIN][entry.unique_id]
+    new_data[CONF_TOKEN] = coordinator.yoto_manager.token
+    _LOGGER.debug(f"Storing token on unload: {new_data[CONF_TOKEN]}")
+    hass.config_entries.async_update_entry(entry, data=new_data)
+
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         release_tasks = set()
-        coordinator = hass.data[DOMAIN][entry.unique_id]
         release_tasks.add(coordinator.release())
-        new_data = dict(entry.data)
-        new_data[CONF_TOKEN] = coordinator.yoto_manager.token
-        hass.config_entries.async_update_entry(entry, data=new_data)
         hass.data[DOMAIN].pop(entry.unique_id)
         await asyncio.gather(*release_tasks)
     return unload_ok
