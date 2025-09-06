@@ -36,6 +36,8 @@ The easiest way to install this integration is via HACS. https://hacs.xyz/
 
 You can enable logging for this integration specifically and share your logs, so I can have a deep dive investigation. To enable logging, enable via the gui or update your configuration.yaml like this, we can get more information in Configuration -> Logs page
 
+Debug can also be enabled via the interface. 
+
 ```yaml config
 logger:
   default: warning
