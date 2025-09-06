@@ -91,7 +91,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.debug("Initiating device activation")
             self.ym = await self.hass.async_add_executor_job(YotoManager)
             assert self.ym is not None
-            urlObject = await self.hass.async_add_executor_job(self.ym.device_code_flow_start)
+            urlObject = await self.hass.async_add_executor_job(
+                self.ym.device_code_flow_start
+            )
             yoto_device_url = urlObject["verification_uri_complete"]
 
         async def _wait_for_login() -> None:
