@@ -8,7 +8,7 @@ from yoto_api import AuthenticationError
 
 
 from .media_source import YotoMediaSource
-from .const import DOMAIN
+from .const import DOMAIN, CONF_TOKEN
 from .coordinator import YotoDataUpdateCoordinator
 from .services import async_setup_services
 
@@ -58,6 +58,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         release_tasks = set()
         coordinator = hass.data[DOMAIN][entry.unique_id]
         release_tasks.add(coordinator.release())
+        new_data = dict(entry.data)
+        new_data[CONF_TOKEN] = coordinator.ym.token
+        hass.config_entries.async_update_entry(entry, data=new_data)
         hass.data[DOMAIN].pop(entry.unique_id)
         await asyncio.gather(*release_tasks)
     return unload_ok
@@ -67,7 +70,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Migrate old entry."""
 
     if entry.version < 2:
-        _LOGGER.debug("Migrating entry to version 2.")
+        _LOGGER.debug("Migrating entry to version 2")
         data = dict(entry.data)
         data.pop(CONF_USERNAME, None)
         data.pop(CONF_PASSWORD, None)
