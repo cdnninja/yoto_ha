@@ -5,11 +5,10 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Mapping
 
-import hashlib
 import logging
 from typing import Any
 
-from yoto_api import Token, YotoManager
+from yoto_api import YotoManager
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -17,7 +16,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlowResult, SOURCE_R
 from homeassistant.const import (
     CONF_SCAN_INTERVAL,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
@@ -67,13 +66,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry: ConfigEntry) -> YotoOptionFlowHandler:
         """Initiate options flow instance."""
         return YotoOptionFlowHandler()
-    
+
     async def async_step_reauth(
         self, entry_data: Mapping[str, Any]
     ) -> ConfigFlowResult:
         """Handle reauth on credential failure."""
         return await self.async_step_reauth_confirm()
-    
+
     async def async_step_reauth_confirm(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -100,10 +99,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             assert self.ym is not None
             _LOGGER.debug("Waiting for device activation")
             await self.hass.async_add_executor_job(self.ym.device_code_flow_complete)
-            
-            if (
-                self.ym.token is None
-            ):
+
+            if self.ym.token is None:
                 raise HomeAssistantError("Device activation failed")
 
         _LOGGER.debug("Checking login task")
@@ -129,7 +126,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             progress_task=self.login_task,
         )
 
-    
     async def async_step_finish_login(
         self,
         user_input: dict[str, Any] | None = None,

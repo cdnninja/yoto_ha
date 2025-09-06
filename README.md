@@ -8,7 +8,6 @@ PRs are appreciated to add more.
 
 ![image](https://github.com/cdnninja/yoto_ha/assets/6373468/a02dac1e-609c-4536-9588-9bf5c7bba013)
 
-
 # Supported Device Features
 
 Not all devices expose all sensors/entities. Only sensors/entities supported by your device will be available in the integration.
@@ -22,7 +21,6 @@ Not all devices expose all sensors/entities. Only sensors/entities supported by 
 # Installing
 
 The easiest way to install this integration is via HACS. https://hacs.xyz/
-
 
 # Services Working
 
