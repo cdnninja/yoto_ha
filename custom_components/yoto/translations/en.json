@@ -1,14 +1,13 @@
 {
   "title": "Yoto",
   "config": {
+    "progress": {
+      "wait_for_device": "To authenticate, open the following URL and login at Yoto:\n{url}"
+    },
     "step": {
-      "user": {
-        "title": "Yoto - Authentication",
-        "description": "Set up your Yoto to integrate with Home Assistant.",
-        "data": {
-          "username": "Username",
-          "password": "Password"
-        }
+      "device_code": {
+        "title": "Yoto - Device Code",
+        "description": "Browse to the following URL, and confirm the code matches."
       },
       "reauth_confirm": {
         "title": "Yoto - Reauthentication",
@@ -17,7 +16,7 @@
     },
     "abort": {
       "already_configured": "Device is already configured",
-      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
+      "reauth_successful": "Sucessfully reauthenticated"
     },
     "error": {
       "invalid_auth": "Login failed into Yoto Servers. Please use official app to logout and log back in and try again!",

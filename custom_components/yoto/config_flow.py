@@ -2,51 +2,31 @@
 
 from __future__ import annotations
 
-import hashlib
+import asyncio
+from collections.abc import Mapping
+
 import logging
 from typing import Any
 
-from yoto_api import Token, YotoManager
+from yoto_api import YotoManager
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigFlowResult, SOURCE_REAUTH
 from homeassistant.const import (
-    CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
-    CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
 from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    CONF_TOKEN,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_USERNAME): str,
-        vol.Required(CONF_PASSWORD): str,
-    }
-)
-
-
-async def validate_input(hass: HomeAssistant, user_input: dict[str, Any]) -> Token:
-    """Validate the user input allows us to connect."""
-
-    ym = YotoManager(
-        username=user_input[CONF_USERNAME], password=user_input[CONF_PASSWORD]
-    )
-
-    await hass.async_add_executor_job(ym.check_and_refresh_token)
-    if ym.token is None:
-        raise InvalidAuth
-
-    return ym.token
 
 
 class YotoOptionFlowHandler(config_entries.OptionsFlow):
@@ -76,8 +56,10 @@ class YotoOptionFlowHandler(config_entries.OptionsFlow):
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Yoto"""
 
-    VERSION = 1
-    reauth_entry: ConfigEntry | None = None
+    VERSION = 2
+    login_task: asyncio.Task | None = None
+    token = None
+    ym: YotoManager | None = None
 
     @staticmethod
     @callback
@@ -85,69 +67,103 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Initiate options flow instance."""
         return YotoOptionFlowHandler()
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle the initial step."""
-        _LOGGER.debug("User step called")
-        if user_input is None:
-            return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
-
-        errors = {}
-
-        try:
-            await validate_input(self.hass, user_input)
-        except InvalidAuth:
-            errors["base"] = "invalid_auth"
-        except Exception:  # pylint: disable=broad-except
-            _LOGGER.exception("Unexpected exception")
-            errors["base"] = "unknown"
-        else:
-            if self.reauth_entry is None:
-                title = f"{user_input[CONF_USERNAME]}"
-                await self.async_set_unique_id(
-                    hashlib.sha256(title.encode("utf-8")).hexdigest()
-                )
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(title=title, data=user_input)
-            else:
-                self.hass.config_entries.async_update_entry(
-                    self.reauth_entry, data=user_input
-                )
-                await self.hass.config_entries.async_reload(self.reauth_entry.entry_id)
-                return self.async_abort(reason="reauth_successful")
-
-        return self.async_show_form(
-            step_id="user", data_schema=DATA_SCHEMA, errors=errors
-        )
-
-    async def async_step_reauth(self, user_input=None):
-        """Perform reauth upon an API authentication error."""
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
+        """Handle reauth on credential failure."""
         return await self.async_step_reauth_confirm()
 
-    async def async_step_reauth_confirm(self, user_input=None):
-        """Dialog that informs the user that reauth is required."""
-        _LOGGER.debug("Reauth step called")
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Prepare reauth."""
+        if user_input is None:
+            return self.async_show_form(step_id="reauth_confirm")
 
-        if user_input:
-            username = user_input[CONF_USERNAME]
-            password = user_input[CONF_PASSWORD]
+        return await self.async_step_user()
 
-            await validate_input(self.hass, user_input)
-            return self.async_update_reload_and_abort(
-                self._get_reauth_entry(),
-                data_updates={
-                    CONF_USERNAME: username,
-                    CONF_PASSWORD: password,
-                },
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle users reauth credentials."""
+
+        if self.ym is None:
+            _LOGGER.debug("Initiating device activation")
+            self.ym = await self.hass.async_add_executor_job(
+                YotoManager, "KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult"
+            )
+            assert self.ym is not None
+            urlObject = await self.hass.async_add_executor_job(
+                self.ym.device_code_flow_start
+            )
+            yoto_device_url = urlObject["verification_uri_complete"]
+
+        async def _wait_for_login() -> None:
+            """Wait for the user to login."""
+            assert self.ym is not None
+            _LOGGER.debug("Waiting for device activation")
+            await self.hass.async_add_executor_job(self.ym.device_code_flow_complete)
+
+            if self.ym.token is None:
+                raise HomeAssistantError("Device activation failed")
+
+        _LOGGER.debug("Checking login task")
+        if self.login_task is None:
+            _LOGGER.debug("Creating task for device activation")
+            self.login_task = self.hass.async_create_task(_wait_for_login())
+
+        if self.login_task.done():
+            _LOGGER.debug("Login task is done, checking results")
+            if self.login_task.exception():
+                return self.async_show_progress_done(next_step_id="timeout")
+            self.token = self.ym.token.refresh_token
+
+            return self.async_show_progress_done(next_step_id="finish_login")
+
+        return self.async_show_progress(
+            step_id="user",
+            progress_action="wait_for_device",
+            description_placeholders={
+                "url": yoto_device_url,
+            },
+            progress_task=self.login_task,
+        )
+
+    async def async_step_finish_login(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Handle the finalization of reauth."""
+        _LOGGER.debug("Finalizing reauth")
+        assert self.ym is not None
+        unique_id = next(iter(self.ym.players))
+
+        if self.source != SOURCE_REAUTH:
+            await self.async_set_unique_id(unique_id)
+            self._abort_if_unique_id_configured()
+
+            return self.async_create_entry(
+                title=unique_id,
+                data={CONF_TOKEN: self.token},
             )
 
-        return self.async_show_form(
-            step_id="reauth_confirm",
-            data_schema=DATA_SCHEMA,
-            description_placeholders={"name": "VeSync"},
-            errors={"base": "invalid_auth"},
+        self._abort_if_unique_id_mismatch(reason="reauth_account_mismatch")
+        return self.async_update_reload_and_abort(
+            self._get_reauth_entry(),
+            data={CONF_TOKEN: self.token},
         )
+
+    async def async_step_timeout(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Handle issues that need transition await from progress step."""
+        if user_input is None:
+            return self.async_show_form(
+                step_id="timeout",
+            )
+        del self.login_task
+        return await self.async_step_user()
 
 
 class InvalidAuth(HomeAssistantError):

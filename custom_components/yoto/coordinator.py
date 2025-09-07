@@ -17,17 +17,12 @@ from yoto_api import (
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
-    CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import (
-    DEFAULT_SCAN_INTERVAL,
-    DOMAIN,
-)
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, CONF_TOKEN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,10 +33,12 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
-        self.yoto_manager = YotoManager(
-            username=config_entry.data.get(CONF_USERNAME),
-            password=config_entry.data.get(CONF_PASSWORD),
-        )
+        self.yoto_manager = YotoManager(client_id="KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult")
+        if config_entry.data.get(CONF_TOKEN):
+            _LOGGER.debug("Using stored token")
+            self.yoto_manager.set_refresh_token(config_entry.data.get(CONF_TOKEN))
+        else:
+            raise ConfigEntryAuthFailed("No token configured")
         self.scan_interval: int = (
             config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL) * 60
         )
@@ -57,6 +54,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         Allow to update for the first time without further checking
         """
+
         try:
             await self.async_check_and_refresh_token()
         except AuthenticationError as ex:
