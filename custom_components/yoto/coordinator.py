@@ -164,21 +164,11 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         player_id: str,
         cardid: str,
-        secondsin: int = 0,
-        cutoff: int = 0,
-        chapter: int = 1,
-        trackkey: int = 1,
+        secondsin: int = None,
+        cutoff: int = None,
+        chapter: int = None,
+        trackkey: int = None,
     ) -> None:
-        if trackkey is None:
-            if chapter is not None:
-                trackkey = chapter
-            else:
-                trackkey = 1
-        if chapter is None:
-            if trackkey is not None:
-                chapter = trackkey
-            else:
-                chapter = 1
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
             self.yoto_manager.play_card,
