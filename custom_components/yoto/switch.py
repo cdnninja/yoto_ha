@@ -35,6 +35,11 @@ SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
         name="Day Auto Display Brightness",
         icon="mdi:brightness-auto",
     ),
+    SwitchEntityDescription(
+        key="end_of_track_sleep",
+        name="End of Track Sleep",
+        icon="mdi:sleep",
+    ),
 )
 
 
@@ -90,6 +95,12 @@ class YotoSwitch(SwitchEntity, YotoEntity):
                 return True
             else:
                 return False
+        elif self._key == "end_of_track_sleep":
+            seconds_to_end = self.player.track_length - self.player.track_position
+            if abs(self.player.sleep_timer_seconds_remaining - seconds_to_end) <= 5:
+                return True
+            else:
+                return False
         elif self._key.startswith("alarms"):
             return getattr(self.player.config, self._attribute)[self._index].enabled
 
@@ -100,6 +111,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             or self._key == "day_display_brightness"
         ):
             await self.coordinator.async_set_brightness(self.player.id, self._key, "0")
+        elif self._key == "end_of_track_sleep":
+            await self.coordinator.async_set_sleep_timer(self.player.id, 0)
         elif self._key.startswith("alarms"):
             await self.coordinator.async_enable_disable_alarm(
                 self.player.id, self._index, False
@@ -115,6 +128,9 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             await self.coordinator.async_set_brightness(
                 self.player.id, self._key, "auto"
             )
+        elif self._key == "end_of_track_sleep":
+            seconds_to_end = self.player.track_length - self.player.track_position
+            await self.coordinator.async_set_sleep_timer(self.player.id, seconds_to_end)
         elif self._key.startswith("alarms"):
             await self.coordinator.async_enable_disable_alarm(
                 self.player.id, self._index, True
