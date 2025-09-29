@@ -62,8 +62,7 @@ async def async_setup_entry(
             entities.append(YotoSwitch(coordinator, alarm_description, player))
 
         for description in SENSOR_DESCRIPTIONS:
-            if getattr(player.config, description.key, None) is not None:
-                entities.append(YotoSwitch(coordinator, description, player))
+            entities.append(YotoSwitch(coordinator, description, player))
     async_add_entities(entities)
     return True
 
