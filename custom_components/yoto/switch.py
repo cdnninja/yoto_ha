@@ -95,7 +95,10 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             else:
                 return False
         elif self._key == "end_of_track_sleep":
-            if self.player.track_length is not None and self.player.track_position is not None:
+            if (
+                self.player.track_length is not None
+                and self.player.track_position is not None
+            ):
                 seconds_to_end = self.player.track_length - self.player.track_position
                 if abs(self.player.sleep_timer_seconds_remaining - seconds_to_end) <= 5:
                     return True
@@ -128,9 +131,14 @@ class YotoSwitch(SwitchEntity, YotoEntity):
                 self.player.id, self._key, "auto"
             )
         elif self._key == "end_of_track_sleep":
-            if self.player.track_length is not None and self.player.track_position is not None:
+            if (
+                self.player.track_length is not None
+                and self.player.track_position is not None
+            ):
                 seconds_to_end = self.player.track_length - self.player.track_position
-                await self.coordinator.async_set_sleep_timer(self.player.id, seconds_to_end)
+                await self.coordinator.async_set_sleep_timer(
+                    self.player.id, seconds_to_end
+                )
         elif self._key.startswith("alarms"):
             await self.coordinator.async_enable_disable_alarm(
                 self.player.id, self._index, True
