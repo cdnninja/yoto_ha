@@ -33,6 +33,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
+        self.config_entry = config_entry
         self.yoto_manager = YotoManager(client_id="KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult")
         if config_entry.data.get(CONF_TOKEN):
             _LOGGER.debug("Using stored token")
@@ -57,6 +58,13 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         try:
             await self.async_check_and_refresh_token()
+            if self.yoto_manager.token.refresh_token != self.config_entry.data.get(CONF_TOKEN):
+                new_data = dict(self.config_entry.data)
+                new_data[CONF_TOKEN] = self.yoto_manager.token.refresh_token
+                _LOGGER.debug("Storing updated token")
+                self.hass.config_entries.async_update_entry(
+                    self.config_entry, data=new_data
+                )
         except AuthenticationError as ex:
             _LOGGER.error(f"Authentication error: {ex}")
             raise ConfigEntryAuthFailed
