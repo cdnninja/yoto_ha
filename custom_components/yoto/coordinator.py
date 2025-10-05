@@ -58,7 +58,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
         try:
             await self.async_check_and_refresh_token()
-            if self.yoto_manager.token.refresh_token != self.config_entry.data.get(CONF_TOKEN):
+            if self.yoto_manager.token.refresh_token != self.config_entry.data.get(
+                CONF_TOKEN
+            ):
                 new_data = dict(self.config_entry.data)
                 new_data[CONF_TOKEN] = self.yoto_manager.token.refresh_token
                 _LOGGER.debug("Storing updated token")
