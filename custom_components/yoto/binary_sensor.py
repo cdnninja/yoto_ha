@@ -81,7 +81,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="night_light_mode",
         name="Night Light Status",
-        is_on=lambda player: player.night_light_mode is not "off",
+        is_on=lambda player: player.night_light_mode != "off",
     ),
 )
 
