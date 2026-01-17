@@ -59,7 +59,7 @@ class YotoTime(TimeEntity, YotoEntity):
         self._attr_name = f"{player.name} {self._description.name}"
 
     @property
-    def native_value(self):
+    def native_value(self) -> time | None:
         """Return the value reported by the sensor."""
         return getattr(self.player.config, self._key)
 

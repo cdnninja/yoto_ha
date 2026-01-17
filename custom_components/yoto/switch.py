@@ -43,7 +43,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensor platform."""
     coordinator = hass.data[DOMAIN][config_entry.unique_id]
-    entities = []
+    entities: list[YotoSwitch] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for index in range(len(player.config.alarms)):
@@ -57,7 +57,6 @@ async def async_setup_entry(
         for description in SENSOR_DESCRIPTIONS:
             entities.append(YotoSwitch(coordinator, description, player))
     async_add_entities(entities)
-    return True
 
 
 class YotoSwitch(SwitchEntity, YotoEntity):
@@ -65,7 +64,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
 
     def __init__(
         self, coordinator, description: SwitchEntityDescription, player: YotoPlayer
-    ):
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, player)
         self._description = description
@@ -99,7 +98,7 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         elif self._key.startswith("alarms"):
             return getattr(self.player.config, self._attribute)[self._index].enabled
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn the entity off."""
         if (
             self._key == "night_display_brightness"
@@ -114,8 +113,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
             )
         self.async_write_ha_state()
 
-    async def async_turn_on(self, **kwargs):
-        """Turn the entity off."""
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn the entity on."""
         if (
             self._key == "night_display_brightness"
             or self._key == "day_display_brightness"

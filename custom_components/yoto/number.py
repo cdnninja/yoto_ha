@@ -70,14 +70,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensor platform."""
     coordinator = hass.data[DOMAIN][config_entry.unique_id]
-    entities = []
+    entities: list[YotoNumber] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
             if rgetattr(player, description.key) is not None:
                 entities.append(YotoNumber(coordinator, description, player))
     async_add_entities(entities)
-    return True
 
 
 class YotoNumber(NumberEntity, YotoEntity):
@@ -85,7 +84,7 @@ class YotoNumber(NumberEntity, YotoEntity):
 
     def __init__(
         self, coordinator, description: NumberEntityDescription, player: YotoPlayer
-    ):
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, player)
         self._description = description
@@ -107,22 +106,22 @@ class YotoNumber(NumberEntity, YotoEntity):
             return rgetattr(self.player, self._key)
 
     @property
-    def native_min_value(self):
+    def native_min_value(self) -> float:
         """Return native_min_value as reported in by the sensor"""
         return self._description.native_min_value
 
     @property
-    def native_max_value(self):
-        """Returnnative_max_value as reported in by the sensor"""
+    def native_max_value(self) -> float:
+        """Return native_max_value as reported in by the sensor"""
         return self._description.native_max_value
 
     @property
-    def native_step(self):
+    def native_step(self) -> float:
         """Return step value as reported in by the sensor"""
         return self._description.native_step
 
     @property
-    def native_unit_of_measurement(self):
+    def native_unit_of_measurement(self) -> str | None:
         """Return the unit the value was reported in by the sensor"""
         return self._description.native_unit_of_measurement
 

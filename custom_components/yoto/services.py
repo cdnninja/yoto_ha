@@ -20,12 +20,12 @@ _LOGGER = logging.getLogger(__name__)
 def async_setup_services(hass: HomeAssistant) -> bool:
     """Set up services for Yoto"""
 
-    async def async_handle_update(call):
+    async def async_handle_update(call: ServiceCall) -> None:
         _LOGGER.debug(f"Call:{call.data}")
         coordinator = _get_coordinator_from_device(hass, call)
         await coordinator.async_update_all()
 
-    services = {SERVICE_UPDATE: async_handle_update}
+    services: dict[str, object] = {SERVICE_UPDATE: async_handle_update}
 
     for service in SUPPORTED_SERVICES:
         hass.services.async_register(DOMAIN, service, services[service])
@@ -33,7 +33,7 @@ def async_setup_services(hass: HomeAssistant) -> bool:
 
 
 @callback
-def async_unload_services(hass) -> None:
+def async_unload_services(hass: HomeAssistant) -> None:
     for service in SUPPORTED_SERVICES:
         hass.services.async_remove(DOMAIN, service)
 

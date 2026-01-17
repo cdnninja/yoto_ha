@@ -40,7 +40,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(seconds=self.scan_interval),
         )
 
-    async def _async_update_data(self):
+    async def _async_update_data(self) -> dict | None:
         """Update data via library. Called by update_coordinator periodically.
 
         Allow to update for the first time without further checking
@@ -70,7 +70,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             )
         return self.data
 
-    def api_callback(self):
+    def api_callback(self) -> None:
         for player in self.yoto_manager.players.values():
             if player.card_id and player.chapter_key:
                 if (
@@ -94,7 +94,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         """Update yoto data."""
         await self.async_refresh()
 
-    async def async_check_and_refresh_token(self):
+    async def async_check_and_refresh_token(self) -> None:
         """Refresh token if needed via library."""
         await self.hass.async_add_executor_job(
             self.yoto_manager.check_and_refresh_token
@@ -214,7 +214,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             self.yoto_manager.set_player_config, player_id, config
         )
 
-    async def async_update_card_detail(self, cardId):
+    async def async_update_card_detail(self, cardId: str) -> None:
         """Get chapter and titles for the card"""
         _LOGGER.debug(f"{DOMAIN} - Updating Card details for:  {cardId}")
         await self.hass.async_add_executor_job(
