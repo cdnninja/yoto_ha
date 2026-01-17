@@ -70,14 +70,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensor platform."""
     coordinator = hass.data[DOMAIN][config_entry.unique_id]
-    entities = []
+    entities: list[YotoSensor] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
             if getattr(player, description.key, None) is not None:
                 entities.append(YotoSensor(coordinator, description, player))
     async_add_entities(entities)
-    return True
 
 
 class YotoSensor(SensorEntity, YotoEntity):
@@ -85,7 +84,7 @@ class YotoSensor(SensorEntity, YotoEntity):
 
     def __init__(
         self, coordinator, description: SensorEntityDescription, player: YotoPlayer
-    ):
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, player)
         self._description = description
@@ -103,7 +102,7 @@ class YotoSensor(SensorEntity, YotoEntity):
         return getattr(self.player, self._key)
 
     @property
-    def native_unit_of_measurement(self):
+    def native_unit_of_measurement(self) -> str | None:
         """Return the unit the value was reported in by the sensor"""
 
         return self._description.native_unit_of_measurement

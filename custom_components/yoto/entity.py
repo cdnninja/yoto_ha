@@ -20,7 +20,7 @@ class YotoEntity(CoordinatorEntity):
         self.player = player
 
     @property
-    def device_info(self):
+    def device_info(self) -> DeviceInfo:
         """Return device information to use for this entity."""
         return DeviceInfo(
             identifiers={(DOMAIN, self.player.id)},
