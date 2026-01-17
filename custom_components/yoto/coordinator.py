@@ -71,6 +71,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         return self.data
 
     def api_callback(self) -> None:
+        """Handle API callback for media player updates."""
         for player in self.yoto_manager.players.values():
             if player.card_id and player.chapter_key:
                 if (
@@ -101,22 +102,26 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     async def async_pause_player(self, player_id: str) -> None:
+        """Pause playback on the player."""
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
             self.yoto_manager.pause_player, player_id
         )
 
     async def async_resume_player(self, player_id: str) -> None:
+        """Resume playback on the player."""
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
             self.yoto_manager.resume_player, player_id
         )
 
     async def async_stop_player(self, player_id: str) -> None:
+        """Stop playback on the player."""
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(self.yoto_manager.stop_player, player_id)
 
     async def async_set_time(self, player_id: str, key: str, value: time) -> None:
+        """Set time for day/night mode."""
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "day_mode_time":
@@ -128,6 +133,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     async def async_set_max_volume(self, player_id: str, key: str, value: int) -> None:
+        """Set maximum volume for day/night mode."""
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "config.night_max_volume_limit":
@@ -139,6 +145,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     async def async_set_brightness(self, player_id: str, key: str, value: str) -> None:
+        """Set display brightness for day/night mode."""
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if (
@@ -167,6 +174,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         chapter: int = None,
         trackkey: int = None,
     ) -> None:
+        """Play a card on the player."""
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
             self.yoto_manager.play_card,
@@ -179,6 +187,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     async def async_set_volume(self, player_id: str, volume: float) -> None:
+        """Set player volume level."""
         volume = volume * 100
         volume = int(round(volume, 0))
         await self.async_check_and_refresh_token()
@@ -187,12 +196,14 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     async def async_set_sleep_timer(self, player_id: str, time: int) -> None:
+        """Set sleep timer on the player."""
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
             self.yoto_manager.set_sleep, player_id, int(time)
         )
 
     async def async_set_light(self, player_id: str, key: str, color: str) -> None:
+        """Set light color for day/night ambient mode."""
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         if key == "config.day_ambient_colour":
@@ -206,6 +217,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_enable_disable_alarm(
         self, player_id: str, alarm: int, enable: bool
     ) -> None:
+        """Enable or disable an alarm."""
         await self.async_check_and_refresh_token()
         config = YotoPlayerConfig()
         config.alarms = self.yoto_manager.players[player_id].config.alarms

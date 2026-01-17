@@ -65,6 +65,7 @@ class YotoMediaSource(MediaSource):
             return await self.async_convert_chapter_to_browse_media(item.identifier)
 
     async def async_convert_library_to_browse_media(self) -> BrowseMediaSource:
+        """Build media source for the library."""
         children = []
         for item in self.coordinator.yoto_manager.library.values():
             children.append(
@@ -92,6 +93,7 @@ class YotoMediaSource(MediaSource):
         )
 
     async def async_convert_chapter_to_browse_media(self, cardid: str) -> BrowseMediaSource:
+        """Build media source for chapters of a card."""
         children = []
 
         if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
@@ -125,6 +127,7 @@ class YotoMediaSource(MediaSource):
     async def async_convert_track_to_browse_media(
         self, cardid: str, chapterid: str
     ) -> BrowseMediaSource:
+        """Build media source for tracks of a chapter."""
         children = []
         if self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks:
             for item in (

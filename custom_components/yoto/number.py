@@ -126,6 +126,7 @@ class YotoNumber(NumberEntity, YotoEntity):
         return self._description.native_unit_of_measurement
 
     async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
         if (
             self._key == "config.day_max_volume_limit"
             or self._key == "config.night_max_volume_limit"

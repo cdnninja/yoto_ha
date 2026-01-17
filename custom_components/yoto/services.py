@@ -39,6 +39,7 @@ def async_unload_services(hass: HomeAssistant) -> None:
 
 
 def _get_player_id_from_device(hass: HomeAssistant, call: ServiceCall) -> str:
+    """Get player ID from device registry."""
     coordinators = list(hass.data[DOMAIN].keys())
     if len(coordinators) == 1:
         coordinator = hass.data[DOMAIN][coordinators[0]]
@@ -56,6 +57,7 @@ def _get_player_id_from_device(hass: HomeAssistant, call: ServiceCall) -> str:
 def _get_coordinator_from_device(
     hass: HomeAssistant, call: ServiceCall
 ) -> YotoDataUpdateCoordinator:
+    """Get coordinator from device registry."""
     coordinators = list(hass.data[DOMAIN].keys())
     if len(coordinators) == 1:
         return hass.data[DOMAIN][coordinators[0]]
