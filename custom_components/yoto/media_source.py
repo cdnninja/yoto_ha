@@ -2,15 +2,14 @@
 
 import logging
 
-
+from homeassistant.components.media_player import MediaClass, MediaType
 from homeassistant.components.media_source import (
-    MediaSource,
     BrowseMediaSource,
+    MediaSource,
     MediaSourceItem,
     PlayMedia,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.components.media_player import MediaClass, MediaType
 
 from .const import DOMAIN
 from .utils import split_media_id

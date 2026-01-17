@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-import logging
 from typing import Final
-
-from yoto_api import YotoPlayer
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -15,9 +13,10 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.const import EntityCategory
+from yoto_api import YotoPlayer
 
 from .const import DOMAIN
 from .coordinator import YotoDataUpdateCoordinator

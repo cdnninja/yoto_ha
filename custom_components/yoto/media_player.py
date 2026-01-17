@@ -1,31 +1,28 @@
 """Media Player for Yoto integration."""
 
 from __future__ import annotations
-from typing import Any
 
 import logging
+from typing import Any
 
-from yoto_api import YotoPlayer
-
+from homeassistant.components.media_player import (
+    BrowseMedia,
+    MediaClass,
+    MediaPlayerDeviceClass,
+    MediaPlayerEnqueue,
+    MediaPlayerEntity,
+    MediaPlayerEntityFeature,
+    MediaPlayerState,
+    MediaType,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from yoto_api import YotoPlayer
 
-
-from homeassistant.components.media_player import (
-    MediaPlayerEntity,
-    MediaPlayerState,
-    MediaPlayerEntityFeature,
-    MediaPlayerDeviceClass,
-    MediaPlayerEnqueue,
-    BrowseMedia,
-    MediaType,
-    MediaClass,
-)
-
-from .utils import split_media_id
 from .const import DOMAIN
 from .entity import YotoEntity
+from .utils import split_media_id
 
 _LOGGER = logging.getLogger(__name__)
 

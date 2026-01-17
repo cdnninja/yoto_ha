@@ -3,28 +3,20 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Mapping
-
 import logging
+from collections.abc import Mapping
 from typing import Any
 
-from yoto_api import YotoManager
 import voluptuous as vol
-
 from homeassistant import config_entries
-from homeassistant.config_entries import ConfigEntry, ConfigFlowResult, SOURCE_REAUTH
-from homeassistant.const import (
-    CONF_SCAN_INTERVAL,
-)
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigFlowResult
+from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+from yoto_api import YotoManager
 
-from .const import (
-    DEFAULT_SCAN_INTERVAL,
-    DOMAIN,
-    CONF_TOKEN,
-)
+from .const import CONF_TOKEN, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

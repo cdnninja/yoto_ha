@@ -2,27 +2,17 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
-from datetime import time
-
-
 import logging
+from datetime import time, timedelta
 
-from yoto_api import (
-    YotoManager,
-    YotoPlayerConfig,
-    AuthenticationError,
-)
-
-from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    CONF_SCAN_INTERVAL,
-)
+from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from yoto_api import AuthenticationError, YotoManager, YotoPlayerConfig
 
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, CONF_TOKEN
+from .const import CONF_TOKEN, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
