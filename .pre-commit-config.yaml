@@ -1,7 +1,8 @@
----
 ci:
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
+
 repos:
+  # Ruff handles linting, formatting, import sorting, and autofixes
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.11
     hooks:
@@ -9,6 +10,7 @@ repos:
         args:
           - --fix
       - id: ruff-format
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
@@ -18,11 +20,14 @@ repos:
           - --skip="./.*,*.csv,*.json,*.ambr"
           - --quiet-level=2
         exclude_types: [csv, json]
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: ["--profile", "black"]
+
+  # Remove isort — Ruff replaces it
+  # Remove flake8 — Ruff replaces it
+  # Remove pep8-naming — Ruff replaces it
+  # Remove flake8-docstrings — Ruff replaces it
+  # Remove flake8-bugbear — Ruff replaces it
+  # Remove flake8-comprehensions — Ruff replaces it
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -32,26 +37,26 @@ repos:
         stages: [manual]
       - id: check-json
         exclude: (.vscode|.devcontainer)
+
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
     hooks:
       - id: pyupgrade
+
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.37.1
     hooks:
       - id: yamllint
         exclude: (.github|.vscode|.devcontainer)
+
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
+
   - repo: https://github.com/cdce8p/python-typing-update
     rev: v0.8.1
     hooks:
-      # Run `python-typing-update` hook manually from time to time
-      # to update python typing syntax.
-      # Will require manual work, before submitting changes!
-      # pre-commit run --hook-stage manual python-typing-update --all-files
       - id: python-typing-update
         stages: [manual]
         args:
@@ -59,25 +64,10 @@ repos:
           - --force
           - --keep-updates
         files: ^(/.+)?[^/]+\.py$
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
     hooks:
       - id: mypy
         args: [--strict, --ignore-missing-imports]
         files: ^(/.+)?[^/]+\.py$
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-docstrings
-          - flake8-comprehensions
-          - flake8-bugbear
-          - flake8-noqa
-          - flake8-pyi
-          - pep8-naming
-        args:
-          - --max-line-length=88
-          - --extend-ignore=E203,W503
-          # Optional: use Bugbear’s B950 instead of F821 for long lines
-          # - --extend-select=B950
