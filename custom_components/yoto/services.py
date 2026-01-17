@@ -1,14 +1,13 @@
 import logging
 from typing import cast
 
-
-from homeassistant.const import ATTR_DEVICE_ID
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import ServiceCall, callback, HomeAssistant
-from .coordinator import YotoDataUpdateCoordinator
+from homeassistant.const import ATTR_DEVICE_ID
+from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import device_registry
 
 from .const import DOMAIN
+from .coordinator import YotoDataUpdateCoordinator
 
 SERVICE_UPDATE = "update"
 

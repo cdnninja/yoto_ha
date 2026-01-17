@@ -5,18 +5,11 @@ from __future__ import annotations
 import logging
 from typing import Final
 
-from yoto_api import YotoPlayer
-
-from homeassistant.components.switch import (
-    SwitchEntity,
-    SwitchEntityDescription,
-)
-
-
+from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
+from yoto_api import YotoPlayer
 
 from .const import DOMAIN
 from .entity import YotoEntity

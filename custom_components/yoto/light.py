@@ -5,24 +5,21 @@ from __future__ import annotations
 import logging
 from typing import Final
 
-from yoto_api import YotoPlayer
-from .utils import rgetattr
-
 from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    ATTR_RGB_COLOR,
+    ColorMode,
     LightEntity,
     LightEntityDescription,
-    ColorMode,
-    ATTR_RGB_COLOR,
-    ATTR_BRIGHTNESS,
 )
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
+from yoto_api import YotoPlayer
 
 from .const import DOMAIN
 from .entity import YotoEntity
+from .utils import rgetattr
 
 _LOGGER = logging.getLogger(__name__)
 

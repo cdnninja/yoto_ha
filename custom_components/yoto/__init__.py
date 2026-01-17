@@ -1,5 +1,6 @@
-import logging
 import asyncio
+import logging
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
@@ -7,12 +8,10 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.device_registry import DeviceEntry
 from yoto_api import AuthenticationError
 
-
-from .media_source import YotoMediaSource
-from .const import DOMAIN, CONF_TOKEN
+from .const import CONF_TOKEN, DOMAIN
 from .coordinator import YotoDataUpdateCoordinator
+from .media_source import YotoMediaSource
 from .services import async_setup_services
-
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -3,26 +3,18 @@
 from __future__ import annotations
 
 import logging
-from .utils import rgetattr
 from typing import Final
 
-from yoto_api import YotoPlayer
-
-from homeassistant.components.number import (
-    NumberEntity,
-    NumberEntityDescription,
-)
-
-from homeassistant.const import PERCENTAGE
-
-
+from homeassistant.components.number import NumberEntity, NumberEntityDescription
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
+from yoto_api import YotoPlayer
 
 from .const import DOMAIN
 from .entity import YotoEntity
+from .utils import rgetattr
 
 _LOGGER = logging.getLogger(__name__)
 
