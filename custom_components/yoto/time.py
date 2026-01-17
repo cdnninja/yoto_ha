@@ -34,17 +34,18 @@ async def async_setup_entry(
 ) -> None:
     """Set up time platform."""
     coordinator = hass.data[DOMAIN][config_entry.unique_id]
-    entities = []
+    entities: list[YotoTime] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in TIME_DESCRIPTIONS:
             if getattr(player.config, description.key, None) is not None:
                 entities.append(YotoTime(coordinator, description, player))
     async_add_entities(entities)
-    return True
 
 
 class YotoTime(TimeEntity, YotoEntity):
+    """Yoto time entity."""
+
     def __init__(
         self,
         coordinator: YotoDataUpdateCoordinator,
@@ -59,10 +60,11 @@ class YotoTime(TimeEntity, YotoEntity):
         self._attr_name = f"{player.name} {self._description.name}"
 
     @property
-    def native_value(self):
+    def native_value(self) -> time | None:
         """Return the value reported by the sensor."""
         return getattr(self.player.config, self._key)
 
     async def async_set_value(self, value: time) -> None:
+        """Update the current time."""
         await self.coordinator.async_set_time(self.player.id, self._key, value)
         self.async_write_ha_state()

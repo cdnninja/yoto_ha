@@ -26,7 +26,7 @@ PLATFORMS: list[str] = [
 ]
 
 
-async def async_setup(hass: HomeAssistant, config_entry: ConfigEntry):
+async def async_setup(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     return True
 
 
