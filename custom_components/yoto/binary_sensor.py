@@ -126,7 +126,7 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
         return None
 
     @property
-    def icon(self):
+    def icon(self) -> str | None:
         """Return the icon to use in the frontend, if any."""
         if (self._description.on_icon == self._description.off_icon) is None:
             return BinarySensorEntity.icon

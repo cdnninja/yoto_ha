@@ -42,14 +42,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensor platform."""
     coordinator = hass.data[DOMAIN][config_entry.unique_id]
-    entities = []
+    entities: list[YotoLight] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
             if rgetattr(player, description.key) is not None:
                 entities.append(YotoLight(coordinator, description, player))
     async_add_entities(entities)
-    return True
 
 
 class YotoLight(LightEntity, YotoEntity):
@@ -57,7 +56,7 @@ class YotoLight(LightEntity, YotoEntity):
 
     def __init__(
         self, coordinator, description: LightEntityDescription, player: YotoPlayer
-    ):
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, player)
         self._description = description
@@ -67,24 +66,24 @@ class YotoLight(LightEntity, YotoEntity):
         self._attr_name = f"{player.name} {self._description.name}"
 
     @property
-    def color_mode(self):
+    def color_mode(self) -> ColorMode:
         """Return the color mode."""
         return ColorMode.RGB
 
     @property
-    def supported_color_modes(self):
+    def supported_color_modes(self) -> list[ColorMode]:
         """Return the color modes the sensor supports."""
         return [ColorMode.RGB]
 
     @property
-    def rgb_color(self):
+    def rgb_color(self) -> tuple[int, int, int]:
         """Return the RGB color"""
         hex_val = rgetattr(self.player, self._key).lstrip("#")
         rgb_val = tuple(int(hex_val[i : i + 2], 16) for i in (0, 2, 4))
         return rgb_val
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return if the light is on."""
         status = rgetattr(self.player, self._key)
         if status != "#0":
@@ -92,12 +91,12 @@ class YotoLight(LightEntity, YotoEntity):
         else:
             return False
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn device off."""
         await self.coordinator.async_set_light(self.player.id, self._key, "#0")
         self.async_write_ha_state()
 
-    async def async_turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs) -> None:
         """Turn device on."""
         _LOGGER.debug(f"{DOMAIN} - Turn on light Args: {kwargs}")
         if ATTR_RGB_COLOR in kwargs:

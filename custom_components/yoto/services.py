@@ -20,12 +20,12 @@ _LOGGER = logging.getLogger(__name__)
 def async_setup_services(hass: HomeAssistant) -> bool:
     """Set up services for Yoto"""
 
-    async def async_handle_update(call):
+    async def async_handle_update(call: ServiceCall) -> None:
         _LOGGER.debug(f"Call:{call.data}")
         coordinator = _get_coordinator_from_device(hass, call)
         await coordinator.async_update_all()
 
-    services = {SERVICE_UPDATE: async_handle_update}
+    services: dict[str, object] = {SERVICE_UPDATE: async_handle_update}
 
     for service in SUPPORTED_SERVICES:
         hass.services.async_register(DOMAIN, service, services[service])
@@ -33,12 +33,13 @@ def async_setup_services(hass: HomeAssistant) -> bool:
 
 
 @callback
-def async_unload_services(hass) -> None:
+def async_unload_services(hass: HomeAssistant) -> None:
     for service in SUPPORTED_SERVICES:
         hass.services.async_remove(DOMAIN, service)
 
 
 def _get_player_id_from_device(hass: HomeAssistant, call: ServiceCall) -> str:
+    """Get player ID from device registry."""
     coordinators = list(hass.data[DOMAIN].keys())
     if len(coordinators) == 1:
         coordinator = hass.data[DOMAIN][coordinators[0]]
@@ -56,6 +57,7 @@ def _get_player_id_from_device(hass: HomeAssistant, call: ServiceCall) -> str:
 def _get_coordinator_from_device(
     hass: HomeAssistant, call: ServiceCall
 ) -> YotoDataUpdateCoordinator:
+    """Get coordinator from device registry."""
     coordinators = list(hass.data[DOMAIN].keys())
     if len(coordinators) == 1:
         return hass.data[DOMAIN][coordinators[0]]
