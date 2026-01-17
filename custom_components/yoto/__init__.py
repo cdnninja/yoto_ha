@@ -80,7 +80,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Migrate old entry."""
-
     if entry.version < 2:
         _LOGGER.debug("Migrating entry to version 2")
         data = dict(entry.data)
