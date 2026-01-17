@@ -76,3 +76,9 @@ repos:
           - flake8-noqa
           - flake8-pyi
           - pep8-naming
+        args:
+          - --max-line-length=88
+          - --extend-ignore=E203,W503
+          # Optional: use Bugbear’s B950 instead of F821 for long lines
+          # - --extend-select=B950
+
