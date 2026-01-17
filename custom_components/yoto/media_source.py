@@ -91,7 +91,9 @@ class YotoMediaSource(MediaSource):
             children_media_class=MediaClass.MUSIC,
         )
 
-    async def async_convert_chapter_to_browse_media(self, cardid: str) -> BrowseMediaSource:
+    async def async_convert_chapter_to_browse_media(
+        self, cardid: str
+    ) -> BrowseMediaSource:
         children = []
 
         if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:

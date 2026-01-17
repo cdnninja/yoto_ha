@@ -1,7 +1,6 @@
 """utils.py"""
 
 import re
-from typing import Any
 
 
 def rgetattr(obj: object, attr: str) -> object:
@@ -21,7 +20,7 @@ def rgetattr(obj: object, attr: str) -> object:
 
 def split_media_id(text: str) -> tuple[str, str | None, str | None, int]:
     """Split media id into components.
-    
+
     Format: cardid-chapterid-trackid-seconds
     """
     parts = text.split("-")
@@ -45,7 +44,7 @@ def split_media_id(text: str) -> tuple[str, str | None, str | None, int]:
 
 def parse_key(text: str) -> tuple[str, int] | None:
     """Parse a key string in format 'name[index]'.
-    
+
     Returns tuple of (name, index) or None if format doesn't match.
     """
     match = re.match(r"(\w+)\[(\d+)\]", text)
