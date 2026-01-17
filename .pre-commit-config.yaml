@@ -81,4 +81,3 @@ repos:
           - --extend-ignore=E203,W503
           # Optional: use Bugbear’s B950 instead of F821 for long lines
           # - --extend-select=B950
-
