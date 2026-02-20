@@ -35,9 +35,17 @@ class YotoMediaSource(MediaSource):
             await self.coordinator.async_update_library()
         await self.coordinator.async_update_card_detail(cardid)
         if chapterid is None:
-            chapterid = next(iter(self.coordinator.yoto_manager.library[cardid].chapters))
+            chapterid = next(
+                iter(self.coordinator.yoto_manager.library[cardid].chapters)
+            )
         if trackid is None:
-                trackid = next(iter(self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks))
+            trackid = next(
+                iter(
+                    self.coordinator.yoto_manager.library[cardid]
+                    .chapters[chapterid]
+                    .tracks
+                )
+            )
         track = (
             self.coordinator.yoto_manager.library[cardid]
             .chapters[chapterid]
