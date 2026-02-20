@@ -31,6 +31,8 @@ class YotoMediaSource(MediaSource):
     async def async_resolve_media(self, item: MediaSourceItem) -> PlayMedia:
         """Provides the URL to play the media."""
         cardid, chapterid, trackid, time = split_media_id(item.identifier)
+        if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
+            await self.coordinator.async_update_library()
         await self.coordinator.async_update_card_detail(cardid)
         if chapterid is None:
             chapterid = next(iter(self.coordinator.yoto_manager.library[cardid].chapters))

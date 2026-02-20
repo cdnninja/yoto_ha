@@ -184,8 +184,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         _LOGGER.debug(
             f"{DOMAIN} - Chapters:  {self.coordinator.yoto_manager.library[cardid].chapters}"
         )
-        if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
-            await self.coordinator.async_update_card_detail(cardid)
+        await self.coordinator.async_update_card_detail(cardid)
         for item in self.coordinator.yoto_manager.library[cardid].chapters.values():
             _LOGGER.debug(f"{DOMAIN} - Chapter processing:  {item}")
             children.append(
