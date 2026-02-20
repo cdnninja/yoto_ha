@@ -104,7 +104,7 @@ class YotoMediaSource(MediaSource):
             children.append(
                 BrowseMediaSource(
                     domain=DOMAIN,
-                    identifier=cardid + "-" + item.key,
+                    identifier=cardid + "+" + item.key,
                     media_class=MediaClass.MUSIC,
                     media_content_type=MediaType.MUSIC,
                     title=item.title,
@@ -139,7 +139,7 @@ class YotoMediaSource(MediaSource):
                 children.append(
                     BrowseMediaSource(
                         domain=DOMAIN,
-                        identifier=cardid + "-" + chapterid + "-" + item.key,
+                        identifier=cardid + "+" + chapterid + "+" + item.key,
                         media_class=MediaClass.MUSIC,
                         media_content_type=MediaType.MUSIC,
                         title=item.title,
