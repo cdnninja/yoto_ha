@@ -1,6 +1,9 @@
 """utils.py"""
 
+import logging
 import re
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def rgetattr(obj: object, attr: str) -> object:
@@ -21,9 +24,11 @@ def rgetattr(obj: object, attr: str) -> object:
 def split_media_id(text: str) -> tuple[str, str | None, str | None, int]:
     """Split media id into components.
 
-    Format: cardid-chapterid-trackid-seconds
+    Format: cardid+chapterid+trackid+seconds
     """
-    parts = text.split("-")
+    if text.count("-") > 1:
+        _LOGGER.ERROR("Switch Media ID format to use + as separator instead of -")
+    parts = text.split("+")
     if len(parts) == 4:
         cardid, chapterid, trackid, time_str = parts
         time = int(time_str)

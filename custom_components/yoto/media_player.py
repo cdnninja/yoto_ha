@@ -189,7 +189,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             _LOGGER.debug(f"{DOMAIN} - Chapter processing:  {item}")
             children.append(
                 BrowseMedia(
-                    media_content_id=cardid + "-" + item.key,
+                    media_content_id=cardid + "+" + item.key,
                     media_class=MediaClass.MUSIC,
                     media_content_type=MediaType.MUSIC,
                     title=item.title,
@@ -223,7 +223,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             ):
                 children.append(
                     BrowseMedia(
-                        media_content_id=cardid + "-" + chapterid + "-" + item.key,
+                        media_content_id=cardid + "+" + chapterid + "+" + item.key,
                         media_class=MediaClass.MUSIC,
                         media_content_type=MediaType.MUSIC,
                         title=item.title,
@@ -330,9 +330,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         if self.player.card_id and self.player.chapter_key and self.player.track_key:
             return (
                 self.player.card_id
-                + "-"
+                + "+"
                 + self.player.chapter_key
-                + "-"
+                + "+"
                 + self.player.track_key
             )
         else:
