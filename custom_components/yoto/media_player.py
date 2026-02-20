@@ -331,9 +331,9 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         if self.player.card_id and self.player.chapter_key and self.player.track_key:
             return (
                 self.player.card_id
-                + "-"
+                + "+"
                 + self.player.chapter_key
-                + "-"
+                + "+"
                 + self.player.track_key
             )
         else:
