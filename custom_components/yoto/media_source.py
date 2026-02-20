@@ -50,9 +50,11 @@ class YotoMediaSource(MediaSource):
             mime = "audio/aac"
         elif track.format == "mp3":
             mime = "audio/mpeg"
+        elif track.format == "opus":
+            mime = "audio/opus"
         else:
-            _LOGGER.debug(
-                f"Unknown format {track.format} for track {track.title}, report this to the developer"
+            _LOGGER.error(
+                f"Unknown track format: {track.format}. Report this to the developer on GitHub."
             )
         return PlayMedia(track.trackUrl, mime)
 
