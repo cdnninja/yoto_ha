@@ -1,9 +1,10 @@
 """utils.py"""
 
-import re
 import logging
+import re
 
 _LOGGER = logging.getLogger(__name__)
+
 
 def rgetattr(obj: object, attr: str) -> object:
     """Recursively get nested attributes."""
@@ -26,7 +27,7 @@ def split_media_id(text: str) -> tuple[str, str | None, str | None, int]:
     Format: cardid+chapterid+trackid+seconds
     """
     if text.count("-") > 1:
-        _LOGGER.ERROR("Switch Media ID format to use + as separator instead of -") 
+        _LOGGER.ERROR("Switch Media ID format to use + as separator instead of -")
     parts = text.split("+")
     if len(parts) == 4:
         cardid, chapterid, trackid, time_str = parts
