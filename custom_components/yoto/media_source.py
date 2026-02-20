@@ -53,7 +53,9 @@ class YotoMediaSource(MediaSource):
         elif track.format == "opus":
             mime = "audio/opus"
         else:
-            _LOGGER.error(f"Unknown track format: {track.format}. Report this to the developer on GitHub.")
+            _LOGGER.error(
+                f"Unknown track format: {track.format}. Report this to the developer on GitHub."
+            )
         return PlayMedia(track.trackUrl, mime)
 
     async def async_browse_media(
