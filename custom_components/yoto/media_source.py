@@ -50,6 +50,8 @@ class YotoMediaSource(MediaSource):
             mime = "audio/aac"
         elif track.format == "mp3":
             mime = "audio/mpeg"
+        else:
+            _LOGGER.debug(f"Unknown format {track.format} for track {track.title}, report this to the developer")
         return PlayMedia(track.trackUrl, mime)
 
     async def async_browse_media(
