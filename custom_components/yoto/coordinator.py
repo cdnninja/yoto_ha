@@ -232,3 +232,8 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.hass.async_add_executor_job(
             self.yoto_manager.update_card_detail, cardId
         )
+
+    async def async_update_library(self) -> None:
+        """Update library details."""
+        _LOGGER.debug(f"{DOMAIN} - Updating library details")
+        await self.hass.async_add_executor_job(self.yoto_manager.update_library)
