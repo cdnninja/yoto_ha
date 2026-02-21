@@ -145,7 +145,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         _LOGGER.debug(
             f"{DOMAIN} - Browse Media id:  {media_content_id} content type: {media_content_type}"
         )
-        self.coordinator.update_library()
+        self.coordinator.yoto_manager.update_library()
         if media_content_id in (None, "library"):
             return await self.async_convert_library_to_browse_media()
         else:
