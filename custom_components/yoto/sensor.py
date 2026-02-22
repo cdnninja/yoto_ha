@@ -40,6 +40,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
         name="Battery Level",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
+        always_load=True,
     ),
     SensorEntityDescription(
         key="temperature_celcius",
@@ -81,7 +82,7 @@ async def async_setup_entry(
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
         for description in SENSOR_DESCRIPTIONS:
-            if getattr(player, description.key, None) is not None:
+            if getattr(player, description.key, None) is not None or description.always_load:
                 entities.append(YotoSensor(coordinator, description, player))
     async_add_entities(entities)
 
