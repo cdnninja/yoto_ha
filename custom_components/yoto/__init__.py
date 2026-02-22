@@ -35,7 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     coordinator = YotoDataUpdateCoordinator(hass, config_entry)
     try:
         await coordinator.async_config_entry_first_refresh()
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
     except AuthenticationError as ex:
         _LOGGER.error(f"Authentication error: {ex}")
         raise ConfigEntryAuthFailed from ex

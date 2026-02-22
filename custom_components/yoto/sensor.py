@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 import logging
-from typing import Final
+from typing import Callable, Final
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -27,41 +28,49 @@ from .entity import YotoEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-SENSOR_DESCRIPTIONS: Final[tuple[SensorEntityDescription, ...]] = (
-    SensorEntityDescription(
+@dataclass(frozen=True, kw_only=True)
+class YotoSensorEntityDescription(SensorEntityDescription):
+    """Describe Yoto sensor entity."""
+
+    always_load: bool = False
+
+
+
+SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
+    YotoSensorEntityDescription(
         key="last_updated_at",
         name="Last Updated",
         icon="mdi:update",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    SensorEntityDescription(
+    YotoSensorEntityDescription(
         key="battery_level_percentage",
         name="Battery Level",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
         always_load=True,
     ),
-    SensorEntityDescription(
+    YotoSensorEntityDescription(
         key="temperature_celcius",
         name="Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
-    SensorEntityDescription(
+    YotoSensorEntityDescription(
         key="ambient_light_sensor_reading",
         name="Ambient Light Reading",
         native_unit_of_measurement=LIGHT_LUX,
         device_class=SensorDeviceClass.ILLUMINANCE,
     ),
-    SensorEntityDescription(
+    YotoSensorEntityDescription(
         key="wifi_strength",
         name="WiFi Signal Strength",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    SensorEntityDescription(
+    YotoSensorEntityDescription(
         key="battery_temperature",
         name="Battery Temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
