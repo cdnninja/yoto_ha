@@ -21,17 +21,14 @@ SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
         key="night_display_brightness",
         translation_key="night_display_brightness",
-        name="Night Auto Display Brightness",
     ),
     SwitchEntityDescription(
         key="day_display_brightness",
         translation_key="day_display_brightness",
-        name="Day Auto Display Brightness",
     ),
     SwitchEntityDescription(
         key="end_of_track_sleep",
         translation_key="end_of_track_sleep",
-        name="End of Track Sleep",
     ),
 )
 
@@ -50,7 +47,6 @@ async def async_setup_entry(
             alarm_description = SwitchEntityDescription(
                 key="alarms[" + str(index) + "]",
                 translation_key="alarm",
-                name="Alarm " + str(index + 1),
             )
             entities.append(YotoSwitch(coordinator, alarm_description, player))
 
@@ -72,7 +68,6 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         self._attr_unique_id = f"{DOMAIN}_{player.id}_switch_{self._key}"
         if self._key.startswith("alarms"):
             self._attribute, self._index = parse_key(self._key)
-        self._attr_name = f"{player.name} {self._description.name}"
         self._attr_translation_key = self._description.translation_key
 
     @property

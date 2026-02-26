@@ -36,7 +36,6 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="online",
         translation_key="online",
-        name="Online",
         is_on=lambda player: player.online,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -44,13 +43,11 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="day_mode_on",
         translation_key="day_mode_on",
-        name="Day Mode",
         is_on=lambda player: player.day_mode_on,
     ),
     YotoBinarySensorEntityDescription(
         key="bluetooth_audio_connected",
         translation_key="bluetooth_audio_connected",
-        name="Bluetooth Audio",
         is_on=lambda player: player.bluetooth_audio_connected,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -58,14 +55,12 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="charging",
         translation_key="charging",
-        name="Charging",
         is_on=lambda player: player.charging,
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
     ),
     YotoBinarySensorEntityDescription(
         key="audio_device_connected",
         translation_key="audio_device_connected",
-        name="Audio Device",
         is_on=lambda player: player.audio_device_connected,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -73,14 +68,12 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="sleep_timer_active",
         translation_key="sleep_timer_active",
-        name="Sleep Timer",
         is_on=lambda player: player.sleep_timer_active,
         device_class=BinarySensorDeviceClass.RUNNING,
     ),
     YotoBinarySensorEntityDescription(
         key="night_light_mode",
         translation_key="night_light_mode",
-        name="Night Light",
         is_on=lambda player: player.night_light_mode != "off",
     ),
 )
@@ -115,7 +108,6 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
         super().__init__(coordinator, player)
         self._description = description
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._description.key}"
-        self._attr_name = f"{player.name} {self._description.name}"
         self._attr_device_class = self._description.device_class
         self._attr_entity_category = self._description.entity_category
         self._attr_translation_key = self._description.translation_key

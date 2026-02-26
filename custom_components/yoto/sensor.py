@@ -40,14 +40,12 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
     YotoSensorEntityDescription(
         key="last_updated_at",
         translation_key="last_updated_at",
-        name="Last Updated",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoSensorEntityDescription(
         key="battery_level_percentage",
         translation_key="battery_level_percentage",
-        name="Battery Level",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
         always_load=True,
@@ -55,21 +53,18 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
     YotoSensorEntityDescription(
         key="temperature_celcius",
         translation_key="temperature_celcius",
-        name="Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
     YotoSensorEntityDescription(
         key="ambient_light_sensor_reading",
         translation_key="ambient_light_sensor_reading",
-        name="Ambient Light Reading",
         native_unit_of_measurement=LIGHT_LUX,
         device_class=SensorDeviceClass.ILLUMINANCE,
     ),
     YotoSensorEntityDescription(
         key="wifi_strength",
         translation_key="wifi_strength",
-        name="WiFi Signal Strength",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -77,7 +72,6 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
     YotoSensorEntityDescription(
         key="battery_temperature",
         translation_key="battery_temperature",
-        name="Battery Temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -115,7 +109,6 @@ class YotoSensor(SensorEntity, YotoEntity):
         self._description = description
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
-        self._attr_name = f"{player.name} {self._description.name}"
         self._attr_state_class = self._description.state_class
         self._attr_device_class = self._description.device_class
         self._attr_entity_category = self._description.entity_category
