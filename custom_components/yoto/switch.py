@@ -20,18 +20,18 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
         key="night_display_brightness",
+        translation_key="night_display_brightness",
         name="Night Auto Display Brightness",
-        icon="mdi:brightness-auto",
     ),
     SwitchEntityDescription(
         key="day_display_brightness",
+        translation_key="day_display_brightness",
         name="Day Auto Display Brightness",
-        icon="mdi:brightness-auto",
     ),
     SwitchEntityDescription(
         key="end_of_track_sleep",
+        translation_key="end_of_track_sleep",
         name="End of Track Sleep",
-        icon="mdi:sleep",
     ),
 )
 
@@ -49,8 +49,8 @@ async def async_setup_entry(
         for index in range(len(player.config.alarms)):
             alarm_description = SwitchEntityDescription(
                 key="alarms[" + str(index) + "]",
+                translation_key="alarm",
                 name="Alarm " + str(index + 1),
-                icon="mdi:alarm",
             )
             entities.append(YotoSwitch(coordinator, alarm_description, player))
 
@@ -72,8 +72,8 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         self._attr_unique_id = f"{DOMAIN}_{player.id}_switch_{self._key}"
         if self._key.startswith("alarms"):
             self._attribute, self._index = parse_key(self._key)
-        self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
+        self._attr_translation_key = self._description.translation_key
 
     @property
     def is_on(self) -> bool | None:

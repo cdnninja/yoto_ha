@@ -26,10 +26,12 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_DESCRIPTIONS: Final[tuple[LightEntityDescription, ...]] = (
     LightEntityDescription(
         key="config.day_ambient_colour",
+        translation_key="day_ambient_colour",
         name="Day Ambient Colour",
     ),
     LightEntityDescription(
         key="config.night_ambient_colour",
+        translation_key="night_ambient_colour",
         name="Night Ambient Colour",
     ),
 )
@@ -62,8 +64,8 @@ class YotoLight(LightEntity, YotoEntity):
         self._description = description
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
-        self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
+        self._attr_translation_key = self._description.translation_key
 
     @property
     def color_mode(self) -> ColorMode:

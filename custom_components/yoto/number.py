@@ -21,24 +21,24 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     NumberEntityDescription(
         key="config.night_max_volume_limit",
+        translation_key="night_max_volume_limit",
         name="Night Max Volume",
-        icon="mdi:volume-high",
         native_min_value=0,
         native_max_value=16,
         native_step=1,
     ),
     NumberEntityDescription(
         key="config.day_max_volume_limit",
+        translation_key="day_max_volume_limit",
         name="Day Max Volume",
-        icon="mdi:volume-high",
         native_min_value=0,
         native_max_value=16,
         native_step=1,
     ),
     NumberEntityDescription(
         key="config.day_display_brightness",
+        translation_key="day_display_brightness",
         name="Day Display Brightness",
-        icon="mdi:brightness-percent",
         native_min_value=0,
         native_max_value=100,
         native_step=1,
@@ -46,8 +46,8 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     ),
     NumberEntityDescription(
         key="config.night_display_brightness",
+        translation_key="night_display_brightness",
         name="Night Display Brightness",
-        icon="mdi:brightness-percent",
         native_min_value=0,
         native_max_value=100,
         native_step=1,
@@ -55,6 +55,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
     ),
     NumberEntityDescription(
         key="sleep_timer_seconds_remaining",
+        translation_key="sleep_timer_seconds_remaining",
         name="Sleep Timer Seconds Remaining",
         native_min_value=0,
         native_max_value=46500,
@@ -90,9 +91,9 @@ class YotoNumber(NumberEntity, YotoEntity):
         self._description = description
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
-        self._attr_icon = self._description.icon
         self._attr_name = f"{player.name} {self._description.name}"
         self._attr_device_class = self._description.device_class
+        self._attr_translation_key = self._description.translation_key
 
     @property
     def native_value(self) -> float | None:

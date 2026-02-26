@@ -30,13 +30,12 @@ class YotoBinarySensorEntityDescription(BinarySensorEntityDescription):
     """A class that describes custom binary sensor entities."""
 
     is_on: Callable[[YotoPlayer], bool] | None = None
-    on_icon: str | None = None
-    off_icon: str | None = None
 
 
 SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="online",
+        translation_key="online",
         name="Online",
         is_on=lambda player: player.online,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
@@ -44,41 +43,43 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     ),
     YotoBinarySensorEntityDescription(
         key="day_mode_on",
+        translation_key="day_mode_on",
         name="Day Mode",
         is_on=lambda player: player.day_mode_on,
     ),
     YotoBinarySensorEntityDescription(
         key="bluetooth_audio_connected",
+        translation_key="bluetooth_audio_connected",
         name="Bluetooth Audio",
         is_on=lambda player: player.bluetooth_audio_connected,
-        on_icon="mdi:headphones-bluetooth",
-        off_icon="mdi:bluetooth-off",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="charging",
+        translation_key="charging",
         name="Charging",
         is_on=lambda player: player.charging,
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
     ),
     YotoBinarySensorEntityDescription(
         key="audio_device_connected",
+        translation_key="audio_device_connected",
         name="Audio Device",
         is_on=lambda player: player.audio_device_connected,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
-        on_icon="mdi:headphones",
-        off_icon="mdi:headphones-off",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="sleep_timer_active",
+        translation_key="sleep_timer_active",
         name="Sleep Timer",
         is_on=lambda player: player.sleep_timer_active,
         device_class=BinarySensorDeviceClass.RUNNING,
     ),
     YotoBinarySensorEntityDescription(
         key="night_light_mode",
+        translation_key="night_light_mode",
         name="Night Light",
         is_on=lambda player: player.night_light_mode != "off",
     ),
@@ -117,6 +118,7 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
         self._attr_name = f"{player.name} {self._description.name}"
         self._attr_device_class = self._description.device_class
         self._attr_entity_category = self._description.entity_category
+        self._attr_translation_key = self._description.translation_key
 
     @property
     def is_on(self) -> bool | None:
@@ -124,10 +126,3 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
         if self._description.is_on is not None:
             return self._description.is_on(self.player)
         return None
-
-    @property
-    def icon(self) -> str | None:
-        """Return the icon to use in the frontend, if any."""
-        if (self._description.on_icon == self._description.off_icon) is None:
-            return BinarySensorEntity.icon
-        return self._description.on_icon if self.is_on else self._description.off_icon
