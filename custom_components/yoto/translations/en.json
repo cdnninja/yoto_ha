@@ -44,5 +44,97 @@
         }
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {
+      "online": {
+        "name": "Online"
+      },
+      "day_mode_on": {
+        "name": "Day mode"
+      },
+      "bluetooth_audio_connected": {
+        "name": "Bluetooth audio"
+      },
+      "charging": {
+        "name": "Charging"
+      },
+      "audio_device_connected": {
+        "name": "Audio device"
+      },
+      "sleep_timer_active": {
+        "name": "Sleep timer"
+      },
+      "night_light_mode": {
+        "name": "Night light"
+      }
+    },
+    "sensor": {
+      "last_updated_at": {
+        "name": "Last updated"
+      },
+      "battery_level_percentage": {
+        "name": "Battery level"
+      },
+      "temperature_celcius": {
+        "name": "Temperature"
+      },
+      "ambient_light_sensor_reading": {
+        "name": "Ambient light reading"
+      },
+      "wifi_strength": {
+        "name": "WiFi signal strength"
+      },
+      "battery_temperature": {
+        "name": "Battery temperature"
+      }
+    },
+    "switch": {
+      "night_display_brightness": {
+        "name": "Night auto display brightness"
+      },
+      "day_display_brightness": {
+        "name": "Day auto display brightness"
+      },
+      "end_of_track_sleep": {
+        "name": "End of track sleep"
+      },
+      "alarm": {
+        "name": "Alarm"
+      }
+    },
+    "number": {
+      "night_max_volume_limit": {
+        "name": "Night max volume"
+      },
+      "day_max_volume_limit": {
+        "name": "Day max volume"
+      },
+      "day_display_brightness": {
+        "name": "Day display brightness"
+      },
+      "night_display_brightness": {
+        "name": "Night display brightness"
+      },
+      "sleep_timer_seconds_remaining": {
+        "name": "Sleep timer seconds remaining"
+      }
+    },
+    "time": {
+      "day_mode_time": {
+        "name": "Day mode"
+      },
+      "night_mode_time": {
+        "name": "Night mode"
+      }
+    },
+    "light": {
+      "day_ambient_colour": {
+        "name": "Day ambient colour"
+      },
+      "night_ambient_colour": {
+        "name": "Night ambient colour"
+      }
+    }
   }
 }

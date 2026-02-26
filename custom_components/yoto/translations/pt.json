@@ -44,5 +44,97 @@
         }
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {
+      "online": {
+        "name": "Online"
+      },
+      "day_mode_on": {
+        "name": "Modo diurno"
+      },
+      "bluetooth_audio_connected": {
+        "name": "Áudio Bluetooth"
+      },
+      "charging": {
+        "name": "A carregar"
+      },
+      "audio_device_connected": {
+        "name": "Dispositivo de áudio"
+      },
+      "sleep_timer_active": {
+        "name": "Temporizador de sono"
+      },
+      "night_light_mode": {
+        "name": "Luz noturna"
+      }
+    },
+    "sensor": {
+      "last_updated_at": {
+        "name": "Última atualização"
+      },
+      "battery_level_percentage": {
+        "name": "Nível da bateria"
+      },
+      "temperature_celcius": {
+        "name": "Temperatura"
+      },
+      "ambient_light_sensor_reading": {
+        "name": "Leitura de luz ambiente"
+      },
+      "wifi_strength": {
+        "name": "Intensidade do sinal WiFi"
+      },
+      "battery_temperature": {
+        "name": "Temperatura da bateria"
+      }
+    },
+    "switch": {
+      "night_display_brightness": {
+        "name": "Brilho automático do ecrã noturno"
+      },
+      "day_display_brightness": {
+        "name": "Brilho automático do ecrã diurno"
+      },
+      "end_of_track_sleep": {
+        "name": "Sono no fim da faixa"
+      },
+      "alarm": {
+        "name": "Alarme"
+      }
+    },
+    "number": {
+      "night_max_volume_limit": {
+        "name": "Volume máximo noturno"
+      },
+      "day_max_volume_limit": {
+        "name": "Volume máximo diurno"
+      },
+      "day_display_brightness": {
+        "name": "Brilho do ecrã diurno"
+      },
+      "night_display_brightness": {
+        "name": "Brilho do ecrã noturno"
+      },
+      "sleep_timer_seconds_remaining": {
+        "name": "Segundos restantes do temporizador de sono"
+      }
+    },
+    "time": {
+      "day_mode_time": {
+        "name": "Modo diurno"
+      },
+      "night_mode_time": {
+        "name": "Modo noturno"
+      }
+    },
+    "light": {
+      "day_ambient_colour": {
+        "name": "Cor ambiente diurna"
+      },
+      "night_ambient_colour": {
+        "name": "Cor ambiente noturna"
+      }
+    }
   }
 }
