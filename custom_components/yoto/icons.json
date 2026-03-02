@@ -1,0 +1,106 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "online": {
+        "default": "mdi:cloud"
+      },
+      "day_mode_on": {
+        "default": "mdi:white-balance-sunny",
+        "state": {
+          "off": "mdi:weather-night"
+        }
+      },
+      "bluetooth_audio_connected": {
+        "default": "mdi:bluetooth-off",
+        "state": {
+          "on": "mdi:headphones-bluetooth"
+        }
+      },
+      "charging": {
+        "default": "mdi:battery"
+      },
+      "audio_device_connected": {
+        "default": "mdi:headphones-off",
+        "state": {
+          "on": "mdi:headphones"
+        }
+      },
+      "sleep_timer_active": {
+        "default": "mdi:timer"
+      },
+      "night_light_mode": {
+        "default": "mdi:lightbulb-night",
+        "state": {
+          "off": "mdi:lightbulb-off"
+        }
+      }
+    },
+    "sensor": {
+      "last_updated_at": {
+        "default": "mdi:update"
+      },
+      "battery_level_percentage": {
+        "default": "mdi:battery"
+      },
+      "temperature_celcius": {
+        "default": "mdi:thermometer"
+      },
+      "ambient_light_sensor_reading": {
+        "default": "mdi:brightness-5"
+      },
+      "wifi_strength": {
+        "default": "mdi:wifi"
+      },
+      "battery_temperature": {
+        "default": "mdi:thermometer"
+      }
+    },
+    "switch": {
+      "night_display_brightness": {
+        "default": "mdi:brightness-auto"
+      },
+      "day_display_brightness": {
+        "default": "mdi:brightness-auto"
+      },
+      "end_of_track_sleep": {
+        "default": "mdi:sleep"
+      },
+      "alarm": {
+        "default": "mdi:alarm"
+      }
+    },
+    "number": {
+      "night_max_volume_limit": {
+        "default": "mdi:volume-high"
+      },
+      "day_max_volume_limit": {
+        "default": "mdi:volume-high"
+      },
+      "day_display_brightness": {
+        "default": "mdi:brightness-percent"
+      },
+      "night_display_brightness": {
+        "default": "mdi:brightness-percent"
+      },
+      "sleep_timer_seconds_remaining": {
+        "default": "mdi:timer"
+      }
+    },
+    "time": {
+      "day_mode_time": {
+        "default": "mdi:sun-clock"
+      },
+      "night_mode_time": {
+        "default": "mdi:moon-waning-crescent"
+      }
+    },
+    "light": {
+      "day_ambient_colour": {
+        "default": "mdi:lightbulb"
+      },
+      "night_ambient_colour": {
+        "default": "mdi:lightbulb-night"
+      }
+    }
+  }
+}

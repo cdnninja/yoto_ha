@@ -18,11 +18,11 @@ from .entity import YotoEntity
 TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
     TimeEntityDescription(
         key="day_mode_time",
-        name="Day Mode",
+        translation_key="day_mode_time",
     ),
     TimeEntityDescription(
         key="night_mode_time",
-        name="Night Mode",
+        translation_key="night_mode_time",
     ),
 )
 
@@ -57,7 +57,7 @@ class YotoTime(TimeEntity, YotoEntity):
         self._description = description
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._description.key}"
-        self._attr_name = f"{player.name} {self._description.name}"
+        self._attr_translation_key = self._description.translation_key
 
     @property
     def native_value(self) -> time | None:

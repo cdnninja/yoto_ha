@@ -39,40 +39,39 @@ class YotoSensorEntityDescription(SensorEntityDescription):
 SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
     YotoSensorEntityDescription(
         key="last_updated_at",
-        name="Last Updated",
-        icon="mdi:update",
+        translation_key="last_updated_at",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoSensorEntityDescription(
         key="battery_level_percentage",
-        name="Battery Level",
+        translation_key="battery_level_percentage",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
         always_load=True,
     ),
     YotoSensorEntityDescription(
         key="temperature_celcius",
-        name="Temperature",
+        translation_key="temperature_celcius",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
     YotoSensorEntityDescription(
         key="ambient_light_sensor_reading",
-        name="Ambient Light Reading",
+        translation_key="ambient_light_sensor_reading",
         native_unit_of_measurement=LIGHT_LUX,
         device_class=SensorDeviceClass.ILLUMINANCE,
     ),
     YotoSensorEntityDescription(
         key="wifi_strength",
-        name="WiFi Signal Strength",
+        translation_key="wifi_strength",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoSensorEntityDescription(
         key="battery_temperature",
-        name="Battery Temperature",
+        translation_key="battery_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -110,11 +109,10 @@ class YotoSensor(SensorEntity, YotoEntity):
         self._description = description
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
-        self._attr_icon = self._description.icon
-        self._attr_name = f"{player.name} {self._description.name}"
         self._attr_state_class = self._description.state_class
         self._attr_device_class = self._description.device_class
         self._attr_entity_category = self._description.entity_category
+        self._attr_translation_key = self._description.translation_key
 
     @property
     def native_value(self):
