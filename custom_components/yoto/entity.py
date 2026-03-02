@@ -14,6 +14,8 @@ _LOGGER = logging.getLogger(__name__)
 class YotoEntity(CoordinatorEntity):
     """Class for base entity for Yoto integration."""
 
+    _attr_has_entity_name = True
+
     def __init__(self, coordinator, player):
         """Initialize the base entity."""
         super().__init__(coordinator)

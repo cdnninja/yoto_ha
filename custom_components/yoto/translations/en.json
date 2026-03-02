@@ -100,7 +100,7 @@
         "name": "End of track sleep"
       },
       "alarm": {
-        "name": "Alarm"
+        "name": "Alarm {number}"
       }
     },
     "number": {

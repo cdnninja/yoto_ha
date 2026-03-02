@@ -47,6 +47,7 @@ async def async_setup_entry(
             alarm_description = SwitchEntityDescription(
                 key="alarms[" + str(index) + "]",
                 translation_key="alarm",
+                translation_placeholders={"number": str(index + 1)},
             )
             entities.append(YotoSwitch(coordinator, alarm_description, player))
 

@@ -100,7 +100,7 @@
         "name": "Sono no fim da faixa"
       },
       "alarm": {
-        "name": "Alarme"
+        "name": "Alarme {number}"
       }
     },
     "number": {
