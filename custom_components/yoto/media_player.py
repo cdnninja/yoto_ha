@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 
 from homeassistant.components.media_player import (
@@ -18,6 +19,7 @@ from homeassistant.components.media_player import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.util.dt import utcnow
 from yoto_api import YotoPlayer
 
 from .const import DOMAIN
@@ -287,6 +289,13 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     def media_duration(self) -> int | None:
         """Return the duration of the current media in seconds."""
         return self.player.track_length
+
+    @property
+    def media_position_updated_at(self) -> datetime | None:
+        """Return the last time the media position was updated."""
+        if self.player.track_position is None:
+            return None
+        return utcnow()
 
     @property
     def media_artist(self) -> str | None:
