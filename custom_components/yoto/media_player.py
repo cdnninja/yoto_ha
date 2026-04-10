@@ -295,7 +295,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         """Return the last time the media position was updated."""
         if self.player.track_position is None:
             return None
-        return utcnow()
+        return self.player.last_updated_at
 
     @property
     def media_artist(self) -> str | None:
