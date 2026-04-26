@@ -12,14 +12,13 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
 
 from .const import DOMAIN
-from .coordinator import YotoDataUpdateCoordinator
+from .coordinator import YotoConfigEntry, YotoDataUpdateCoordinator
 from .entity import YotoEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -81,11 +80,11 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: YotoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up binary_sensor platform."""
-    coordinator = hass.data[DOMAIN][config_entry.unique_id]
+    coordinator = config_entry.runtime_data
     entities: list[YotoBinarySensor] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]

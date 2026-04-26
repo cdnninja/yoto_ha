@@ -16,11 +16,13 @@ from .const import CONF_TOKEN, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+type YotoConfigEntry = ConfigEntry["YotoDataUpdateCoordinator"]
+
 
 class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, config_entry: YotoConfigEntry) -> None:
         """Initialize."""
         self.platforms: set[str] = set()
         self.config_entry = config_entry

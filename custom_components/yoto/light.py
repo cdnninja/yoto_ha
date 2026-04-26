@@ -12,12 +12,12 @@ from homeassistant.components.light import (
     LightEntity,
     LightEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
 
 from .const import DOMAIN
+from .coordinator import YotoConfigEntry
 from .entity import YotoEntity
 from .utils import rgetattr
 
@@ -37,11 +37,11 @@ SENSOR_DESCRIPTIONS: Final[tuple[LightEntityDescription, ...]] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: YotoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up sensor platform."""
-    coordinator = hass.data[DOMAIN][config_entry.unique_id]
+    coordinator = config_entry.runtime_data
     entities: list[YotoLight] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]

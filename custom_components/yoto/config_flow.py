@@ -1,4 +1,4 @@
-"""Config flow for Hyundai / Kia Connect integration."""
+"""Config flow for Yoto integration."""
 
 from __future__ import annotations
 

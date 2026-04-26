@@ -11,7 +11,6 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     LIGHT_LUX,
     PERCENTAGE,
@@ -24,6 +23,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
 
 from .const import DOMAIN
+from .coordinator import YotoConfigEntry
 from .entity import YotoEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -81,11 +81,11 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: YotoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up sensor platform."""
-    coordinator = hass.data[DOMAIN][config_entry.unique_id]
+    coordinator = config_entry.runtime_data
     entities: list[YotoSensor] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]
