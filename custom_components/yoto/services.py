@@ -1,9 +1,13 @@
-import logging
-from typing import cast
+"""Yoto integration services."""
 
-from homeassistant.config_entries import ConfigEntry
+from __future__ import annotations
+
+import logging
+
+from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import ATTR_DEVICE_ID
 from homeassistant.core import HomeAssistant, ServiceCall, callback
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import device_registry
 
 from .const import DOMAIN
@@ -17,68 +21,41 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @callback
-def async_setup_services(hass: HomeAssistant) -> bool:
-    """Set up services for Yoto"""
+def async_setup_services(hass: HomeAssistant) -> None:
+    """Set up services for Yoto."""
 
     async def async_handle_update(call: ServiceCall) -> None:
         _LOGGER.debug(f"Call:{call.data}")
         coordinator = _get_coordinator_from_device(hass, call)
         await coordinator.async_update_all()
 
-    services: dict[str, object] = {SERVICE_UPDATE: async_handle_update}
+    services = {SERVICE_UPDATE: async_handle_update}
 
     for service in SUPPORTED_SERVICES:
         hass.services.async_register(DOMAIN, service, services[service])
-    return True
-
-
-@callback
-def async_unload_services(hass: HomeAssistant) -> None:
-    for service in SUPPORTED_SERVICES:
-        hass.services.async_remove(DOMAIN, service)
-
-
-def _get_player_id_from_device(hass: HomeAssistant, call: ServiceCall) -> str:
-    """Get player ID from device registry."""
-    coordinators = list(hass.data[DOMAIN].keys())
-    if len(coordinators) == 1:
-        coordinator = hass.data[DOMAIN][coordinators[0]]
-        players = coordinator.yoto_manager.players
-        if len(players) == 1:
-            return list(players.keys())[0]
-
-    device_entry = device_registry.async_get(hass).async_get(call.data[ATTR_DEVICE_ID])
-    for entry in device_entry.identifiers:
-        if entry[0] == DOMAIN:
-            player_id = entry[1]
-    return player_id
 
 
 def _get_coordinator_from_device(
     hass: HomeAssistant, call: ServiceCall
 ) -> YotoDataUpdateCoordinator:
-    """Get coordinator from device registry."""
-    coordinators = list(hass.data[DOMAIN].keys())
-    if len(coordinators) == 1:
-        return hass.data[DOMAIN][coordinators[0]]
-    else:
-        device_entry = device_registry.async_get(hass).async_get(
-            call.data[ATTR_DEVICE_ID]
-        )
-        config_entry_ids = device_entry.config_entries
-        config_entry_id = next(
-            (
-                config_entry_id
-                for config_entry_id in config_entry_ids
-                if cast(
-                    ConfigEntry,
-                    hass.config_entries.async_get_entry(config_entry_id),
-                ).domain
-                == DOMAIN
-            ),
-            None,
-        )
-        config_entry_unique_id = hass.config_entries.async_get_entry(
-            config_entry_id
-        ).unique_id
-        return hass.data[DOMAIN][config_entry_unique_id]
+    """Get the coordinator targeted by the service call."""
+    entries = [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if entry.state == ConfigEntryState.LOADED
+    ]
+    if not entries:
+        raise ServiceValidationError("No loaded Yoto config entry found")
+
+    if len(entries) == 1:
+        return entries[0].runtime_data
+
+    device_entry = device_registry.async_get(hass).async_get(call.data[ATTR_DEVICE_ID])
+    if device_entry is None:
+        raise ServiceValidationError("Device not found")
+
+    for entry in entries:
+        if entry.entry_id in device_entry.config_entries:
+            return entry.runtime_data
+
+    raise ServiceValidationError("No Yoto config entry for the requested device")

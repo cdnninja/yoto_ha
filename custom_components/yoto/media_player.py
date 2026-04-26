@@ -16,12 +16,12 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
     MediaType,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
 
 from .const import DOMAIN
+from .coordinator import YotoConfigEntry
 from .entity import YotoEntity
 from .utils import split_media_id
 
@@ -30,11 +30,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: YotoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Media Player platform."""
-    coordinator = hass.data[DOMAIN][config_entry.unique_id]
+    coordinator = config_entry.runtime_data
     entities: list[YotoMediaPlayer] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]

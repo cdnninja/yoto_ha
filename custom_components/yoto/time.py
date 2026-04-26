@@ -6,13 +6,12 @@ from datetime import time
 from typing import Final
 
 from homeassistant.components.time import TimeEntity, TimeEntityDescription
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
 
 from .const import DOMAIN
-from .coordinator import YotoDataUpdateCoordinator
+from .coordinator import YotoConfigEntry, YotoDataUpdateCoordinator
 from .entity import YotoEntity
 
 TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
@@ -29,11 +28,11 @@ TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: YotoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up time platform."""
-    coordinator = hass.data[DOMAIN][config_entry.unique_id]
+    coordinator = config_entry.runtime_data
     entities: list[YotoTime] = []
     for player_id in coordinator.yoto_manager.players.keys():
         player: YotoPlayer = coordinator.yoto_manager.players[player_id]

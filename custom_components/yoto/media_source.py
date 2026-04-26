@@ -9,6 +9,7 @@ from homeassistant.components.media_source import (
     MediaSourceItem,
     PlayMedia,
 )
+from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
@@ -68,7 +69,12 @@ class YotoMediaSource(MediaSource):
     ) -> BrowseMediaSource:
         """Browse media for Yoto."""
         if self.coordinator is None:
-            self.coordinator = next(iter(self.hass.data[DOMAIN].values()))
+            entries = [
+                entry
+                for entry in self.hass.config_entries.async_entries(DOMAIN)
+                if entry.state == ConfigEntryState.LOADED
+            ]
+            self.coordinator = entries[0].runtime_data
         if item.identifier is None:
             return await self.async_convert_library_to_browse_media()
         else:
