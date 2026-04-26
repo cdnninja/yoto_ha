@@ -23,16 +23,6 @@
       "unknown": "Unexpected error"
     }
   },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Yoto - Configuration",
-        "data": {
-          "scan_interval": "Scan Interval (min)"
-        }
-      }
-    }
-  },
   "services": {
     "update": {
       "name": "Update",

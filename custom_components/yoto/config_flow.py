@@ -7,57 +7,23 @@ import logging
 from collections.abc import Mapping
 from typing import Any
 
-import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigFlowResult
-from homeassistant.const import CONF_SCAN_INTERVAL
-from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigFlowResult
 from homeassistant.exceptions import HomeAssistantError
 from yoto_api import YotoManager
 
-from .const import CONF_TOKEN, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import CONF_TOKEN, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class YotoOptionFlowHandler(config_entries.OptionsFlow):
-    """Handle an option flow for Yoto."""
-
-    async def async_step_init(self, user_input=None) -> FlowResult:
-        """Handle options init setup."""
-        if user_input is not None:
-            return self.async_create_entry(
-                title=self.config_entry.title, data=user_input
-            )
-
-        schema = vol.Schema(
-            {
-                vol.Required(
-                    CONF_SCAN_INTERVAL,
-                    default=self.config_entry.options.get(
-                        CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=15, max=999)),
-            }
-        )
-
-        return self.async_show_form(step_id="init", data_schema=schema)
-
-
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Yoto"""
+    """Handle a config flow for Yoto."""
 
-    VERSION = 2
+    VERSION = 3
     login_task: asyncio.Task | None = None
     token = None
     ym: YotoManager | None = None
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry: ConfigEntry) -> YotoOptionFlowHandler:
-        """Initiate options flow instance."""
-        return YotoOptionFlowHandler()
 
     async def async_step_reauth(
         self, entry_data: Mapping[str, Any]
@@ -77,7 +43,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle users reauth credentials."""
+        """Handle the device code login flow."""
 
         if self.ym is None:
             _LOGGER.debug("Initiating device activation")
@@ -91,13 +57,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             yoto_device_url = urlObject["verification_uri_complete"]
 
         async def _wait_for_login() -> None:
-            """Wait for the user to login."""
+            """Wait for the user to login and validate the resulting token."""
             assert self.ym is not None
             _LOGGER.debug("Waiting for device activation")
             await self.hass.async_add_executor_job(self.ym.device_code_flow_complete)
 
             if self.ym.token is None:
                 raise HomeAssistantError("Device activation failed")
+
+            # Validate the token by hitting the players endpoint. Surfaces a
+            # bad/expired token before the entry is created.
+            await self.hass.async_add_executor_job(self.ym.update_players_status)
+            if not self.ym.players:
+                raise HomeAssistantError("No Yoto players found on this account")
 
         _LOGGER.debug("Checking login task")
         if self.login_task is None:
@@ -125,8 +97,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
-        """Handle the finalization of reauth."""
-        _LOGGER.debug("Finalizing reauth")
+        """Create or update the config entry once the login has succeeded."""
+        _LOGGER.debug("Finalizing login")
         assert self.ym is not None
         unique_id = next(iter(self.ym.players))
 

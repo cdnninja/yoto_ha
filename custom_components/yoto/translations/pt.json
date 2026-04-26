@@ -23,16 +23,6 @@
       "unknown": "Erro desconhecido"
     }
   },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Yoto - Configuração",
-        "data": {
-          "scan_interval": "Intervalo de Verificação (min)"
-        }
-      }
-    }
-  },
   "services": {
     "update": {
       "name": "Atualizar",
