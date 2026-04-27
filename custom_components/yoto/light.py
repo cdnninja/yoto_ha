@@ -12,6 +12,7 @@ from homeassistant.components.light import (
     LightEntity,
     LightEntityDescription,
 )
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
@@ -27,10 +28,12 @@ SENSOR_DESCRIPTIONS: Final[tuple[LightEntityDescription, ...]] = (
     LightEntityDescription(
         key="config.day_ambient_colour",
         translation_key="day_ambient_colour",
+        entity_category=EntityCategory.CONFIG,
     ),
     LightEntityDescription(
         key="config.night_ambient_colour",
         translation_key="night_ambient_colour",
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
@@ -63,6 +66,7 @@ class YotoLight(LightEntity, YotoEntity):
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
         self._attr_translation_key = self._description.translation_key
+        self._attr_entity_category = description.entity_category
 
     @property
     def color_mode(self) -> ColorMode:

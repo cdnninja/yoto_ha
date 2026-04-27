@@ -42,29 +42,29 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
         translation_key="last_updated_at",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
     YotoSensorEntityDescription(
         key="battery_level_percentage",
-        translation_key="battery_level_percentage",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
         always_load=True,
     ),
     YotoSensorEntityDescription(
         key="temperature_celcius",
-        translation_key="temperature_celcius",
+        translation_key="temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoSensorEntityDescription(
         key="ambient_light_sensor_reading",
-        translation_key="ambient_light_sensor_reading",
         native_unit_of_measurement=LIGHT_LUX,
         device_class=SensorDeviceClass.ILLUMINANCE,
     ),
     YotoSensorEntityDescription(
         key="wifi_strength",
-        translation_key="wifi_strength",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -75,6 +75,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
 )
 
@@ -112,6 +113,9 @@ class YotoSensor(SensorEntity, YotoEntity):
         self._attr_state_class = self._description.state_class
         self._attr_device_class = self._description.device_class
         self._attr_entity_category = self._description.entity_category
+        self._attr_entity_registry_enabled_default = (
+            description.entity_registry_enabled_default
+        )
         self._attr_translation_key = self._description.translation_key
 
     @property

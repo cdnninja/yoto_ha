@@ -6,6 +6,7 @@ import logging
 from typing import Final
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
@@ -21,14 +22,17 @@ SENSOR_DESCRIPTIONS: Final[tuple[SwitchEntityDescription, ...]] = (
     SwitchEntityDescription(
         key="night_display_brightness",
         translation_key="night_display_brightness",
+        entity_category=EntityCategory.CONFIG,
     ),
     SwitchEntityDescription(
         key="day_display_brightness",
         translation_key="day_display_brightness",
+        entity_category=EntityCategory.CONFIG,
     ),
     SwitchEntityDescription(
         key="end_of_track_sleep",
         translation_key="end_of_track_sleep",
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
@@ -48,6 +52,7 @@ async def async_setup_entry(
                 key="alarms[" + str(index) + "]",
                 translation_key="alarm",
                 translation_placeholders={"number": str(index + 1)},
+                entity_category=EntityCategory.CONFIG,
             )
             entities.append(YotoSwitch(coordinator, alarm_description, player))
 
@@ -70,6 +75,9 @@ class YotoSwitch(SwitchEntity, YotoEntity):
         if self._key.startswith("alarms"):
             self._attribute, self._index = parse_key(self._key)
         self._attr_translation_key = self._description.translation_key
+        if description.translation_placeholders:
+            self._attr_translation_placeholders = description.translation_placeholders
+        self._attr_entity_category = description.entity_category
 
     @property
     def is_on(self) -> bool | None:
