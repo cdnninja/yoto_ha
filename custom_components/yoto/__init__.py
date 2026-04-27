@@ -95,9 +95,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.debug("Migrating entry to version 3")
         options = dict(entry.options)
         options.pop(CONF_SCAN_INTERVAL, None)
-        hass.config_entries.async_update_entry(
-            entry=entry, options=options, version=3
-        )
+        hass.config_entries.async_update_entry(entry=entry, options=options, version=3)
         _LOGGER.debug("Migration to version 3 successful")
     return True
 

@@ -42,7 +42,7 @@
       "temperature": {
         "default": "mdi:thermometer"
       },
-"battery_temperature": {
+      "battery_temperature": {
         "default": "mdi:thermometer"
       }
     },
