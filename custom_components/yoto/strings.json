@@ -15,15 +15,6 @@
       "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
     }
   },
-  "options": {
-    "step": {
-      "init": {
-        "data": {
-          "scan_interval": "[%key:component::yoto::options::step::init::data::scan_interval%]"
-        }
-      }
-    }
-  },
   "entity": {
     "binary_sensor": {
       "online": {
