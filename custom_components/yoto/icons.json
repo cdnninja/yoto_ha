@@ -39,9 +39,6 @@
       "last_updated_at": {
         "default": "mdi:update"
       },
-      "temperature": {
-        "default": "mdi:thermometer"
-      },
       "battery_temperature": {
         "default": "mdi:thermometer"
       }

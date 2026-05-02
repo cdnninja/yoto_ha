@@ -43,9 +43,6 @@
       "last_updated_at": {
         "name": "Last updated"
       },
-      "temperature": {
-        "name": "Temperature"
-      },
       "battery_temperature": {
         "name": "Battery temperature"
       }

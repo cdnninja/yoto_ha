@@ -53,7 +53,6 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoSensorEntityDescription, ...]] = (
     ),
     YotoSensorEntityDescription(
         key="temperature_celcius",
-        translation_key="temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         entity_category=EntityCategory.DIAGNOSTIC,
