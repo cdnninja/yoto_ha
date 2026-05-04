@@ -5,8 +5,12 @@ from __future__ import annotations
 import logging
 from typing import Final
 
-from homeassistant.components.number import NumberEntity, NumberEntityDescription
-from homeassistant.const import PERCENTAGE
+from homeassistant.components.number import (
+    NumberDeviceClass,
+    NumberEntity,
+    NumberEntityDescription,
+)
+from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
@@ -25,6 +29,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_min_value=0,
         native_max_value=16,
         native_step=1,
+        entity_category=EntityCategory.CONFIG,
     ),
     NumberEntityDescription(
         key="config.day_max_volume_limit",
@@ -32,6 +37,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_min_value=0,
         native_max_value=16,
         native_step=1,
+        entity_category=EntityCategory.CONFIG,
     ),
     NumberEntityDescription(
         key="config.day_display_brightness",
@@ -40,6 +46,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_max_value=100,
         native_step=1,
         native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.CONFIG,
     ),
     NumberEntityDescription(
         key="config.night_display_brightness",
@@ -48,13 +55,17 @@ SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_max_value=100,
         native_step=1,
         native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.CONFIG,
     ),
     NumberEntityDescription(
         key="sleep_timer_seconds_remaining",
-        translation_key="sleep_timer_seconds_remaining",
+        translation_key="sleep_timer",
+        device_class=NumberDeviceClass.DURATION,
         native_min_value=0,
         native_max_value=46500,
         native_step=1,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
@@ -88,6 +99,7 @@ class YotoNumber(NumberEntity, YotoEntity):
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
         self._attr_device_class = self._description.device_class
         self._attr_translation_key = self._description.translation_key
+        self._attr_entity_category = description.entity_category
 
     @property
     def native_value(self) -> float | None:

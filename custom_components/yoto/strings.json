@@ -30,7 +30,7 @@
         "name": "Charging"
       },
       "audio_device_connected": {
-        "name": "Audio device"
+        "name": "Headphones"
       },
       "sleep_timer_active": {
         "name": "Sleep timer"
@@ -42,18 +42,6 @@
     "sensor": {
       "last_updated_at": {
         "name": "Last updated"
-      },
-      "battery_level_percentage": {
-        "name": "Battery level"
-      },
-      "temperature_celcius": {
-        "name": "Temperature"
-      },
-      "ambient_light_sensor_reading": {
-        "name": "Ambient light reading"
-      },
-      "wifi_strength": {
-        "name": "WiFi signal strength"
       },
       "battery_temperature": {
         "name": "Battery temperature"
@@ -86,16 +74,16 @@
       "night_display_brightness": {
         "name": "Night display brightness"
       },
-      "sleep_timer_seconds_remaining": {
-        "name": "Sleep timer seconds remaining"
+      "sleep_timer": {
+        "name": "Sleep timer"
       }
     },
     "time": {
       "day_mode_time": {
-        "name": "Day mode"
+        "name": "Day mode start"
       },
       "night_mode_time": {
-        "name": "Night mode"
+        "name": "Night mode start"
       }
     },
     "light": {

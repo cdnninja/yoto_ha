@@ -43,6 +43,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         key="day_mode_on",
         translation_key="day_mode_on",
         is_on=lambda player: player.day_mode_on,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="bluetooth_audio_connected",
@@ -56,6 +57,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         translation_key="charging",
         is_on=lambda player: player.charging,
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="audio_device_connected",
@@ -69,11 +71,13 @@ SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
         translation_key="sleep_timer_active",
         is_on=lambda player: player.sleep_timer_active,
         device_class=BinarySensorDeviceClass.RUNNING,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="night_light_mode",
         translation_key="night_light_mode",
         is_on=lambda player: player.night_light_mode != "off",
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
 )
 

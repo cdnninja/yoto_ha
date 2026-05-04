@@ -39,18 +39,6 @@
       "last_updated_at": {
         "default": "mdi:update"
       },
-      "battery_level_percentage": {
-        "default": "mdi:battery"
-      },
-      "temperature_celcius": {
-        "default": "mdi:thermometer"
-      },
-      "ambient_light_sensor_reading": {
-        "default": "mdi:brightness-5"
-      },
-      "wifi_strength": {
-        "default": "mdi:wifi"
-      },
       "battery_temperature": {
         "default": "mdi:thermometer"
       }
@@ -82,7 +70,7 @@
       "night_display_brightness": {
         "default": "mdi:brightness-percent"
       },
-      "sleep_timer_seconds_remaining": {
+      "sleep_timer": {
         "default": "mdi:timer"
       }
     },

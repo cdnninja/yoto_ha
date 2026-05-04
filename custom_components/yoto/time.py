@@ -6,6 +6,7 @@ from datetime import time
 from typing import Final
 
 from homeassistant.components.time import TimeEntity, TimeEntityDescription
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
@@ -18,10 +19,12 @@ TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
     TimeEntityDescription(
         key="day_mode_time",
         translation_key="day_mode_time",
+        entity_category=EntityCategory.CONFIG,
     ),
     TimeEntityDescription(
         key="night_mode_time",
         translation_key="night_mode_time",
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
@@ -57,6 +60,7 @@ class YotoTime(TimeEntity, YotoEntity):
         self._key = self._description.key
         self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._description.key}"
         self._attr_translation_key = self._description.translation_key
+        self._attr_entity_category = description.entity_category
 
     @property
     def native_value(self) -> time | None:
