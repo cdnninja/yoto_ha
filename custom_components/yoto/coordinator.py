@@ -194,9 +194,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_next_track(self, player_id: str) -> None:
         """Skip to the next track."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.next_track, player_id
-        )
+        await self.hass.async_add_executor_job(self.yoto_manager.next_track, player_id)
 
     async def async_previous_track(self, player_id: str) -> None:
         """Skip to the previous track."""
