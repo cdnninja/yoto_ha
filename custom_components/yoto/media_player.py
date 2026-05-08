@@ -81,25 +81,11 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     async def async_media_next_track(self) -> None:
         """Skip to next track."""
-        cardid, chapterid, trackid, time = split_media_id(self.media_content_id)
-        if chapterid:
-            chapterid = int(chapterid) + 1
-        if trackid:
-            trackid = int(trackid) + 1
-        await self.coordinator.async_play_card(
-            player_id=self.player.id, cardid=cardid, chapter=chapterid, trackkey=trackid
-        )
+        await self.coordinator.async_next_track(self.player.id)
 
     async def async_media_previous_track(self) -> None:
         """Skip to previous track."""
-        cardid, chapterid, trackid, time = split_media_id(self.media_content_id)
-        if chapterid:
-            chapterid = int(chapterid) - 1
-        if trackid:
-            trackid = int(trackid) - 1
-        await self.coordinator.async_play_card(
-            player_id=self.player.id, cardid=cardid, chapter=chapterid, trackkey=trackid
-        )
+        await self.coordinator.async_previous_track(self.player.id)
 
     async def async_play_media(
         self,
@@ -124,13 +110,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
 
     async def async_media_seek(self, position: float) -> None:
         """Send seek command."""
-        await self.coordinator.async_play_card(
-            player_id=self.player.id,
-            cardid=self.player.card_id,
-            chapter=self.player.chapter_key,
-            trackkey=self.player.track_key,
-            secondsin=int(position),
-        )
+        await self.coordinator.async_seek(self.player.id, int(position))
 
     async def async_set_volume_level(self, volume: float) -> None:
         """Set volume level."""
