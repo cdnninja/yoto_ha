@@ -184,6 +184,25 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             trackkey,
         )
 
+    async def async_seek(self, player_id: str, position: int) -> None:
+        """Seek to a position in the current track."""
+        await self.async_check_and_refresh_token()
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.seek, player_id, position
+        )
+
+    async def async_next_track(self, player_id: str) -> None:
+        """Skip to the next track."""
+        await self.async_check_and_refresh_token()
+        await self.hass.async_add_executor_job(self.yoto_manager.next_track, player_id)
+
+    async def async_previous_track(self, player_id: str) -> None:
+        """Skip to the previous track."""
+        await self.async_check_and_refresh_token()
+        await self.hass.async_add_executor_job(
+            self.yoto_manager.previous_track, player_id
+        )
+
     async def async_set_volume(self, player_id: str, volume: float) -> None:
         """Set player volume level."""
         volume = volume * 100
