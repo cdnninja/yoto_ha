@@ -93,9 +93,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_check_and_refresh_token(self) -> None:
         """Refresh token if needed via library."""
-        await self.hass.async_add_executor_job(
-            self.yoto_client.check_and_refresh_token
-        )
+        await self.hass.async_add_executor_job(self.yoto_client.check_and_refresh_token)
 
     async def async_pause_player(self, player_id: str) -> None:
         """Pause playback on the player."""
@@ -112,9 +110,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(self.yoto_client.stop, player_id)
 
-    async def async_set_player_config(
-        self, player_id: str, **fields: Any
-    ) -> None:
+    async def async_set_player_config(self, player_id: str, **fields: Any) -> None:
         """Update PlayerConfig fields on the device. Pass v3 field names."""
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(
@@ -160,9 +156,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_next_track(self, player_id: str) -> None:
         """Skip to the next track."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_client.next_track, player_id
-        )
+        await self.hass.async_add_executor_job(self.yoto_client.next_track, player_id)
 
     async def async_previous_track(self, player_id: str) -> None:
         """Skip to the previous track."""

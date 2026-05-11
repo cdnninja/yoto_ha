@@ -150,12 +150,12 @@ class YotoLight(LightEntity, YotoEntity):
             r = g = b = 255
         if ATTR_BRIGHTNESS in kwargs:
             brightness = kwargs[ATTR_BRIGHTNESS]
-        elif (current_brightness := self.brightness):
+        elif current_brightness := self.brightness:
             brightness = current_brightness
         else:
             brightness = 255
         scale = brightness / 255
-        hex_color = "#%02x%02x%02x" % (
+        hex_color = "#{:02x}{:02x}{:02x}".format(
             round(r * scale),
             round(g * scale),
             round(b * scale),

@@ -25,9 +25,7 @@ class YotoSwitchEntityDescription(SwitchEntityDescription):
     """Yoto switch entity."""
 
     value: Callable[[YotoPlayer], bool | None]
-    setter: Callable[
-        [YotoDataUpdateCoordinator, YotoPlayer, bool], Awaitable[None]
-    ]
+    setter: Callable[[YotoDataUpdateCoordinator, YotoPlayer, bool], Awaitable[None]]
 
 
 # Default brightness applied when the user turns off auto mode — Yoto's
@@ -146,9 +144,7 @@ class YotoEndOfTrackSleepSwitch(SwitchEntity, YotoEntity):
         event = self.player.last_event
         if event.track_length is not None and event.position is not None:
             seconds_to_end = event.track_length - event.position
-            await self.coordinator.async_set_sleep_timer(
-                self.player.id, seconds_to_end
-            )
+            await self.coordinator.async_set_sleep_timer(self.player.id, seconds_to_end)
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs) -> None:

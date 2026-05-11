@@ -23,9 +23,7 @@ class YotoTimeEntityDescription(TimeEntityDescription):
     """Yoto time entity."""
 
     value: Callable[[YotoPlayer], time | None]
-    setter: Callable[
-        [YotoDataUpdateCoordinator, YotoPlayer, time], Awaitable[None]
-    ]
+    setter: Callable[[YotoDataUpdateCoordinator, YotoPlayer, time], Awaitable[None]]
 
 
 TIME_DESCRIPTIONS: Final[tuple[YotoTimeEntityDescription, ...]] = (

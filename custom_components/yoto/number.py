@@ -29,9 +29,7 @@ class YotoNumberEntityDescription(NumberEntityDescription):
     """Yoto number entity."""
 
     value: Callable[[YotoPlayer], int | None]
-    setter: Callable[
-        [YotoDataUpdateCoordinator, YotoPlayer, int], Awaitable[None]
-    ]
+    setter: Callable[[YotoDataUpdateCoordinator, YotoPlayer, int], Awaitable[None]]
     available: Callable[[YotoPlayer], bool] | None = None
     always_load: bool = False
 
@@ -53,9 +51,7 @@ NUMBER_DESCRIPTIONS: Final[tuple[YotoNumberEntityDescription, ...]] = (
         key="config.day_max_volume_limit",
         translation_key="day_max_volume_limit",
         value=lambda p: p.info.config.day_max_volume_limit,
-        setter=lambda c, p, v: c.async_set_player_config(
-            p.id, day_max_volume_limit=v
-        ),
+        setter=lambda c, p, v: c.async_set_player_config(p.id, day_max_volume_limit=v),
         native_min_value=0,
         native_max_value=16,
         native_step=1,
@@ -137,9 +133,7 @@ class YotoNumber(NumberEntity, YotoEntity):
         return super().available and (check is None or check(self.player))
 
     async def async_set_native_value(self, value: float) -> None:
-        await self.entity_description.setter(
-            self.coordinator, self.player, int(value)
-        )
+        await self.entity_description.setter(self.coordinator, self.player, int(value))
         self.async_write_ha_state()
 
 
@@ -156,9 +150,7 @@ class YotoSleepTimerNumber(NumberEntity, YotoEntity):
 
     def __init__(self, coordinator, player: YotoPlayer) -> None:
         super().__init__(coordinator, player)
-        self._attr_unique_id = (
-            f"{DOMAIN}_{player.id}_sleep_timer_seconds_remaining"
-        )
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_sleep_timer_seconds_remaining"
 
     @property
     def native_value(self) -> float | None:
