@@ -96,10 +96,6 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     ) -> None:
         """Play media."""
         cardid, chapterid, trackid, time = split_media_id(media_id)
-        # Yoto needs a trackKey to jump to a specific chapter; without it the
-        # device ignores chapterKey and keeps playing the current track.
-        if chapterid is not None and trackid is None:
-            trackid = "01"
         _LOGGER.debug(
             f"{DOMAIN} - Media requested:  {media_id} Cardid:  {cardid}, chapterid:  {chapterid}, trackid: {trackid}"
         )
@@ -132,7 +128,7 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         await self.coordinator.async_update_library()
         if media_content_id in (None, "library"):
             return await self.async_convert_library_to_browse_media()
-        return await self.async_convert_card_to_browse_media(media_content_id)
+        return await self.async_convert_chapter_to_browse_media(media_content_id)
 
     async def async_convert_library_to_browse_media(self) -> BrowseMedia:
         """Browse library content."""
@@ -161,47 +157,33 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             children_media_class=MediaClass.MUSIC,
         )
 
-    async def async_convert_card_to_browse_media(self, cardid: str) -> BrowseMedia:
-        """Browse a card: flat list of (chapter, track) playable leaves."""
+    async def async_convert_chapter_to_browse_media(self, cardid: str) -> BrowseMedia:
+        """Browse chapter content for a card."""
+        children = []
+        _LOGGER.debug(
+            f"{DOMAIN} - Chapters:  {self.coordinator.yoto_client.library[cardid].chapters}"
+        )
         await self.coordinator.async_update_card_detail(cardid)
-        card = self.coordinator.yoto_client.library[cardid]
-        children: list[BrowseMedia] = []
-        for chapter in card.chapters.values():
-            if not chapter.tracks:
-                children.append(
-                    BrowseMedia(
-                        media_content_id=f"{cardid}+{chapter.key}",
-                        media_class=MediaClass.MUSIC,
-                        media_content_type=MediaType.MUSIC,
-                        title=chapter.title,
-                        can_expand=False,
-                        can_play=True,
-                        thumbnail=chapter.icon,
-                    )
+        for item in self.coordinator.yoto_client.library[cardid].chapters.values():
+            _LOGGER.debug(f"{DOMAIN} - Chapter processing:  {item}")
+            children.append(
+                BrowseMedia(
+                    media_content_id=cardid + "+" + item.key,
+                    media_class=MediaClass.MUSIC,
+                    media_content_type=MediaType.MUSIC,
+                    title=item.title,
+                    can_expand=False,
+                    can_play=True,
+                    thumbnail=item.icon,
                 )
-                continue
-            for track in chapter.tracks.values():
-                if chapter.title == track.title:
-                    title = chapter.title
-                else:
-                    title = f"{chapter.title} - {track.title}"
-                children.append(
-                    BrowseMedia(
-                        media_content_id=f"{cardid}+{chapter.key}+{track.key}",
-                        media_class=MediaClass.MUSIC,
-                        media_content_type=MediaType.MUSIC,
-                        title=title,
-                        can_expand=False,
-                        can_play=True,
-                        thumbnail=track.icon or chapter.icon,
-                    )
-                )
+            )
+        _LOGGER.debug(f"{DOMAIN} - Browse media:  {children}")
         return BrowseMedia(
             media_content_id=cardid,
             media_class=MediaClass.MUSIC,
             media_content_type=MediaType.MUSIC,
-            title=card.title,
-            can_expand=True,
+            title=self.coordinator.yoto_client.library[cardid].title,
+            can_expand=False,
             can_play=True,
             children=children,
             children_media_class=MediaClass.MUSIC,
