@@ -1,6 +1,5 @@
 """Yoto integration."""
 
-import asyncio
 import logging
 
 from homeassistant.config_entries import ConfigEntry
@@ -45,12 +44,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: YotoConfigEntry) 
     coordinator = YotoDataUpdateCoordinator(hass, config_entry)
     try:
         await coordinator.async_config_entry_first_refresh()
-        await asyncio.sleep(3)
     except AuthenticationError as ex:
         _LOGGER.error(f"Authentication error: {ex}")
         raise ConfigEntryAuthFailed from ex
 
     config_entry.runtime_data = coordinator
+    coordinator.setup_periodic_status_push()
 
     async def _handle_shutdown(event):
         new_data = dict(config_entry.data)

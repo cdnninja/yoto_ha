@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
+from datetime import datetime
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from yoto_api import AuthenticationError, YotoClient
+from yoto_api import AuthenticationError, YotoClient, YotoError
 
-from .const import CONF_TOKEN, DOMAIN, SCAN_INTERVAL
+from .const import CONF_TOKEN, DOMAIN, SCAN_INTERVAL, STATUS_PUSH_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +29,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         self.platforms: set[str] = set()
         self.config_entry = config_entry
         self.yoto_client = YotoClient(client_id="KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult")
+        self._status_push_unsub: Callable[[], None] | None = None
         if config_entry.data.get(CONF_TOKEN):
             _LOGGER.debug("Using stored token")
             self.yoto_client.set_refresh_token(config_entry.data.get(CONF_TOKEN))
@@ -37,6 +41,30 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             name=DOMAIN,
             update_interval=SCAN_INTERVAL,
         )
+
+    @callback
+    def setup_periodic_status_push(self) -> None:
+        """Start the MQTT status push heartbeat once MQTT is connected."""
+        if self._status_push_unsub is not None:
+            return
+        self._status_push_unsub = async_track_time_interval(
+            self.hass, self._async_request_status_push, STATUS_PUSH_INTERVAL
+        )
+
+    async def _async_request_status_push(self, _now: datetime) -> None:
+        """Ask every connected player to push its current status over MQTT."""
+        if not self.yoto_client.is_mqtt_connected:
+            return
+        for player_id in list(self.yoto_client.players):
+            try:
+                await self.hass.async_add_executor_job(
+                    self.yoto_client.request_status_push, player_id
+                )
+            except YotoError as err:
+                _LOGGER.debug(
+                    "%s - request_status_push failed for %s: %s",
+                    DOMAIN, player_id, err,
+                )
 
     async def _async_update_data(self) -> dict | None:
         """Update data via library. Called by update_coordinator periodically."""
@@ -85,6 +113,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def release(self) -> None:
         """Disconnect from API."""
+        if self._status_push_unsub is not None:
+            self._status_push_unsub()
+            self._status_push_unsub = None
         await self.hass.async_add_executor_job(self.yoto_client.disconnect_events)
 
     async def async_update_all(self) -> None:
