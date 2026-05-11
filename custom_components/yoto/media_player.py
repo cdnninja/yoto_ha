@@ -207,6 +207,8 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def state(self) -> MediaPlayerState:
         """Return the playback state."""
+        if not self.player.status.is_online:
+            return MediaPlayerState.OFF
         playback_status = self.player.last_event.playback_status
         if playback_status == "paused":
             return MediaPlayerState.PAUSED
@@ -214,8 +216,6 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             return MediaPlayerState.PLAYING
         if playback_status == "stopped":
             return MediaPlayerState.IDLE
-        if not self.player.status.is_online:
-            return MediaPlayerState.OFF
         return MediaPlayerState.ON
 
     @property
