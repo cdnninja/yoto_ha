@@ -54,7 +54,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: YotoConfigEntry) 
 
     async def _handle_shutdown(event):
         new_data = dict(config_entry.data)
-        new_data[CONF_TOKEN] = coordinator.yoto_manager.token.refresh_token
+        new_data[CONF_TOKEN] = coordinator.yoto_client.token.refresh_token
         _LOGGER.debug("Storing token on HA shutdown.")
         hass.config_entries.async_update_entry(config_entry, data=new_data)
 
@@ -71,9 +71,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: YotoConfigEntry) 
 async def async_unload_entry(hass: HomeAssistant, entry: YotoConfigEntry) -> bool:
     """Handle removal of an entry."""
     coordinator = entry.runtime_data
-    if coordinator.yoto_manager.token.refresh_token != entry.data.get(CONF_TOKEN):
+    if coordinator.yoto_client.token.refresh_token != entry.data.get(CONF_TOKEN):
         new_data = dict(entry.data)
-        new_data[CONF_TOKEN] = coordinator.yoto_manager.token.refresh_token
+        new_data[CONF_TOKEN] = coordinator.yoto_client.token.refresh_token
         _LOGGER.debug("Storing token on unload")
         hass.config_entries.async_update_entry(entry, data=new_data)
 

@@ -36,8 +36,8 @@ async def async_setup_entry(
     """Set up Media Player platform."""
     coordinator = config_entry.runtime_data
     entities: list[YotoMediaPlayer] = []
-    for player_id in coordinator.yoto_manager.players.keys():
-        player: YotoPlayer = coordinator.yoto_manager.players[player_id]
+    for player_id in coordinator.yoto_client.players.keys():
+        player: YotoPlayer = coordinator.yoto_client.players[player_id]
         entities.append(YotoMediaPlayer(coordinator, player))
     async_add_entities(entities)
 
@@ -58,7 +58,6 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         """Initialize the media player."""
         super().__init__(coordinator, player)
         self._id = f"{player.name}"
-        # self.data = data
         self._key = "media_player"
         self._attr_unique_id = f"{DOMAIN}_{player.id}_media_player"
         self._attr_name = None
@@ -97,6 +96,10 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     ) -> None:
         """Play media."""
         cardid, chapterid, trackid, time = split_media_id(media_id)
+        # Yoto needs a trackKey to jump to a specific chapter; without it the
+        # device ignores chapterKey and keeps playing the current track.
+        if chapterid is not None and trackid is None:
+            trackid = "01"
         _LOGGER.debug(
             f"{DOMAIN} - Media requested:  {media_id} Cardid:  {cardid}, chapterid:  {chapterid}, trackid: {trackid}"
         )
@@ -129,14 +132,13 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
         await self.coordinator.async_update_library()
         if media_content_id in (None, "library"):
             return await self.async_convert_library_to_browse_media()
-        else:
-            return await self.async_convert_chapter_to_browse_media(media_content_id)
+        return await self.async_convert_card_to_browse_media(media_content_id)
 
     async def async_convert_library_to_browse_media(self) -> BrowseMedia:
         """Browse library content."""
         children = []
 
-        for item in self.coordinator.yoto_manager.library.values():
+        for item in self.coordinator.yoto_client.library.values():
             children.append(
                 BrowseMedia(
                     media_content_id=item.id,
@@ -159,68 +161,47 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
             children_media_class=MediaClass.MUSIC,
         )
 
-    async def async_convert_chapter_to_browse_media(self, cardid: str) -> BrowseMedia:
-        """Browse chapter content for a card."""
-        children = []
-        _LOGGER.debug(
-            f"{DOMAIN} - Chapters:  {self.coordinator.yoto_manager.library[cardid].chapters}"
-        )
+    async def async_convert_card_to_browse_media(self, cardid: str) -> BrowseMedia:
+        """Browse a card: flat list of (chapter, track) playable leaves."""
         await self.coordinator.async_update_card_detail(cardid)
-        for item in self.coordinator.yoto_manager.library[cardid].chapters.values():
-            _LOGGER.debug(f"{DOMAIN} - Chapter processing:  {item}")
-            children.append(
-                BrowseMedia(
-                    media_content_id=cardid + "+" + item.key,
-                    media_class=MediaClass.MUSIC,
-                    media_content_type=MediaType.MUSIC,
-                    title=item.title,
-                    can_expand=False,
-                    can_play=True,
-                    thumbnail=item.icon,
-                )
-            )
-        _LOGGER.debug(f"{DOMAIN} - Browse media:  {children}")
-        return BrowseMedia(
-            media_content_id=cardid,
-            media_class=MediaClass.MUSIC,
-            media_content_type=MediaType.MUSIC,
-            title=self.coordinator.yoto_manager.library[cardid].title,
-            can_expand=False,
-            can_play=True,
-            children=children,
-            children_media_class=MediaClass.MUSIC,
-        )
-
-    async def async_convert_track_to_browse_media(
-        self, cardid: str, chapterid: str
-    ) -> BrowseMedia:
-        """Browse track content for a chapter."""
-        children = []
-        if self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks:
-            for item in (
-                self.coordinator.yoto_manager.library[cardid]
-                .chapters[chapterid]
-                .tracks.values()
-            ):
+        card = self.coordinator.yoto_client.library[cardid]
+        children: list[BrowseMedia] = []
+        for chapter in card.chapters.values():
+            if not chapter.tracks:
                 children.append(
                     BrowseMedia(
-                        media_content_id=cardid + "+" + chapterid + "+" + item.key,
+                        media_content_id=f"{cardid}+{chapter.key}",
                         media_class=MediaClass.MUSIC,
                         media_content_type=MediaType.MUSIC,
-                        title=item.title,
+                        title=chapter.title,
                         can_expand=False,
                         can_play=True,
-                        thumbnail=item.icon,
+                        thumbnail=chapter.icon,
+                    )
+                )
+                continue
+            for track in chapter.tracks.values():
+                if chapter.title == track.title:
+                    title = chapter.title
+                else:
+                    title = f"{chapter.title} - {track.title}"
+                children.append(
+                    BrowseMedia(
+                        media_content_id=f"{cardid}+{chapter.key}+{track.key}",
+                        media_class=MediaClass.MUSIC,
+                        media_content_type=MediaType.MUSIC,
+                        title=title,
+                        can_expand=False,
+                        can_play=True,
+                        thumbnail=track.icon or chapter.icon,
                     )
                 )
         return BrowseMedia(
             media_content_id=cardid,
             media_class=MediaClass.MUSIC,
             media_content_type=MediaType.MUSIC,
-            title=self.coordinator.yoto_manager.library[cardid]
-            .chapters[chapterid]
-            .title,
-            can_expand=False,
+            title=card.title,
+            can_expand=True,
             can_play=True,
             children=children,
             children_media_class=MediaClass.MUSIC,
@@ -244,45 +225,41 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def state(self) -> MediaPlayerState:
         """Return the playback state."""
-
-        if self.player.playback_status == "paused":
+        playback_status = self.player.last_event.playback_status
+        if playback_status == "paused":
             return MediaPlayerState.PAUSED
-        if self.player.playback_status == "playing":
+        if playback_status == "playing":
             return MediaPlayerState.PLAYING
-        if self.player.playback_status == "stopped":
+        if playback_status == "stopped":
             return MediaPlayerState.IDLE
-        if not self.player.online:
+        if not self.player.status.is_online:
             return MediaPlayerState.OFF
-        if self.player.online:
-            return MediaPlayerState.ON
+        return MediaPlayerState.ON
 
     @property
     def volume_level(self) -> float | None:
         """Return the volume level."""
-        if self.player.volume:
-            return self.player.volume / 16
-        else:
-            return None
+        return self.player.last_event.volume_percentage
 
     @property
     def media_duration(self) -> int | None:
         """Return the duration of the current media in seconds."""
-        return self.player.track_length
+        return self.player.last_event.track_length
 
     @property
     def media_position_updated_at(self) -> datetime | None:
         """Return the last time the media position was updated."""
-        if self.player.track_position is None:
+        if self.player.last_event.position is None:
             return None
-        return self.player.last_updated_at
+        return self.player.last_event_received_at
 
     @property
     def media_artist(self) -> str | None:
         """Return the artist of the current media."""
-        if self.player.card_id in self.coordinator.yoto_manager.library:
-            return self.coordinator.yoto_manager.library[self.player.card_id].author
-        else:
-            return None
+        card_id = self.player.last_event.card_id
+        if card_id and card_id in self.coordinator.yoto_client.library:
+            return self.coordinator.yoto_client.library[card_id].author
+        return None
 
     @property
     def media_image_remotely_accessible(self) -> bool:
@@ -292,95 +269,58 @@ class YotoMediaPlayer(MediaPlayerEntity, YotoEntity):
     @property
     def media_album_name(self) -> str | None:
         """Return the album name of the current media."""
-        if self.player.card_id in self.coordinator.yoto_manager.library:
-            return self.coordinator.yoto_manager.library[self.player.card_id].title
-        else:
-            return None
+        card_id = self.player.last_event.card_id
+        if card_id and card_id in self.coordinator.yoto_client.library:
+            return self.coordinator.yoto_client.library[card_id].title
+        return None
 
     @property
     def media_image_url(self) -> str | None:
         """Return the image URL of the current media."""
-        if self.player.card_id in self.coordinator.yoto_manager.library:
-            return self.coordinator.yoto_manager.library[
-                self.player.card_id
-            ].cover_image_large
-        else:
-            return None
+        card_id = self.player.last_event.card_id
+        if card_id and card_id in self.coordinator.yoto_client.library:
+            return self.coordinator.yoto_client.library[card_id].cover_image_large
+        return None
 
     @property
     def media_position(self) -> int | None:
         """Return the current position of the playback."""
-        return self.player.track_position
+        return self.player.last_event.position
 
     @property
     def media_content_id(self) -> str | None:
         """Return the current media content ID."""
-        if self.player.card_id and self.player.chapter_key and self.player.track_key:
-            return (
-                self.player.card_id
-                + "+"
-                + self.player.chapter_key
-                + "+"
-                + self.player.track_key
-            )
-        else:
-            return None
+        event = self.player.last_event
+        if event.card_id and event.chapter_key and event.track_key:
+            return event.card_id + "+" + event.chapter_key + "+" + event.track_key
+        return None
 
     @property
     def media_title(self) -> str | None:
         """Return the current media title."""
-        if self.player.chapter_title == self.player.track_title:
-            return self.player.chapter_title
-        elif self.player.chapter_title and self.player.track_title:
-            return self.player.chapter_title + " - " + self.player.track_title
-        else:
-            return self.player.chapter_title
+        event = self.player.last_event
+        if event.chapter_title == event.track_title:
+            return event.chapter_title
+        if event.chapter_title and event.track_title:
+            return event.chapter_title + " - " + event.track_title
+        return event.chapter_title
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return device specific state attributes."""
         state_attributes: dict[str, Any] = {}
-        if self.player.card_id and self.player.chapter_key:
-            if (
-                self.player.card_id in self.coordinator.yoto_manager.library
-                and self.coordinator.yoto_manager.library[self.player.card_id].chapters
-            ):
-                if (
-                    self.player.chapter_key
-                    in self.coordinator.yoto_manager.library[
-                        self.player.card_id
-                    ].chapters
-                ):
-                    if (
-                        self.player.track_key
-                        in self.coordinator.yoto_manager.library[self.player.card_id]
-                        .chapters[self.player.chapter_key]
-                        .tracks
-                    ):
-                        if (
-                            self.coordinator.yoto_manager.library[self.player.card_id]
-                            .chapters[self.player.chapter_key]
-                            .icon
-                        ):
-                            state_attributes["media_chapter_icon"] = (
-                                self.coordinator.yoto_manager.library[
-                                    self.player.card_id
-                                ]
-                                .chapters[self.player.chapter_key]
-                                .icon
-                            )
-                        if (
-                            self.coordinator.yoto_manager.library[self.player.card_id]
-                            .chapters[self.player.chapter_key]
-                            .tracks[self.player.track_key]
-                            .icon
-                        ):
-                            state_attributes["media_track_icon"] = (
-                                self.coordinator.yoto_manager.library[
-                                    self.player.card_id
-                                ]
-                                .chapters[self.player.chapter_key]
-                                .tracks[self.player.track_key]
-                                .icon
-                            )
+        event = self.player.last_event
+        if not event.card_id or not event.chapter_key:
+            return state_attributes
+        card = self.coordinator.yoto_client.library.get(event.card_id)
+        if card is None or not card.chapters:
+            return state_attributes
+        chapter = card.chapters.get(event.chapter_key)
+        if chapter is None:
+            return state_attributes
+        if chapter.icon:
+            state_attributes["media_chapter_icon"] = chapter.icon
+        track = (chapter.tracks or {}).get(event.track_key)
+        if track is not None and track.icon:
+            state_attributes["media_track_icon"] = track.icon
         return state_attributes

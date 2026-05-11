@@ -23,9 +23,9 @@ class YotoEntity(CoordinatorEntity):
         return DeviceInfo(
             identifiers={(DOMAIN, self.player.id)},
             manufacturer="Yoto",
-            model=self.player.device_type,
+            model=self.player.info.device_type,
             name=self.player.name,
-            sw_version=self.player.firmware_version,
+            sw_version=self.player.info.firmware_version,
         )
 
     @callback

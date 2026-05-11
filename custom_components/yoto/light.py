@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from typing import Final
 
 from homeassistant.components.light import (
@@ -15,27 +17,59 @@ from homeassistant.components.light import (
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from yoto_api import YotoPlayer
+from yoto_api import YotoPlayer, caps_for
 
 from .const import DOMAIN
-from .coordinator import YotoConfigEntry
+from .coordinator import YotoConfigEntry, YotoDataUpdateCoordinator
 from .entity import YotoEntity
-from .utils import rgetattr
 
 _LOGGER = logging.getLogger(__name__)
 
-SENSOR_DESCRIPTIONS: Final[tuple[LightEntityDescription, ...]] = (
-    LightEntityDescription(
+
+@dataclass(frozen=True, kw_only=True)
+class YotoLightEntityDescription(LightEntityDescription):
+    """Yoto light entity."""
+
+    value: Callable[[YotoPlayer], str | None]
+    setter: Callable[[YotoDataUpdateCoordinator, YotoPlayer, str], Awaitable[None]]
+
+
+LIGHT_DESCRIPTIONS: Final[tuple[YotoLightEntityDescription, ...]] = (
+    YotoLightEntityDescription(
         key="config.day_ambient_colour",
         translation_key="day_ambient_colour",
+        value=lambda p: p.info.config.day_ambient_colour,
+        setter=lambda c, p, color: c.async_set_player_config(
+            p.id, day_ambient_colour=color
+        ),
         entity_category=EntityCategory.CONFIG,
     ),
-    LightEntityDescription(
+    YotoLightEntityDescription(
         key="config.night_ambient_colour",
         translation_key="night_ambient_colour",
+        value=lambda p: p.info.config.night_ambient_colour,
+        setter=lambda c, p, color: c.async_set_player_config(
+            p.id, night_ambient_colour=color
+        ),
         entity_category=EntityCategory.CONFIG,
     ),
 )
+
+
+def _parse_hex(value: str | None) -> tuple[int, int, int] | None:
+    if value is None:
+        return None
+    hex_val = value.lstrip("#")
+    if len(hex_val) != 6:
+        return None
+    try:
+        return (
+            int(hex_val[0:2], 16),
+            int(hex_val[2:4], 16),
+            int(hex_val[4:6], 16),
+        )
+    except ValueError:
+        return None
 
 
 async def async_setup_entry(
@@ -43,73 +77,91 @@ async def async_setup_entry(
     config_entry: YotoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up sensor platform."""
+    """Set up light platform."""
     coordinator = config_entry.runtime_data
     entities: list[YotoLight] = []
-    for player_id in coordinator.yoto_manager.players.keys():
-        player: YotoPlayer = coordinator.yoto_manager.players[player_id]
-        for description in SENSOR_DESCRIPTIONS:
-            if rgetattr(player, description.key) is not None:
+    for player_id in coordinator.yoto_client.players.keys():
+        player: YotoPlayer = coordinator.yoto_client.players[player_id]
+        if not caps_for(player.device).has_ambient_light:
+            continue
+        for description in LIGHT_DESCRIPTIONS:
+            if description.value(player) is not None:
                 entities.append(YotoLight(coordinator, description, player))
     async_add_entities(entities)
 
 
 class YotoLight(LightEntity, YotoEntity):
-    """Yoto sensor class."""
+    """Yoto light entity.
+
+    Yoto stores ambient colour as a single hex RGB string where brightness
+    is folded into the channel values (`"#400000"` is a dim red). HA
+    prefers a separated model: `rgb_color` normalised so the max channel
+    is 255, plus an independent `brightness`. We translate between the
+    two on read and write.
+    """
+
+    entity_description: YotoLightEntityDescription
+    _attr_color_mode = ColorMode.RGB
+    _attr_supported_color_modes = {ColorMode.RGB}
 
     def __init__(
-        self, coordinator, description: LightEntityDescription, player: YotoPlayer
+        self,
+        coordinator,
+        description: YotoLightEntityDescription,
+        player: YotoPlayer,
     ) -> None:
-        """Initialize the sensor."""
         super().__init__(coordinator, player)
-        self._description = description
-        self._key = self._description.key
-        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
-        self._attr_translation_key = self._description.translation_key
-        self._attr_entity_category = description.entity_category
+        self.entity_description = description
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_{description.key}"
 
     @property
-    def color_mode(self) -> ColorMode:
-        """Return the color mode."""
-        return ColorMode.RGB
-
-    @property
-    def supported_color_modes(self) -> list[ColorMode]:
-        """Return the color modes the sensor supports."""
-        return [ColorMode.RGB]
-
-    @property
-    def rgb_color(self) -> tuple[int, int, int]:
-        """Return the RGB color"""
-        hex_val = rgetattr(self.player, self._key).lstrip("#")
-        rgb_val = tuple(int(hex_val[i : i + 2], 16) for i in (0, 2, 4))
-        return rgb_val
+    def _rgb_raw(self) -> tuple[int, int, int] | None:
+        return _parse_hex(self.entity_description.value(self.player))
 
     @property
     def is_on(self) -> bool:
-        """Return if the light is on."""
-        status = rgetattr(self.player, self._key)
-        if status != "#0":
-            return True
-        else:
-            return False
+        rgb = self._rgb_raw
+        return rgb is not None and max(rgb) > 0
+
+    @property
+    def brightness(self) -> int | None:
+        rgb = self._rgb_raw
+        return max(rgb) if rgb is not None else None
+
+    @property
+    def rgb_color(self) -> tuple[int, int, int] | None:
+        rgb = self._rgb_raw
+        if rgb is None:
+            return None
+        peak = max(rgb)
+        if peak == 0:
+            return (0, 0, 0)
+        return tuple(round(c * 255 / peak) for c in rgb)
 
     async def async_turn_off(self, **kwargs) -> None:
-        """Turn device off."""
-        await self.coordinator.async_set_light(self.player.id, self._key, "#0")
-        self.async_write_ha_state()
+        await self._write("#0")
 
     async def async_turn_on(self, **kwargs) -> None:
-        """Turn device on."""
-        _LOGGER.debug(f"{DOMAIN} - Turn on light Args: {kwargs}")
         if ATTR_RGB_COLOR in kwargs:
-            rgb = kwargs[ATTR_RGB_COLOR]
-            hex_color = "#%02x%02x%02x" % rgb
-        elif ATTR_BRIGHTNESS in kwargs:
-            # Placeholder for now.  Not sure we can use this yet. Need to see how my v3 handles dimmed rgb values
-            # brightness = kwargs[ATTR_BRIGHTNESS]
-            hex_color = "#ffffff"
+            r, g, b = kwargs[ATTR_RGB_COLOR]
+        elif (current := self.rgb_color) is not None:
+            r, g, b = current
         else:
-            hex_color = "#ffffff"
-        await self.coordinator.async_set_light(self.player.id, self._key, hex_color)
+            r = g = b = 255
+        if ATTR_BRIGHTNESS in kwargs:
+            brightness = kwargs[ATTR_BRIGHTNESS]
+        elif (current_brightness := self.brightness):
+            brightness = current_brightness
+        else:
+            brightness = 255
+        scale = brightness / 255
+        hex_color = "#%02x%02x%02x" % (
+            round(r * scale),
+            round(g * scale),
+            round(b * scale),
+        )
+        await self._write(hex_color)
+
+    async def _write(self, hex_color: str) -> None:
+        await self.entity_description.setter(self.coordinator, self.player, hex_color)
         self.async_write_ha_state()
