@@ -63,7 +63,9 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             except YotoError as err:
                 _LOGGER.debug(
                     "%s - request_status_push failed for %s: %s",
-                    DOMAIN, player_id, err,
+                    DOMAIN,
+                    player_id,
+                    err,
                 )
 
     async def _async_update_data(self) -> dict | None:
