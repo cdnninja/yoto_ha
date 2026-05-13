@@ -10,7 +10,8 @@ from typing import Any
 from homeassistant import config_entries
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigFlowResult
 from homeassistant.exceptions import HomeAssistantError
-from yoto_api import YotoManager
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from yoto_api import YotoClient
 
 from .const import CONF_TOKEN, DOMAIN
 
@@ -23,7 +24,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 3
     login_task: asyncio.Task | None = None
     token = None
-    ym: YotoManager | None = None
+    ym: YotoClient | None = None
 
     async def async_step_reauth(
         self, entry_data: Mapping[str, Any]
@@ -47,27 +48,25 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if self.ym is None:
             _LOGGER.debug("Initiating device activation")
-            self.ym = await self.hass.async_add_executor_job(
-                YotoManager, "KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult"
+            self.ym = YotoClient(
+                client_id="KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult",
+                session=async_get_clientsession(self.hass),
             )
-            assert self.ym is not None
-            urlObject = await self.hass.async_add_executor_job(
-                self.ym.device_code_flow_start
-            )
+            urlObject = await self.ym.device_code_flow_start()
             yoto_device_url = urlObject["verification_uri_complete"]
 
         async def _wait_for_login() -> None:
             """Wait for the user to login and validate the resulting token."""
             assert self.ym is not None
             _LOGGER.debug("Waiting for device activation")
-            await self.hass.async_add_executor_job(self.ym.device_code_flow_complete)
+            await self.ym.device_code_flow_complete()
 
             if self.ym.token is None:
                 raise HomeAssistantError("Device activation failed")
 
             # Validate the token by hitting the players endpoint. Surfaces a
             # bad/expired token before the entry is created.
-            await self.hass.async_add_executor_job(self.ym.update_players_status)
+            await self.ym.update_player_list()
             if not self.ym.players:
                 raise HomeAssistantError("No Yoto players found on this account")
 

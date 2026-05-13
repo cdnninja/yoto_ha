@@ -1,8 +1,10 @@
-"""Sensor for Yoto integration."""
+"""Number entities for Yoto integration."""
 
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from typing import Final
 
 from homeassistant.components.number import (
@@ -16,55 +18,73 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from yoto_api import YotoPlayer
 
 from .const import DOMAIN
-from .coordinator import YotoConfigEntry
+from .coordinator import YotoConfigEntry, YotoDataUpdateCoordinator
 from .entity import YotoEntity
-from .utils import rgetattr
 
 _LOGGER = logging.getLogger(__name__)
 
-SENSOR_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
-    NumberEntityDescription(
+
+@dataclass(frozen=True, kw_only=True)
+class YotoNumberEntityDescription(NumberEntityDescription):
+    """Yoto number entity."""
+
+    value: Callable[[YotoPlayer], int | None]
+    setter: Callable[[YotoDataUpdateCoordinator, YotoPlayer, int], Awaitable[None]]
+    available: Callable[[YotoPlayer], bool] | None = None
+    always_load: bool = False
+
+
+NUMBER_DESCRIPTIONS: Final[tuple[YotoNumberEntityDescription, ...]] = (
+    YotoNumberEntityDescription(
         key="config.night_max_volume_limit",
         translation_key="night_max_volume_limit",
+        value=lambda p: p.info.config.night_max_volume_limit,
+        setter=lambda c, p, v: c.async_set_player_config(
+            p.id, night_max_volume_limit=v
+        ),
         native_min_value=0,
         native_max_value=16,
         native_step=1,
         entity_category=EntityCategory.CONFIG,
     ),
-    NumberEntityDescription(
+    YotoNumberEntityDescription(
         key="config.day_max_volume_limit",
         translation_key="day_max_volume_limit",
+        value=lambda p: p.info.config.day_max_volume_limit,
+        setter=lambda c, p, v: c.async_set_player_config(p.id, day_max_volume_limit=v),
         native_min_value=0,
         native_max_value=16,
         native_step=1,
         entity_category=EntityCategory.CONFIG,
     ),
-    NumberEntityDescription(
+    YotoNumberEntityDescription(
         key="config.day_display_brightness",
         translation_key="day_display_brightness",
+        value=lambda p: p.info.config.day_display_brightness,
+        setter=lambda c, p, v: c.async_set_player_config(
+            p.id, day_display_brightness=v
+        ),
+        available=lambda p: not p.info.config.day_display_brightness_auto,
+        always_load=True,
         native_min_value=0,
         native_max_value=100,
         native_step=1,
         native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.CONFIG,
     ),
-    NumberEntityDescription(
+    YotoNumberEntityDescription(
         key="config.night_display_brightness",
         translation_key="night_display_brightness",
+        value=lambda p: p.info.config.night_display_brightness,
+        setter=lambda c, p, v: c.async_set_player_config(
+            p.id, night_display_brightness=v
+        ),
+        available=lambda p: not p.info.config.night_display_brightness_auto,
+        always_load=True,
         native_min_value=0,
         native_max_value=100,
         native_step=1,
         native_unit_of_measurement=PERCENTAGE,
-        entity_category=EntityCategory.CONFIG,
-    ),
-    NumberEntityDescription(
-        key="sleep_timer_seconds_remaining",
-        translation_key="sleep_timer",
-        device_class=NumberDeviceClass.DURATION,
-        native_min_value=0,
-        native_max_value=46500,
-        native_step=1,
-        native_unit_of_measurement=UnitOfTime.SECONDS,
         entity_category=EntityCategory.CONFIG,
     ),
 )
@@ -75,79 +95,68 @@ async def async_setup_entry(
     config_entry: YotoConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up sensor platform."""
+    """Set up number platform."""
     coordinator = config_entry.runtime_data
-    entities: list[YotoNumber] = []
-    for player_id in coordinator.yoto_manager.players.keys():
-        player: YotoPlayer = coordinator.yoto_manager.players[player_id]
-        for description in SENSOR_DESCRIPTIONS:
-            if rgetattr(player, description.key) is not None:
+    entities: list[NumberEntity] = []
+    for player_id in coordinator.yoto_client.players.keys():
+        player: YotoPlayer = coordinator.yoto_client.players[player_id]
+        for description in NUMBER_DESCRIPTIONS:
+            if description.always_load or description.value(player) is not None:
                 entities.append(YotoNumber(coordinator, description, player))
+        entities.append(YotoSleepTimerNumber(coordinator, player))
     async_add_entities(entities)
 
 
 class YotoNumber(NumberEntity, YotoEntity):
-    """Yoto sensor class."""
+    """Yoto number entity backed by a PlayerConfig field."""
+
+    entity_description: YotoNumberEntityDescription
 
     def __init__(
-        self, coordinator, description: NumberEntityDescription, player: YotoPlayer
+        self,
+        coordinator,
+        description: YotoNumberEntityDescription,
+        player: YotoPlayer,
     ) -> None:
-        """Initialize the sensor."""
         super().__init__(coordinator, player)
-        self._description = description
-        self._key = self._description.key
-        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._key}"
-        self._attr_device_class = self._description.device_class
-        self._attr_translation_key = self._description.translation_key
-        self._attr_entity_category = description.entity_category
+        self.entity_description = description
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_{description.key}"
 
     @property
     def native_value(self) -> float | None:
-        """Return the entity value to represent the entity state."""
-        if (
-            self._key == "config.day_display_brightness"
-            or self._key == "config.night_display_brightness"
-        ) and rgetattr(self.player, self._key) == "auto":
-            return 100
-        else:
-            return rgetattr(self.player, self._key)
+        raw = self.entity_description.value(self.player)
+        return float(raw) if raw is not None else None
 
     @property
-    def native_min_value(self) -> float:
-        """Return native_min_value as reported in by the sensor"""
-        return self._description.native_min_value
-
-    @property
-    def native_max_value(self) -> float:
-        """Return native_max_value as reported in by the sensor"""
-        return self._description.native_max_value
-
-    @property
-    def native_step(self) -> float:
-        """Return step value as reported in by the sensor"""
-        return self._description.native_step
-
-    @property
-    def native_unit_of_measurement(self) -> str | None:
-        """Return the unit the value was reported in by the sensor"""
-        return self._description.native_unit_of_measurement
+    def available(self) -> bool:
+        check = self.entity_description.available
+        return super().available and (check is None or check(self.player))
 
     async def async_set_native_value(self, value: float) -> None:
-        """Update the current value."""
-        if (
-            self._key == "config.day_max_volume_limit"
-            or self._key == "config.night_max_volume_limit"
-        ):
-            await self.coordinator.async_set_max_volume(
-                self.player.id, self._key, value
-            )
-        elif (
-            self._key == "config.day_display_brightness"
-            or self._key == "config.night_display_brightness"
-        ):
-            await self.coordinator.async_set_brightness(
-                self.player.id, self._key, value
-            )
-        elif self._key == "sleep_timer_seconds_remaining":
-            await self.coordinator.async_set_sleep_timer(self.player.id, value)
+        await self.entity_description.setter(self.coordinator, self.player, int(value))
+        self.async_write_ha_state()
+
+
+class YotoSleepTimerNumber(NumberEntity, YotoEntity):
+    """Number entity exposing the remaining seconds on the sleep timer."""
+
+    _attr_translation_key = "sleep_timer"
+    _attr_device_class = NumberDeviceClass.DURATION
+    _attr_native_min_value = 0
+    _attr_native_max_value = 46500
+    _attr_native_step = 1
+    _attr_native_unit_of_measurement = UnitOfTime.SECONDS
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(self, coordinator, player: YotoPlayer) -> None:
+        super().__init__(coordinator, player)
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_sleep_timer_seconds_remaining"
+
+    @property
+    def native_value(self) -> float | None:
+        remaining = self.player.last_event.sleep_timer_seconds
+        return float(remaining) if remaining is not None else None
+
+    async def async_set_native_value(self, value: float) -> None:
+        await self.coordinator.async_set_sleep_timer(self.player.id, int(value))
         self.async_write_ha_state()

@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 import logging
-from datetime import time
+from collections.abc import Callable
+from datetime import datetime
+from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from yoto_api import AuthenticationError, YotoManager, YotoPlayerConfig
+from yoto_api import AuthenticationError, YotoClient, YotoError, YotoPlayer
 
-from .const import CONF_TOKEN, DOMAIN, SCAN_INTERVAL
+from .const import CONF_TOKEN, DOMAIN, SCAN_INTERVAL, STATUS_PUSH_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,10 +29,14 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize."""
         self.platforms: set[str] = set()
         self.config_entry = config_entry
-        self.yoto_manager = YotoManager(client_id="KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult")
+        self.yoto_client = YotoClient(
+            client_id="KFLTf5PCpTh0yOuDuyQ5C3LEU9PSbult",
+            session=async_get_clientsession(hass),
+        )
+        self._status_push_unsub: Callable[[], None] | None = None
         if config_entry.data.get(CONF_TOKEN):
             _LOGGER.debug("Using stored token")
-            self.yoto_manager.set_refresh_token(config_entry.data.get(CONF_TOKEN))
+            self.yoto_client.set_refresh_token(config_entry.data.get(CONF_TOKEN))
         else:
             raise ConfigEntryAuthFailed("No token configured")
         super().__init__(
@@ -38,19 +46,39 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=SCAN_INTERVAL,
         )
 
+    @callback
+    def setup_periodic_status_push(self) -> None:
+        """Start the MQTT status push heartbeat once MQTT is connected."""
+        if self._status_push_unsub is not None:
+            return
+        self._status_push_unsub = async_track_time_interval(
+            self.hass, self._async_request_status_push, STATUS_PUSH_INTERVAL
+        )
+
+    async def _async_request_status_push(self, _now: datetime) -> None:
+        """Ask every connected player to push its current status over MQTT."""
+        if not self.yoto_client.is_mqtt_connected:
+            return
+        for player_id in list(self.yoto_client.players):
+            try:
+                await self.yoto_client.request_status_push(player_id)
+            except YotoError as err:
+                _LOGGER.debug(
+                    "%s - request_status_push failed for %s: %s",
+                    DOMAIN,
+                    player_id,
+                    err,
+                )
+
     async def _async_update_data(self) -> dict | None:
-        """Update data via library. Called by update_coordinator periodically.
-
-        Allow to update for the first time without further checking
-        """
-
+        """Update data via library. Called by update_coordinator periodically."""
         try:
             await self.async_check_and_refresh_token()
-            if self.yoto_manager.token.refresh_token != self.config_entry.data.get(
+            if self.yoto_client.token.refresh_token != self.config_entry.data.get(
                 CONF_TOKEN
             ):
                 new_data = dict(self.config_entry.data)
-                new_data[CONF_TOKEN] = self.yoto_manager.token.refresh_token
+                new_data[CONF_TOKEN] = self.yoto_client.token.refresh_token
                 _LOGGER.debug("Storing updated token")
                 self.hass.config_entries.async_update_entry(
                     self.config_entry, data=new_data
@@ -59,35 +87,40 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.error(f"Authentication error: {ex}")
             raise ConfigEntryAuthFailed
 
-        await self.hass.async_add_executor_job(self.yoto_manager.update_players_status)
-        if len(self.yoto_manager.library.keys()) == 0:
-            await self.hass.async_add_executor_job(self.yoto_manager.update_library)
-        if self.yoto_manager.mqtt_client is None:
-            await self.hass.async_add_executor_job(
-                self.yoto_manager.connect_to_events, self.api_callback
+        await self.yoto_client.refresh()
+        for player_id in list(self.yoto_client.players):
+            await self.yoto_client.update_player_status(player_id)
+        if len(self.yoto_client.library.keys()) == 0:
+            await self.yoto_client.update_library()
+        if not self.yoto_client.is_mqtt_connected:
+            await self.yoto_client.connect_events(
+                list(self.yoto_client.players),
+                on_update=self.api_callback,
             )
         return self.data
 
-    def api_callback(self) -> None:
-        """Handle API callback for media player updates."""
-        for player in self.yoto_manager.players.values():
-            if player.card_id and player.chapter_key:
-                if (
-                    player.card_id not in self.yoto_manager.library
-                    or not self.yoto_manager.library[player.card_id].chapters
-                ):
-                    self.hass.add_job(self.async_update_card_detail, player.card_id)
-                else:
-                    if (
-                        player.chapter_key
-                        not in self.yoto_manager.library[player.card_id].chapters
-                    ):
-                        self.hass.add_job(self.async_update_card_detail, player.card_id)
+    @callback
+    def api_callback(self, player: YotoPlayer) -> None:
+        """Handle MQTT updates from the library."""
+        event = player.last_event
+        if event.card_id and event.chapter_key:
+            card = self.yoto_client.library.get(event.card_id)
+            if (
+                card is None
+                or not card.chapters
+                or event.chapter_key not in card.chapters
+            ):
+                self.hass.async_create_task(
+                    self.async_update_card_detail(event.card_id)
+                )
         self.async_update_listeners()
 
     async def release(self) -> None:
         """Disconnect from API."""
-        self.yoto_manager.disconnect()
+        if self._status_push_unsub is not None:
+            self._status_push_unsub()
+            self._status_push_unsub = None
+        await self.yoto_client.disconnect_events()
 
     async def async_update_all(self) -> None:
         """Update yoto data."""
@@ -95,73 +128,32 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_check_and_refresh_token(self) -> None:
         """Refresh token if needed via library."""
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.check_and_refresh_token
-        )
+        await self.yoto_client.check_and_refresh_token()
 
     async def async_pause_player(self, player_id: str) -> None:
         """Pause playback on the player."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.pause_player, player_id
-        )
+        await self.yoto_client.pause(player_id)
 
     async def async_resume_player(self, player_id: str) -> None:
         """Resume playback on the player."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.resume_player, player_id
-        )
+        await self.yoto_client.resume(player_id)
 
     async def async_stop_player(self, player_id: str) -> None:
         """Stop playback on the player."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(self.yoto_manager.stop_player, player_id)
+        await self.yoto_client.stop(player_id)
 
-    async def async_set_time(self, player_id: str, key: str, value: time) -> None:
-        """Set time for day/night mode."""
+    async def async_set_player_config(self, player_id: str, **fields: Any) -> None:
+        """Update PlayerConfig fields on the device. Pass v3 field names."""
         await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
-        if key == "day_mode_time":
-            config.day_mode_time = value
-        if key == "night_mode_time":
-            config.night_mode_time = value
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.set_player_config, player_id, config
-        )
-
-    async def async_set_max_volume(self, player_id: str, key: str, value: int) -> None:
-        """Set maximum volume for day/night mode."""
-        await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
-        if key == "config.night_max_volume_limit":
-            config.night_max_volume_limit = int(value)
-        if key == "config.day_max_volume_limit":
-            config.day_max_volume_limit = int(value)
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.set_player_config, player_id, config
-        )
-
-    async def async_set_brightness(self, player_id: str, key: str, value: str) -> None:
-        """Set display brightness for day/night mode."""
-        await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
-        if (
-            key == "config.night_display_brightness"
-            or key == "night_display_brightness"
-        ):
-            if value == "auto":
-                config.night_display_brightness = value
-            else:
-                config.night_display_brightness = int(value)
-        if key == "config.day_display_brightness" or key == "day_display_brightness":
-            if value == "auto":
-                config.day_display_brightness = value
-            else:
-                config.day_display_brightness = int(value)
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.set_player_config, player_id, config
-        )
+        await self.yoto_client.set_player_config(player_id, **fields)
+        # The lib doesn't mirror PlayerConfig writes back onto the local
+        # player.info.config, so refetch /config to surface the new value
+        # before the next 5-minute poll tick.
+        await self.yoto_client.update_player_info(player_id)
+        self.async_update_listeners()
 
     async def async_play_card(
         self,
@@ -174,83 +166,53 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> None:
         """Play a card on the player."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.play_card,
+        await self.yoto_client.play_card(
             player_id,
             cardid,
-            secondsin,
-            cutoff,
-            chapter,
-            trackkey,
+            seconds_in=secondsin,
+            cutoff=cutoff,
+            chapter_key=str(chapter) if chapter is not None else None,
+            track_key=str(trackkey) if trackkey is not None else None,
         )
 
     async def async_seek(self, player_id: str, position: int) -> None:
         """Seek to a position in the current track."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.seek, player_id, position
-        )
+        await self.yoto_client.seek(player_id, position)
 
     async def async_next_track(self, player_id: str) -> None:
         """Skip to the next track."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(self.yoto_manager.next_track, player_id)
+        await self.yoto_client.next_track(player_id)
 
     async def async_previous_track(self, player_id: str) -> None:
         """Skip to the previous track."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.previous_track, player_id
-        )
+        await self.yoto_client.previous_track(player_id)
 
     async def async_set_volume(self, player_id: str, volume: float) -> None:
         """Set player volume level."""
-        volume = volume * 100
-        volume = int(round(volume, 0))
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.set_volume, player_id, volume
-        )
+        await self.yoto_client.set_volume(player_id, int(round(volume * 100, 0)))
 
     async def async_set_sleep_timer(self, player_id: str, time: int) -> None:
         """Set sleep timer on the player."""
         await self.async_check_and_refresh_token()
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.set_sleep, player_id, int(time)
-        )
-
-    async def async_set_light(self, player_id: str, key: str, color: str) -> None:
-        """Set light color for day/night ambient mode."""
-        await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
-        if key == "config.day_ambient_colour":
-            config.day_ambient_colour = color
-        elif key == "config.night_ambient_colour":
-            config.night_ambient_colour = color
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.set_player_config, player_id, config
-        )
+        await self.yoto_client.set_sleep_timer(player_id, int(time))
 
     async def async_enable_disable_alarm(
         self, player_id: str, alarm: int, enable: bool
     ) -> None:
         """Enable or disable an alarm."""
         await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
-        config.alarms = self.yoto_manager.players[player_id].config.alarms
-        config.alarms[alarm].enabled = enable
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.set_player_config, player_id, config
-        )
+        await self.yoto_client.set_alarm_enabled(player_id, alarm, enable)
 
     async def async_update_card_detail(self, cardId: str) -> None:
         """Get chapter and titles for the card"""
         _LOGGER.debug(f"{DOMAIN} - Updating Card details for:  {cardId}")
-        await self.hass.async_add_executor_job(
-            self.yoto_manager.update_card_detail, cardId
-        )
+        await self.yoto_client.update_card_detail(cardId)
 
     async def async_update_library(self) -> None:
         """Update library details."""
         _LOGGER.debug(f"{DOMAIN} - Updating library details")
-        await self.hass.async_add_executor_job(self.yoto_manager.update_library)
+        await self.yoto_client.update_library()
