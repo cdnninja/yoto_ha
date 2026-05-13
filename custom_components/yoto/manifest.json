@@ -9,7 +9,7 @@
   "issue_tracker": "https://github.com/cdnninja/yoto_ha/issues",
   "loggers": ["yoto", "yoto_api", "paho_mqtt"],
   "requirements": [
-    "yoto-api @ git+https://github.com/piitaya/yoto_api.git@837ba5b19fa9ec4d4273fd06dfaab03dde0f2f0e"
+    "yoto-api @ git+https://github.com/piitaya/yoto_api.git@ae9a538427292131446b797414cb76d7e472f4b6"
   ],
   "version": "3.2.1"
 }

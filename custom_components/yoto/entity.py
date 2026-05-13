@@ -1,6 +1,5 @@
 """Base entity for Yoto integration."""
 
-from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -27,10 +26,3 @@ class YotoEntity(CoordinatorEntity):
             name=self.player.name,
             sw_version=self.player.info.firmware_version,
         )
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        # Coordinator's api_callback fires from the paho-mqtt thread, so route
-        # the state write through the thread-safe scheduler instead of the
-        # default async_write_ha_state.
-        self.schedule_update_ha_state()
