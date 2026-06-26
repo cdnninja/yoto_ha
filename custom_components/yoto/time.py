@@ -1,7 +1,9 @@
-"""Time for Yoto integration."""
+"""Time entities for Yoto integration."""
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from datetime import time
 from typing import Final
 
@@ -15,15 +17,28 @@ from .const import DOMAIN
 from .coordinator import YotoConfigEntry, YotoDataUpdateCoordinator
 from .entity import YotoEntity
 
-TIME_DESCRIPTIONS: Final[tuple[TimeEntityDescription, ...]] = (
-    TimeEntityDescription(
+
+@dataclass(frozen=True, kw_only=True)
+class YotoTimeEntityDescription(TimeEntityDescription):
+    """Yoto time entity."""
+
+    value: Callable[[YotoPlayer], time | None]
+    setter: Callable[[YotoDataUpdateCoordinator, YotoPlayer, time], Awaitable[None]]
+
+
+TIME_DESCRIPTIONS: Final[tuple[YotoTimeEntityDescription, ...]] = (
+    YotoTimeEntityDescription(
         key="day_mode_time",
         translation_key="day_mode_time",
+        value=lambda p: p.info.config.day_time,
+        setter=lambda c, p, v: c.async_set_player_config(p.id, day_time=v),
         entity_category=EntityCategory.CONFIG,
     ),
-    TimeEntityDescription(
+    YotoTimeEntityDescription(
         key="night_mode_time",
         translation_key="night_mode_time",
+        value=lambda p: p.info.config.night_time,
+        setter=lambda c, p, v: c.async_set_player_config(p.id, night_time=v),
         entity_category=EntityCategory.CONFIG,
     ),
 )
@@ -37,10 +52,10 @@ async def async_setup_entry(
     """Set up time platform."""
     coordinator = config_entry.runtime_data
     entities: list[YotoTime] = []
-    for player_id in coordinator.yoto_manager.players.keys():
-        player: YotoPlayer = coordinator.yoto_manager.players[player_id]
+    for player_id in coordinator.yoto_client.players.keys():
+        player: YotoPlayer = coordinator.yoto_client.players[player_id]
         for description in TIME_DESCRIPTIONS:
-            if getattr(player.config, description.key, None) is not None:
+            if description.value(player) is not None:
                 entities.append(YotoTime(coordinator, description, player))
     async_add_entities(entities)
 
@@ -48,26 +63,22 @@ async def async_setup_entry(
 class YotoTime(TimeEntity, YotoEntity):
     """Yoto time entity."""
 
+    entity_description: YotoTimeEntityDescription
+
     def __init__(
         self,
-        coordinator: YotoDataUpdateCoordinator,
-        description: TimeEntityDescription,
+        coordinator,
+        description: YotoTimeEntityDescription,
         player: YotoPlayer,
     ) -> None:
-        """Initialize the sensor."""
         super().__init__(coordinator, player)
-        self._description = description
-        self._key = self._description.key
-        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._description.key}"
-        self._attr_translation_key = self._description.translation_key
-        self._attr_entity_category = description.entity_category
+        self.entity_description = description
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_{description.key}"
 
     @property
     def native_value(self) -> time | None:
-        """Return the value reported by the sensor."""
-        return getattr(self.player.config, self._key)
+        return self.entity_description.value(self.player)
 
     async def async_set_value(self, value: time) -> None:
-        """Update the current time."""
-        await self.coordinator.async_set_time(self.player.id, self._key, value)
+        await self.entity_description.setter(self.coordinator, self.player, value)
         self.async_write_ha_state()
