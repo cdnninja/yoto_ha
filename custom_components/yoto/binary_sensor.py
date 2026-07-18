@@ -15,7 +15,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from yoto_api import YotoPlayer
+from yoto_api import DayMode, YotoPlayer, caps_for
 
 from .const import DOMAIN
 from .coordinator import YotoConfigEntry, YotoDataUpdateCoordinator
@@ -28,55 +28,69 @@ _LOGGER = logging.getLogger(__name__)
 class YotoBinarySensorEntityDescription(BinarySensorEntityDescription):
     """A class that describes custom binary sensor entities."""
 
-    is_on: Callable[[YotoPlayer], bool] | None = None
+    value: Callable[[YotoPlayer], bool | None] | None = None
+    requires_ambient_light: bool = False
+
+
+def _day_mode_on(player: YotoPlayer) -> bool | None:
+    day_mode = player.status.day_mode
+    if day_mode is None or day_mode == DayMode.UNKNOWN:
+        return None
+    return day_mode == DayMode.DAY
+
+
+def _night_light_on(player: YotoPlayer) -> bool | None:
+    mode = player.status.nightlight_mode
+    return None if mode is None else mode != "off"
 
 
 SENSOR_DESCRIPTIONS: Final[tuple[YotoBinarySensorEntityDescription, ...]] = (
     YotoBinarySensorEntityDescription(
         key="online",
         translation_key="online",
-        is_on=lambda player: player.online,
+        value=lambda player: player.status.is_online,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="day_mode_on",
         translation_key="day_mode_on",
-        is_on=lambda player: player.day_mode_on,
+        value=_day_mode_on,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="bluetooth_audio_connected",
         translation_key="bluetooth_audio_connected",
-        is_on=lambda player: player.bluetooth_audio_connected,
+        value=lambda player: player.status.is_bluetooth_audio_connected,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="charging",
         translation_key="charging",
-        is_on=lambda player: player.charging,
+        value=lambda player: player.status.is_charging,
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="audio_device_connected",
         translation_key="audio_device_connected",
-        is_on=lambda player: player.audio_device_connected,
+        value=lambda player: player.status.is_audio_device_connected,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="sleep_timer_active",
         translation_key="sleep_timer_active",
-        is_on=lambda player: player.sleep_timer_active,
+        value=lambda player: bool(player.last_event.sleep_timer_active),
         device_class=BinarySensorDeviceClass.RUNNING,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     YotoBinarySensorEntityDescription(
         key="night_light_mode",
         translation_key="night_light_mode",
-        is_on=lambda player: player.night_light_mode != "off",
+        value=_night_light_on,
+        requires_ambient_light=True,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
 )
@@ -90,16 +104,21 @@ async def async_setup_entry(
     """Set up binary_sensor platform."""
     coordinator = config_entry.runtime_data
     entities: list[YotoBinarySensor] = []
-    for player_id in coordinator.yoto_manager.players.keys():
-        player: YotoPlayer = coordinator.yoto_manager.players[player_id]
+    for player_id in coordinator.yoto_client.players.keys():
+        player: YotoPlayer = coordinator.yoto_client.players[player_id]
+        caps = caps_for(player.device)
         for description in SENSOR_DESCRIPTIONS:
-            if getattr(player, description.key, None) is not None:
+            if description.requires_ambient_light and not caps.has_ambient_light:
+                continue
+            if description.value is not None and description.value(player) is not None:
                 entities.append(YotoBinarySensor(coordinator, description, player))
     async_add_entities(entities)
 
 
 class YotoBinarySensor(BinarySensorEntity, YotoEntity):
     """Yoto binary sensor class."""
+
+    entity_description: YotoBinarySensorEntityDescription
 
     def __init__(
         self,
@@ -109,15 +128,11 @@ class YotoBinarySensor(BinarySensorEntity, YotoEntity):
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, player)
-        self._description = description
-        self._attr_unique_id = f"{DOMAIN}_{player.id}_{self._description.key}"
-        self._attr_device_class = self._description.device_class
-        self._attr_entity_category = self._description.entity_category
-        self._attr_translation_key = self._description.translation_key
+        self.entity_description = description
+        self._attr_unique_id = f"{DOMAIN}_{player.id}_{description.key}"
 
     @property
     def is_on(self) -> bool | None:
         """Return true if the binary sensor is on."""
-        if self._description.is_on is not None:
-            return self._description.is_on(self.player)
-        return None
+        value = self.entity_description.value
+        return value(self.player) if value is not None else None

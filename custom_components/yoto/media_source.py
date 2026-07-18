@@ -32,22 +32,22 @@ class YotoMediaSource(MediaSource):
     async def async_resolve_media(self, item: MediaSourceItem) -> PlayMedia:
         """Provides the URL to play the media."""
         cardid, chapterid, trackid, time = split_media_id(item.identifier)
-        if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
+        if len(self.coordinator.yoto_client.library[cardid].chapters.keys()) == 0:
             await self.coordinator.async_update_card_detail(cardid)
         if chapterid is None:
             chapterid = next(
-                iter(self.coordinator.yoto_manager.library[cardid].chapters)
+                iter(self.coordinator.yoto_client.library[cardid].chapters)
             )
         if trackid is None:
             trackid = next(
                 iter(
-                    self.coordinator.yoto_manager.library[cardid]
+                    self.coordinator.yoto_client.library[cardid]
                     .chapters[chapterid]
                     .tracks
                 )
             )
         track = (
-            self.coordinator.yoto_manager.library[cardid]
+            self.coordinator.yoto_client.library[cardid]
             .chapters[chapterid]
             .tracks[trackid]
         )
@@ -83,7 +83,7 @@ class YotoMediaSource(MediaSource):
     async def async_convert_library_to_browse_media(self) -> BrowseMediaSource:
         """Build media source for the library."""
         children = []
-        for item in self.coordinator.yoto_manager.library.values():
+        for item in self.coordinator.yoto_client.library.values():
             children.append(
                 BrowseMediaSource(
                     domain=DOMAIN,
@@ -113,9 +113,9 @@ class YotoMediaSource(MediaSource):
     ) -> BrowseMediaSource:
         children = []
 
-        if len(self.coordinator.yoto_manager.library[cardid].chapters.keys()) == 0:
+        if len(self.coordinator.yoto_client.library[cardid].chapters.keys()) == 0:
             await self.coordinator.async_update_card_detail(cardid)
-        for item in self.coordinator.yoto_manager.library[cardid].chapters.values():
+        for item in self.coordinator.yoto_client.library[cardid].chapters.values():
             _LOGGER.debug(f"{DOMAIN} - Chapter processing:  {item}")
             children.append(
                 BrowseMediaSource(
@@ -134,7 +134,7 @@ class YotoMediaSource(MediaSource):
             identifier=cardid,
             media_class=MediaClass.MUSIC,
             media_content_type=MediaType.MUSIC,
-            title=self.coordinator.yoto_manager.library[cardid].title,
+            title=self.coordinator.yoto_client.library[cardid].title,
             can_expand=False,
             can_play=True,
             children=children,
@@ -146,9 +146,9 @@ class YotoMediaSource(MediaSource):
     ) -> BrowseMediaSource:
         """Build media source for tracks of a chapter."""
         children = []
-        if self.coordinator.yoto_manager.library[cardid].chapters[chapterid].tracks:
+        if self.coordinator.yoto_client.library[cardid].chapters[chapterid].tracks:
             for item in (
-                self.coordinator.yoto_manager.library[cardid]
+                self.coordinator.yoto_client.library[cardid]
                 .chapters[chapterid]
                 .tracks.values()
             ):
@@ -169,7 +169,7 @@ class YotoMediaSource(MediaSource):
             identifier=cardid,
             media_class=MediaClass.MUSIC,
             media_content_type=MediaType.MUSIC,
-            title=self.coordinator.yoto_manager.library[cardid]
+            title=self.coordinator.yoto_client.library[cardid]
             .chapters[chapterid]
             .title,
             can_expand=False,

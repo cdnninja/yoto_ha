@@ -8,6 +8,12 @@ DOMAIN: str = "yoto"
 # disconnect event, so polling is what surfaces the online -> offline transition.
 SCAN_INTERVAL = timedelta(minutes=5)
 
+# Yoto only emits a `data/status` MQTT message in response to a
+# `command/status/request` publish. The lib fires one on connect and after
+# writes; this heartbeat refreshes MQTT-only fields (battery, charging,
+# brightness, ambient sensor...) between user actions.
+STATUS_PUSH_INTERVAL = timedelta(seconds=60)
+
 DYNAMIC_UNIT: str = "dynamic_unit"
 
 CONF_TOKEN = "token"
