@@ -118,10 +118,22 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
         await self.async_check_and_refresh_token()
         await self.hass.async_add_executor_job(self.yoto_manager.stop_player, player_id)
 
+    def _get_day_night_config(self, player_id: str) -> YotoPlayerConfig:
+        """Return the complete day/night config for a player."""
+        current_config = self.yoto_manager.players[player_id].config
+        return YotoPlayerConfig(
+            day_mode_time=current_config.day_mode_time,
+            day_ambient_colour=current_config.day_ambient_colour,
+            day_max_volume_limit=current_config.day_max_volume_limit,
+            night_mode_time=current_config.night_mode_time,
+            night_ambient_colour=current_config.night_ambient_colour,
+            night_max_volume_limit=current_config.night_max_volume_limit,
+        )
+
     async def async_set_time(self, player_id: str, key: str, value: time) -> None:
         """Set time for day/night mode."""
         await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
+        config = self._get_day_night_config(player_id)
         if key == "day_mode_time":
             config.day_mode_time = value
         if key == "night_mode_time":
@@ -133,7 +145,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_set_max_volume(self, player_id: str, key: str, value: int) -> None:
         """Set maximum volume for day/night mode."""
         await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
+        config = self._get_day_night_config(player_id)
         if key == "config.night_max_volume_limit":
             config.night_max_volume_limit = int(value)
         if key == "config.day_max_volume_limit":
@@ -222,7 +234,7 @@ class YotoDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_set_light(self, player_id: str, key: str, color: str) -> None:
         """Set light color for day/night ambient mode."""
         await self.async_check_and_refresh_token()
-        config = YotoPlayerConfig()
+        config = self._get_day_night_config(player_id)
         if key == "config.day_ambient_colour":
             config.day_ambient_colour = color
         elif key == "config.night_ambient_colour":
