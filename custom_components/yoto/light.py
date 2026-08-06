@@ -79,11 +79,21 @@ class YotoLight(LightEntity, YotoEntity):
         return [ColorMode.RGB]
 
     @property
-    def rgb_color(self) -> tuple[int, int, int]:
-        """Return the RGB color"""
-        hex_val = rgetattr(self.player, self._key).lstrip("#")
-        rgb_val = tuple(int(hex_val[i : i + 2], 16) for i in (0, 2, 4))
-        return rgb_val
+    def rgb_color(self) -> tuple[int, int, int] | None:
+        """Return the RGB color."""
+        raw = rgetattr(self.player, self._key)
+        if not isinstance(raw, str):
+            return None
+        hex_val = raw.lstrip("#")
+        if len(hex_val) != 6:
+            # The player reports "#0" while the ambient light is off, so there
+            # is no color to report.
+            return None
+        return (
+            int(hex_val[0:2], 16),
+            int(hex_val[2:4], 16),
+            int(hex_val[4:6], 16),
+        )
 
     @property
     def is_on(self) -> bool:
