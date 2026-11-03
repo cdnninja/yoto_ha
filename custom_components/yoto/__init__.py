@@ -36,6 +36,16 @@ PLATFORMS: list[str] = [
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Yoto component."""
+    _LOGGER.warning(
+        "The Yoto custom integration is deprecated and will no longer receive "
+        "updates. Yoto is now a core Home Assistant integration (2026.6 and "
+        "newer). To migrate, delete the Yoto integration under Settings -> "
+        "Devices & services, remove the custom integration from HACS (or "
+        "delete custom_components/yoto), restart Home Assistant, and add the "
+        "core Yoto integration. Instructions: "
+        "https://github.com/cdnninja/yoto_ha#migrating-to-the-core-yoto-integration "
+        "- Core docs: https://www.home-assistant.io/integrations/yoto"
+    )
     async_setup_services(hass)
     return True
 
