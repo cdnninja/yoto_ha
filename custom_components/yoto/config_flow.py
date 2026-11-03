@@ -24,6 +24,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     login_task: asyncio.Task | None = None
     token = None
     ym: YotoManager | None = None
+    yoto_device_url: str | None = None
 
     async def async_step_reauth(
         self, entry_data: Mapping[str, Any]
@@ -54,7 +55,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             urlObject = await self.hass.async_add_executor_job(
                 self.ym.device_code_flow_start
             )
-            yoto_device_url = urlObject["verification_uri_complete"]
+            self.yoto_device_url = urlObject["verification_uri_complete"]
 
         async def _wait_for_login() -> None:
             """Wait for the user to login and validate the resulting token."""
@@ -88,7 +89,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             progress_action="wait_for_device",
             description_placeholders={
-                "url": yoto_device_url,
+                "url": self.yoto_device_url,
             },
             progress_task=self.login_task,
         )
